@@ -101,6 +101,34 @@ export const sessions = [
   },
   {
     id: 's6',
+    day: 1,
+    start: '14:15',
+    end: '15:15',
+    title: 'Workshop — Prompting for Advisers',
+    kind: 'WORKSHOP',
+    room: 'Harbour Room',
+    speakerIds: ['lindqvist'],
+    summary: 'Practical prompting patterns for advice work.',
+  },
+  {
+    id: 'e1',
+    day: 1,
+    start: '18:30',
+    end: '22:00',
+    title: 'Welcome Dinner',
+    kind: 'SOCIAL',
+    room: 'The Glass House',
+    speakerIds: [],
+    summary: 'Conference welcome dinner — all attendees.',
+    venue: {
+      name: 'The Glass House',
+      address: 'Brooke Street Pier, Hobart TAS 7000',
+      mapUrl: 'https://maps.google.com/?q=The+Glass+House+Brooke+Street+Pier+Hobart',
+      dress: 'Smart casual',
+    },
+  },
+  {
+    id: 's7',
     day: 2,
     start: '09:30',
     end: '10:30',
@@ -111,6 +139,22 @@ export const sessions = [
     summary: 'Real PGW practices, real tools, real results.',
   },
 ]
+
+/** Next social event (dinner etc) for the "Tonight" tile. */
+export function nextSocial() {
+  return sessions.find((s) => s.kind === 'SOCIAL')
+}
+
+/** Sessions after the given wall-clock minute, day 1, in order. */
+export function upcomingAfter(nowMin, limit = 3) {
+  const toMin = (t) => {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+  return sessions
+    .filter((s) => s.day === 1 && s.kind !== 'BREAK' && toMin(s.start) > nowMin)
+    .slice(0, limit)
+}
 
 export const materials = [
   {

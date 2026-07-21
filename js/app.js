@@ -1,4 +1,4 @@
-import { homeView, stubView } from './views.js'
+import { homeView, tonightView, stubView } from './views.js'
 import { icons } from './icons.js'
 
 const view = document.getElementById('view')
@@ -9,18 +9,19 @@ const routes = {
   agenda: () => stubView('Agenda', 'Full 2-day schedule — next screen to build.'),
   ask: () => stubView('Ask a question', 'Anonymous Q&A — wired to the cloud brain in the next phase.'),
   materials: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.'),
-  me: () => stubView('My Agenda', 'Starred sessions, stored on this phone only.'),
   speakers: () => stubView('Speakers', 'Speaker profiles — content pours in via the admin.'),
+  tonight: () => tonightView(),
   wifi: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.'),
   venue: () => stubView('Venue', 'Map, address and parking.'),
 }
 
+// v4: Me/My Agenda dropped — single-track conference, everyone attends everything.
+// Starring stays in the framework (store.js) for a multi-stream 2027, off by default.
 const tabs = [
   { path: '', label: 'Home', icon: icons.home },
   { path: 'agenda', label: 'Agenda', icon: icons.agendaTab },
   { path: 'ask', label: 'Ask', icon: icons.chatBold, center: true },
   { path: 'materials', label: 'Materials', icon: icons.materialsTab },
-  { path: 'me', label: 'Me', icon: icons.me },
 ]
 
 function currentPath() {

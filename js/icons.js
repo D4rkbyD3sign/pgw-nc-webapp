@@ -59,4 +59,7 @@ export const icons = {
     1.6,
   ),
   me: wrap(`<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>`, 1.6),
+  dinner: wrap(
+    `<path d="M8 21v-8.2"/><path d="M6 3v4.5a2 2 0 0 0 4 0V3"/><path d="M8 3v9.8"/><path d="M16 21v-6.5"/><path d="M18.5 3c-1.7 0-2.5 2.6-2.5 5.5v6h2.5V3z"/>`,
+  ),
 }

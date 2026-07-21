@@ -163,6 +163,40 @@ h1.title .ai::after {
   font-weight: 400;
 }
 
+/* Now carousel — swipe sideways to peek at what's coming (Nicole, v4) */
+.nowrap {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 24px 6px;
+  scrollbar-width: none;
+}
+.nowrap::-webkit-scrollbar {
+  display: none;
+}
+.nowrap .now {
+  margin: 0;
+  flex: 0 0 88%;
+  scroll-snap-align: start;
+}
+.nowrap .upcard {
+  background: var(--card);
+}
+.live .dot.up {
+  background: var(--greige-line);
+  box-shadow: 0 0 0 3px rgba(39, 39, 40, 0.05);
+}
+.seemore {
+  display: block;
+  text-align: right;
+  padding: 10px 24px 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  color: var(--grey);
+}
+
 /* Now card */
 .now {
   margin: 0 24px;
@@ -272,6 +306,38 @@ h1.title .ai::after {
 .ask svg {
   width: 19px;
   height: 19px;
+}
+/* v4: ask box lives inside the on-now card */
+.ask.askin {
+  margin: 18px 0 0;
+  padding: 13px;
+  font-size: 14px;
+}
+
+/* Press feedback — brief greige press-down on every tappable (v4 fidelity pass) */
+.tile,
+.logicard,
+.ask,
+.tab,
+.seemore,
+.now {
+  transition: background-color 0.12s ease, transform 0.12s ease;
+}
+.tile:active,
+.logicard:active,
+.seemore:active {
+  background-color: var(--greige);
+  transform: scale(0.985);
+}
+.ask:active {
+  background-color: var(--lime-deep);
+  transform: scale(0.985);
+}
+.tab:active {
+  color: var(--ink-soft);
+}
+.tab.center:active .fab {
+  background-color: var(--lime-deep);
 }
 
 /* Nav tiles */
