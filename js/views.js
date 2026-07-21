@@ -1,5 +1,6 @@
 import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay } from './data.js'
 import { icons } from './icons.js'
+import * as brain from './brain.js'
 
 const minutes = (t) => {
   const [h, m] = t.split(':').map(Number)
@@ -361,4 +362,138 @@ export function sessionView(id) {
 
 export function stubView(title, note) {
   return `<div class="stub"><h2>${title}</h2><p>${note}</p></div>`
+}
+
+/* ---------- Live Q&A (runs on the brain adapter — mock now, Firebase later) ---------- */
+
+const STATUS_LABEL = {
+  pending: 'SENT',
+  approved: 'APPROVED',
+  promoted: 'ON SCREEN',
+  shown: 'SHOWN',
+  dismissed: 'CLOSED',
+}
+
+let askDraft = ''
+
+export function askView() {
+  const live = liveSession()
+  const mine = brain.myQuestions()
+  return `
+    <div class="pagehead">
+      <h2>Ask a question</h2>
+      <p class="sub">Anonymous — nothing about you is collected, ever.</p>
+    </div>
+    <div class="now" style="margin-bottom:16px">
+      <div class="row">
+        <span class="live"><span class="dot"></span>ON NOW · ${live.session.start}–${live.session.end}</span>
+        <span class="tagm">${live.session.kind}</span>
+      </div>
+      <h3>${live.session.title}</h3>
+    </div>
+    <form id="askform" class="askform">
+      <textarea id="asktext" rows="3" maxlength="400" placeholder="Type your question for this session…">${askDraft}</textarea>
+      <button type="submit" class="ask" style="margin:14px 0 0; width:100%">${icons.chat} Send anonymously</button>
+    </form>
+    ${
+      mine.length
+        ? `
+    <span class="lab" style="margin-top:28px">// Your questions</span>
+    <div class="mylist">
+      ${mine
+        .slice()
+        .reverse()
+        .map(
+          (q) => `
+      <div class="myq">
+        <p>${q.text}</p>
+        <span class="chip s-${q.status}">${STATUS_LABEL[q.status] ?? q.status}</span>
+      </div>`,
+        )
+        .join('')}
+    </div>`
+        : ''
+    }
+  `
+}
+
+export function wireAsk(rerender) {
+  const form = document.getElementById('askform')
+  const text = document.getElementById('asktext')
+  text?.addEventListener('input', () => {
+    askDraft = text.value
+  })
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const v = text.value.trim()
+    if (!v) return
+    const live = liveSession()
+    brain.submitQuestion(live.session.id, v)
+    askDraft = ''
+    rerender()
+  })
+}
+
+export function modView() {
+  const qs = brain.questions()
+  const bySession = (q) => sessions.find((s) => s.id === q.sessionId)?.title ?? 'General'
+  const item = (q, buttons) => `
+    <div class="myq">
+      <div style="flex:1">
+        <p>${q.text}</p>
+        <span class="s" style="font-family:var(--mono);font-size:10px">${bySession(q)}</span>
+      </div>
+      <div class="modbtns">${buttons}</div>
+    </div>`
+  const group = (title, list, buttons) =>
+    list.length
+      ? `<span class="lab" style="margin-top:24px">// ${title} (${list.length})</span>
+         <div class="mylist">${list.map((q) => item(q, buttons(q))).join('')}</div>`
+      : ''
+  const pending = qs.filter((q) => q.status === 'pending')
+  const approved = qs.filter((q) => q.status === 'approved')
+  const onscreen = qs.filter((q) => q.status === 'promoted')
+  const history = qs.filter((q) => q.status === 'shown' || q.status === 'dismissed')
+  return `
+    <div class="pagehead">
+      <h2>Moderator</h2>
+      <p class="sub">Curate incoming questions · promote to the room screen</p>
+    </div>
+    ${group('On screen', onscreen, (q) => `<button class="mbtn" data-act="shown" data-id="${q.id}">Done</button>`)}
+    ${group('Incoming', pending, (q) => `<button class="mbtn go" data-act="approve" data-id="${q.id}">Approve</button><button class="mbtn" data-act="dismiss" data-id="${q.id}">Dismiss</button>`)}
+    ${group('Approved — ready', approved, (q) => `<button class="mbtn go" data-act="promote" data-id="${q.id}">To screen</button><button class="mbtn" data-act="dismiss" data-id="${q.id}">Dismiss</button>`)}
+    ${group('History', history, () => '')}
+    ${qs.length ? '' : '<p class="stub" style="padding-top:8px">No questions yet — open the Ask tab in another tab of this browser to demo the loop.</p>'}
+  `
+}
+
+export function wireMod() {
+  document.querySelectorAll('.mbtn').forEach((b) =>
+    b.addEventListener('click', () => {
+      const { act, id } = b.dataset
+      if (act === 'promote') brain.promote(id)
+      else if (act === 'approve') brain.setStatus(id, 'approved')
+      else if (act === 'dismiss') brain.setStatus(id, 'dismissed')
+      else if (act === 'shown') brain.setStatus(id, 'shown')
+    }),
+  )
+}
+
+export function screenView() {
+  const live = liveSession()
+  const q = brain.promotedQuestion()
+  return `
+    <div class="bigscreen">
+      <div class="bs-head">
+        ${icons.logo}
+        <span class="bs-brand">PGW <b>ImplementAI</b> ${conference.year}</span>
+      </div>
+      <div class="bs-session">${live.session.title}</div>
+      ${
+        q
+          ? `<div class="bs-q">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ANONYMOUS</div>`
+          : `<div class="bs-idle">Ask a question — anonymously<br><span>open the conference app on your phone</span></div>`
+      }
+    </div>
+  `
 }
