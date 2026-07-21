@@ -59,6 +59,12 @@ export const icons = {
     1.6,
   ),
   me: wrap(`<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>`, 1.6),
+  cup: wrap(
+    `<path d="M4.5 8.5h12v5.5a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5V8.5z"/><path d="M16.5 9.5h1.5a2.5 2.5 0 0 1 0 5h-1.5"/><path d="M8 5.5V4"/><path d="M11 5.5V4"/>`,
+  ),
+  glass: wrap(
+    `<path d="M5 4h14l-7 8.5z"/><line x1="12" y1="12.5" x2="12" y2="19.5"/><line x1="8.5" y1="19.5" x2="15.5" y2="19.5"/>`,
+  ),
   award: wrap(
     `<circle cx="12" cy="9" r="5.5"/><path d="M9 13.8L7.5 21l4.5-2.4L16.5 21L15 13.8"/>`,
     1.6,

@@ -34,19 +34,36 @@ function whoLine(s) {
   return `<b>${names.join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
 }
 
+/** Small wayfinding icon for breaks and social events, by title. */
+function eventIcon(s) {
+  if (s.kind !== 'BREAK' && s.kind !== 'SOCIAL') return ''
+  const t = s.title.toLowerCase()
+  if (/tea|coffee/.test(t)) return icons.cup
+  if (/drink/.test(t)) return icons.glass
+  if (/lunch|dinner|breakfast|registration|awards/.test(t)) return icons.dinner
+  return s.kind === 'SOCIAL' ? icons.glass : icons.cup
+}
+
+/** Small partner logo for a session, when a partner presents it. */
+function partnerMark(s) {
+  const p = s.partnerId ? partnerById(s.partnerId) : null
+  return p ? `<img class="aglogo" src="${p.logo}" alt="${p.name}">` : ''
+}
+
 function upcomingCard(s) {
   const isBreak = s.kind === 'BREAK'
   return `
     <div class="now upcard${isBreak ? ' brk' : ''}">
       <div class="row">
         <span class="live"><span class="dot up"></span>UP NEXT · ${s.start}–${s.end}</span>
-        <span class="tagm">${s.kind}</span>
+        ${eventIcon(s) ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
       </div>
       <h3>${s.title}</h3>
       ${isBreak ? `<div class="who"><span class="txt">${s.room}</span></div>` : `
       <div class="who">
         ${s.speakerIds.length ? '<span class="pic"></span>' : ''}
         <span class="txt">${whoLine(s)}</span>
+        ${partnerMark(s)}
       </div>`}
     </div>`
 }
@@ -135,7 +152,7 @@ export function agendaView(dayArg) {
         return `
         <div class="agrow">
           <div class="agtime">${s.start}</div>
-          <div class="agbreak">${s.title} · ${s.room}</div>
+          <div class="agbreak"><span class="evico">${eventIcon(s)}</span>${s.title} · ${s.room}</div>
         </div>`
       }
       const social = s.kind === 'SOCIAL'
@@ -145,10 +162,10 @@ export function agendaView(dayArg) {
         <a href="#/${social ? 'tonight' : `session/${s.id}`}" class="agcard${isNow ? ' isnow' : ''}">
           <div class="row">
             <span class="live">${isNow ? '<span class="dot"></span>ON NOW · ' : ''}${s.start}–${s.end}</span>
-            <span class="tagm">${s.kind}</span>
+            ${social ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
           </div>
           <h3>${s.title}</h3>
-          <div class="who"><span class="txt">${whoLine(s)}</span></div>
+          <div class="who"><span class="txt">${whoLine(s)}</span>${partnerMark(s)}</div>
         </a>
       </div>`
     })
@@ -292,7 +309,7 @@ export function tonightView() {
       return `
     <div class="now" style="margin-bottom:14px">
       <div class="row">
-        <span class="live"><span class="dot up"></span>${social.start} · ${social.title}</span>
+        <span class="live"><span class="evico">${eventIcon(social)}</span>${social.start} · ${social.title}</span>
         <span class="tagm">${v.dress ?? ''}</span>
       </div>
       <h3>${v.name ?? social.room}</h3>

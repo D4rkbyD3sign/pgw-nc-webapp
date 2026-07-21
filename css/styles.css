@@ -600,6 +600,9 @@ h1.title .ai::after {
 }
 .agbreak {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -610,6 +613,37 @@ h1.title .ai::after {
   padding: 14px 18px;
   align-self: center;
   width: 100%;
+}
+
+/* wayfinding icon for breaks/socials */
+.evico {
+  display: inline-flex;
+  align-items: center;
+}
+.evico svg {
+  width: 17px;
+  height: 17px;
+  color: var(--ink-soft);
+  flex: 0 0 17px;
+}
+.live .evico {
+  margin-right: 2px;
+}
+
+/* small partner logo on agenda/session cards */
+.aglogo {
+  max-height: 16px;
+  max-width: 74px;
+  object-fit: contain;
+  margin-left: auto;
+  flex: 0 0 auto;
+  opacity: 0.9;
+}
+.agcard .who,
+.upcard .who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* Speakers */
