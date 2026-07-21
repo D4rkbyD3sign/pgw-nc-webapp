@@ -1,4 +1,4 @@
-import { homeView, agendaView, speakersView, tonightView, sessionView, stubView } from './views.js'
+import { homeView, agendaView, speakersView, speakerView, partnersView, partnerView, tonightView, sessionView, stubView } from './views.js'
 import { icons } from './icons.js'
 
 const view = document.getElementById('view')
@@ -9,6 +9,9 @@ const routes = {
   agenda: (arg) => agendaView(arg),
   session: (arg) => sessionView(arg),
   speakers: () => speakersView(),
+  speaker: (arg) => speakerView(arg),
+  partners: () => partnersView(),
+  partner: (arg) => partnerView(arg),
   tonight: () => tonightView(),
   ask: () => stubView('Ask a question', 'Anonymous Q&A — wired to the cloud brain in the next phase.'),
   materials: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.'),
@@ -23,6 +26,7 @@ const tabs = [
   { path: 'agenda', label: 'Agenda', icon: icons.agendaTab },
   { path: 'ask', label: 'Ask', icon: icons.chatBold, center: true },
   { path: 'materials', label: 'Materials', icon: icons.materialsTab },
+  { path: 'partners', label: 'Partners', icon: icons.award },
 ]
 
 function currentPath() {

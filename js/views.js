@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay } from './data.js'
+import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay } from './data.js'
 import { icons } from './icons.js'
 
 const minutes = (t) => {
@@ -183,19 +183,14 @@ export function speakersView() {
   const cards = speakers
     .map(
       (s) => `
-      <div class="spcard">
+      <a href="#/speaker/${s.id}" class="spcard">
         ${s.photo ? `<img class="spavatar" src="${s.photo}" alt="${s.name}">` : `<span class="spavatar spinit">${initials(s.name)}</span>`}
         <div class="spbody">
-          <div class="row">
-            <div>
-              <div class="n">${s.name}</div>
-              <div class="s">${s.org}</div>
-            </div>
-            ${s.linkedin ? `<a class="lichip" href="${s.linkedin}" target="_blank" rel="noopener">in</a>` : ''}
-          </div>
-          <p class="spbio">${s.bio}</p>
+          <div class="n">${s.name}</div>
+          <div class="s">${s.title} · ${s.org}</div>
+          <p class="spbio clamp">${s.bio}</p>
         </div>
-      </div>`,
+      </a>`,
     )
     .join('')
 
@@ -205,6 +200,84 @@ export function speakersView() {
       <p class="sub">${speakers.length} across the two days</p>
     </div>
     <div class="splist">${cards}</div>
+  `
+}
+
+export function speakerView(id) {
+  const s = speakers.find((x) => x.id === id)
+  if (!s) return stubView('Speaker', 'Speaker not found.')
+  const theirSessions = sessions.filter((x) => x.speakerIds.includes(s.id))
+  return `
+    <div class="sphero">
+      ${s.photo ? `<img class="spportrait" src="${s.photo}" alt="${s.name}">` : `<span class="spportrait spinit">${initials(s.name)}</span>`}
+      <div class="pagehead" style="padding-top:18px">
+        <h2>${s.name}</h2>
+        <p class="sub">${s.title} · ${s.org}</p>
+      </div>
+    </div>
+    <div class="spdetail">
+      <p class="spbio">${s.bio}</p>
+    </div>
+    <span class="lab" style="margin-top:26px">// Contact</span>
+    <div class="contactlist">
+      ${s.email ? `<a class="contactrow" href="mailto:${s.email}">${icons.mail}<span>${s.email}</span></a>` : ''}
+      ${s.phone ? `<a class="contactrow" href="tel:${s.phone.replace(/\s/g, '')}">${icons.phone}<span>${s.phone}</span></a>` : ''}
+      ${s.linkedin ? `<a class="contactrow" href="${s.linkedin}" target="_blank" rel="noopener"><span class="limark">in</span><span>LinkedIn profile</span></a>` : ''}
+    </div>
+    ${theirSessions.length ? `
+    <span class="lab" style="margin-top:26px">// Speaking at</span>
+    <div class="aglist">
+      ${theirSessions
+        .map(
+          (x) => `
+      <div class="agrow">
+        <div class="agtime">${x.start}</div>
+        <a href="#/session/${x.id}" class="agcard">
+          <div class="row"><span class="live">${conference.days.find((d) => d.day === x.day)?.label ?? ''} · ${x.start}–${x.end}</span><span class="tagm">${x.kind}</span></div>
+          <h3>${x.title}</h3>
+        </a>
+      </div>`,
+        )
+        .join('')}
+    </div>` : ''}
+  `
+}
+
+export function partnersView() {
+  const [first, ...rest] = partners
+  const tile = (p, wide = false) => `
+    <a href="#/partner/${p.id}" class="ptcard${wide ? ' wide' : ''}">
+      <img class="ptlogo" src="${p.logo}" alt="${p.name}">
+    </a>`
+  return `
+    <div class="pagehead">
+      <h2>Educational Partners</h2>
+      <p class="sub">The partners who make this event possible</p>
+    </div>
+    <div class="ptgrid">
+      ${tile(first, true)}
+      ${rest.map((p) => tile(p)).join('')}
+    </div>
+  `
+}
+
+export function partnerView(id) {
+  const p = partnerById(id)
+  if (!p) return stubView('Partner', 'Partner not found.')
+  return `
+    <div class="ptheroband"><img class="ptlogo big" src="${p.logo}" alt="${p.name}"></div>
+    <div class="pagehead" style="padding-top:20px">
+      <h2>${p.name}</h2>
+      <p class="sub">${p.positioning}</p>
+    </div>
+    <div class="spdetail">
+      <p class="spbio">${p.blurb}</p>
+    </div>
+    <span class="lab" style="margin-top:26px">// ImplementAI ${conference.year}</span>
+    <div class="now" style="margin-bottom:14px">
+      <p class="spbio" style="margin-top:0">${p.themeFit}</p>
+    </div>
+    <div class="quotebar">“${p.tagline}”</div>
   `
 }
 
@@ -253,19 +326,14 @@ export function sessionView(id) {
     ${sps
       .map(
         (sp) => `
-      <div class="spcard" style="margin-top:4px">
+      <a href="#/speaker/${sp.id}" class="spcard" style="margin-top:4px">
         ${sp.photo ? `<img class="spavatar" src="${sp.photo}" alt="${sp.name}">` : `<span class="spavatar spinit">${initials(sp.name)}</span>`}
         <div class="spbody">
-          <div class="row">
-            <div>
-              <div class="n">${sp.name}</div>
-              <div class="s">${sp.org}</div>
-            </div>
-            ${sp.linkedin ? `<a class="lichip" href="${sp.linkedin}" target="_blank" rel="noopener">in</a>` : ''}
-          </div>
-          <p class="spbio">${sp.bio}</p>
+          <div class="n">${sp.name}</div>
+          <div class="s">${sp.title} · ${sp.org}</div>
+          <p class="spbio clamp">${sp.bio}</p>
         </div>
-      </div>`,
+      </a>`,
       )
       .join('')}
     <div style="padding:20px 24px">

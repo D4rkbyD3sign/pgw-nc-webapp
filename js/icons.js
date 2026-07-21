@@ -59,6 +59,16 @@ export const icons = {
     1.6,
   ),
   me: wrap(`<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>`, 1.6),
+  award: wrap(
+    `<circle cx="12" cy="9" r="5.5"/><path d="M9 13.8L7.5 21l4.5-2.4L16.5 21L15 13.8"/>`,
+    1.6,
+  ),
+  mail: wrap(
+    `<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/>`,
+  ),
+  phone: wrap(
+    `<path d="M5.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 3.5 5.7a2 2 0 0 1 2-2.2z"/>`,
+  ),
   dinner: wrap(
     `<path d="M8 21v-8.2"/><path d="M6 3v4.5a2 2 0 0 0 4 0V3"/><path d="M8 3v9.8"/><path d="M16 21v-6.5"/><path d="M18.5 3c-1.7 0-2.5 2.6-2.5 5.5v6h2.5V3z"/>`,
   ),
