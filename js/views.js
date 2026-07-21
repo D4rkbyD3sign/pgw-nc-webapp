@@ -1,4 +1,4 @@
-import { conference, sessions, speakerById, nextSocial, upcomingAfter } from './data.js'
+import { conference, sessions, speakers, speakerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay } from './data.js'
 import { icons } from './icons.js'
 
 const minutes = (t) => {
@@ -6,14 +6,14 @@ const minutes = (t) => {
   return h * 60 + m
 }
 
-/** The session on right now (wall clock vs day-1 times).
- *  Outside conference hours we demo the keynote so the screen never sits empty. */
+/** The session on right now (wall clock vs session times).
+ *  Outside conference hours we demo the first speaker session so the screen never sits empty. */
 export function liveSession(now = new Date()) {
   const nowMin = now.getHours() * 60 + now.getMinutes()
   const hit = sessions.find(
     (s) => s.kind !== 'BREAK' && s.kind !== 'SOCIAL' && nowMin >= minutes(s.start) && nowMin < minutes(s.end),
   )
-  const session = hit ?? sessions.find((s) => s.id === 's2')
+  const session = hit ?? sessions.find((s) => s.speakerIds.length > 0)
   const start = minutes(session.start)
   const dur = minutes(session.end) - start
   const minIn = hit ? nowMin - start : Math.round(dur * 0.44)
@@ -26,26 +26,34 @@ export function liveSession(now = new Date()) {
   }
 }
 
+function whoLine(s) {
+  if (s.kind === 'SOCIAL') return `<b>${s.venue?.name ?? s.room}</b> · ${s.venue?.address ?? ''}`
+  const names = s.speakerIds.map((id) => speakerById(id)?.name).filter(Boolean)
+  if (!names.length) return `<b>PGW</b> · ${s.room}`
+  const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
+  return `<b>${names.join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
+}
+
 function upcomingCard(s) {
-  const speaker = speakerById(s.speakerIds[0] ?? '')
+  const isBreak = s.kind === 'BREAK'
   return `
-    <div class="now upcard">
+    <div class="now upcard${isBreak ? ' brk' : ''}">
       <div class="row">
         <span class="live"><span class="dot up"></span>UP NEXT · ${s.start}–${s.end}</span>
         <span class="tagm">${s.kind}</span>
       </div>
       <h3>${s.title}</h3>
+      ${isBreak ? `<div class="who"><span class="txt">${s.room}</span></div>` : `
       <div class="who">
-        ${s.kind === 'SOCIAL' ? '' : '<span class="pic"></span>'}
-        <span class="txt"><b>${s.kind === 'SOCIAL' ? s.venue?.name ?? s.room : speaker?.name ?? 'TBA'}</b> · ${s.kind === 'SOCIAL' ? s.venue?.address ?? '' : s.room}</span>
-      </div>
+        ${s.speakerIds.length ? '<span class="pic"></span>' : ''}
+        <span class="txt">${whoLine(s)}</span>
+      </div>`}
     </div>`
 }
 
 export function homeView() {
   const live = liveSession()
-  const speaker = speakerById(live.session.speakerIds[0] ?? '')
-  const upcoming = upcomingAfter(live.demoNowMin)
+  const upcoming = upcomingAfter(live.demoNowMin, live.session.day)
   const social = nextSocial()
 
   return `
@@ -73,8 +81,8 @@ export function homeView() {
         </div>
         <h3>${live.session.title}</h3>
         <div class="who">
-          <span class="pic"></span>
-          <span class="txt"><b>${speaker?.name ?? 'TBA'}</b> · ${live.session.room}</span>
+          ${live.session.speakerIds.length ? '<span class="pic"></span>' : ''}
+          <span class="txt">${whoLine(live.session)}</span>
         </div>
         <div class="prog"><i style="width:${live.pct}%"></i></div>
         <div class="foot"><span>${live.minIn} MIN IN</span><span>${live.minLeft} MIN LEFT</span></div>
@@ -89,7 +97,7 @@ export function homeView() {
       <div class="grid">
         <a href="#/speakers" class="tile">
           <div class="ico">${icons.speakers}</div>
-          <div><div class="n">Speakers</div><div class="s">${conference.speakerCount} this year</div></div>
+          <div><div class="n">Speakers</div><div class="s">${speakers.length} this year</div></div>
         </a>
         <a href="#/tonight" class="tile tonight">
           <div class="ico">${icons.dinner}</div>
@@ -114,25 +122,154 @@ export function homeView() {
   `
 }
 
-export function tonightView() {
-  const social = nextSocial()
-  if (!social) return stubView('Tonight', 'Nothing scheduled tonight.')
-  const v = social.venue ?? {}
+export function agendaView(dayArg) {
+  const day = Number(dayArg) === 2 ? 2 : 1
+  const list = agendaForDay(day)
+  const live = liveSession()
+
+  const rows = list
+    .map((s) => {
+      const isBreak = s.kind === 'BREAK'
+      const isNow = s.id === live.session.id
+      if (isBreak) {
+        return `
+        <div class="agrow">
+          <div class="agtime">${s.start}</div>
+          <div class="agbreak">${s.title} · ${s.room}</div>
+        </div>`
+      }
+      const social = s.kind === 'SOCIAL'
+      return `
+      <div class="agrow">
+        <div class="agtime">${s.start}</div>
+        <a href="#/${social ? 'tonight' : `session/${s.id}`}" class="agcard${isNow ? ' isnow' : ''}">
+          <div class="row">
+            <span class="live">${isNow ? '<span class="dot"></span>ON NOW · ' : ''}${s.start}–${s.end}</span>
+            <span class="tagm">${s.kind}</span>
+          </div>
+          <h3>${s.title}</h3>
+          <div class="who"><span class="txt">${whoLine(s)}</span></div>
+        </a>
+      </div>`
+    })
+    .join('')
+
   return `
-    <div class="stub">
-      <span class="eyebrow">TONIGHT · ${social.start}–${social.end}</span>
-      <h2 style="margin-top:12px">${social.title}</h2>
-      <p>${social.summary}</p>
+    <div class="pagehead">
+      <h2>Agenda</h2>
+      <div class="daypills">
+        ${conference.days
+          .map(
+            (d) =>
+              `<a href="#/agenda${d.day === 2 ? '/2' : ''}" class="pill${day === d.day ? ' active' : ''}">${d.label}</a>`,
+          )
+          .join('')}
+      </div>
     </div>
-    <div class="now" style="margin-top:4px">
+    <div class="aglist">${rows}</div>
+  `
+}
+
+function initials(name) {
+  return name
+    .split(' ')
+    .filter((w) => /^[A-Z]/.test(w))
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+}
+
+export function speakersView() {
+  const cards = speakers
+    .map(
+      (s) => `
+      <div class="spcard">
+        ${s.photo ? `<img class="spavatar" src="${s.photo}" alt="${s.name}">` : `<span class="spavatar spinit">${initials(s.name)}</span>`}
+        <div class="spbody">
+          <div class="row">
+            <div>
+              <div class="n">${s.name}</div>
+              <div class="s">${s.org}</div>
+            </div>
+            ${s.linkedin ? `<a class="lichip" href="${s.linkedin}" target="_blank" rel="noopener">in</a>` : ''}
+          </div>
+          <p class="spbio">${s.bio}</p>
+        </div>
+      </div>`,
+    )
+    .join('')
+
+  return `
+    <div class="pagehead">
+      <h2>Speakers</h2>
+      <p class="sub">${speakers.length} across the two days</p>
+    </div>
+    <div class="splist">${cards}</div>
+  `
+}
+
+export function tonightView() {
+  const live = liveSession()
+  const socials = socialsForDay(live.session.day)
+  if (!socials.length) return stubView('Tonight', 'Nothing scheduled tonight.')
+  const dayLabel = conference.days.find((d) => d.day === live.session.day)?.label ?? ''
+  const cards = socials
+    .map((social) => {
+      const v = social.venue ?? {}
+      return `
+    <div class="now" style="margin-bottom:14px">
       <div class="row">
-        <span class="live"><span class="dot up"></span>${v.name ?? social.room}</span>
+        <span class="live"><span class="dot up"></span>${social.start} · ${social.title}</span>
         <span class="tagm">${v.dress ?? ''}</span>
       </div>
+      <h3>${v.name ?? social.room}</h3>
       <div class="who">
         <span class="txt">${v.address ?? ''}</span>
       </div>
+      <p class="spbio" style="margin-top:10px">${social.summary}</p>
       ${v.mapUrl ? `<a href="${v.mapUrl}" target="_blank" rel="noopener" class="ask askin">${icons.pin} Open map &amp; directions</a>` : ''}
+    </div>`
+    })
+    .join('')
+  return `
+    <div class="pagehead">
+      <h2>Tonight</h2>
+      <p class="sub">${dayLabel} — the evening's plan</p>
+    </div>
+    ${cards}
+  `
+}
+
+export function sessionView(id) {
+  const s = sessions.find((x) => x.id === id)
+  if (!s) return stubView('Session', 'Session not found.')
+  const sps = s.speakerIds.map(speakerById).filter(Boolean)
+  return `
+    <div class="stub">
+      <span class="eyebrow">${s.kind} · ${s.start}–${s.end} · ${s.room}</span>
+      <h2 style="margin-top:12px">${s.title}</h2>
+      <p>${s.summary || ''}</p>
+    </div>
+    ${sps
+      .map(
+        (sp) => `
+      <div class="spcard" style="margin-top:4px">
+        ${sp.photo ? `<img class="spavatar" src="${sp.photo}" alt="${sp.name}">` : `<span class="spavatar spinit">${initials(sp.name)}</span>`}
+        <div class="spbody">
+          <div class="row">
+            <div>
+              <div class="n">${sp.name}</div>
+              <div class="s">${sp.org}</div>
+            </div>
+            ${sp.linkedin ? `<a class="lichip" href="${sp.linkedin}" target="_blank" rel="noopener">in</a>` : ''}
+          </div>
+          <p class="spbio">${sp.bio}</p>
+        </div>
+      </div>`,
+      )
+      .join('')}
+    <div style="padding:20px 24px">
+      <a href="#/ask" class="ask" style="margin:0">${icons.chat} Ask a question — anonymously</a>
     </div>
   `
 }

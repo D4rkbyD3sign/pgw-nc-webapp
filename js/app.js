@@ -1,4 +1,4 @@
-import { homeView, tonightView, stubView } from './views.js'
+import { homeView, agendaView, speakersView, tonightView, sessionView, stubView } from './views.js'
 import { icons } from './icons.js'
 
 const view = document.getElementById('view')
@@ -6,11 +6,12 @@ const tabbar = document.getElementById('tabbar')
 
 const routes = {
   '': () => homeView(),
-  agenda: () => stubView('Agenda', 'Full 2-day schedule — next screen to build.'),
+  agenda: (arg) => agendaView(arg),
+  session: (arg) => sessionView(arg),
+  speakers: () => speakersView(),
+  tonight: () => tonightView(),
   ask: () => stubView('Ask a question', 'Anonymous Q&A — wired to the cloud brain in the next phase.'),
   materials: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.'),
-  speakers: () => stubView('Speakers', 'Speaker profiles — content pours in via the admin.'),
-  tonight: () => tonightView(),
   wifi: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.'),
   venue: () => stubView('Venue', 'Map, address and parking.'),
 }
@@ -28,13 +29,13 @@ function currentPath() {
   return location.hash.replace(/^#\/?/, '').replace(/\/$/, '')
 }
 
-function renderTabs(path) {
+function renderTabs(base) {
   tabbar.innerHTML = tabs
     .map((t) => {
       if (t.center) {
         return `<a href="#/${t.path}" class="tab center"><span class="fab">${t.icon}</span>${t.label}</a>`
       }
-      const active = path === t.path ? ' active' : ''
+      const active = base === t.path ? ' active' : ''
       return `<a href="#/${t.path}" class="tab${active}">${t.icon}${t.label}</a>`
     })
     .join('')
@@ -42,9 +43,10 @@ function renderTabs(path) {
 
 function render() {
   const path = currentPath()
-  const page = routes[path] ?? routes['']
-  view.innerHTML = page()
-  renderTabs(path)
+  const [base, ...rest] = path.split('/')
+  const page = routes[base] ?? routes['']
+  view.innerHTML = page(rest.join('/'))
+  renderTabs(base)
   view.scrollTop = 0
   window.scrollTo(0, 0)
 }
