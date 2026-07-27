@@ -13,9 +13,11 @@ import {
   wireMod,
   screenView,
   stubView,
+  loginView,
+  wireLogin,
 } from './views.js'
 import { icons } from './icons.js'
-import { onChange } from './brain.js'
+import { onChange, onAuthChange, user, authReadyYet } from './brain.js'
 
 const view = document.getElementById('view')
 const tabbar = document.getElementById('tabbar')
@@ -31,9 +33,11 @@ const routes = {
   partner: { render: (arg) => partnerView(arg) },
   tonight: { render: () => tonightView() },
   ask: { render: () => askView(), wire: wireAsk, live: true },
-  // Crew-facing faces of the same app — hidden routes, admin auth arrives with Firebase.
-  mod: { render: () => modView(), wire: wireMod, live: true },
-  screen: { render: () => screenView(), live: true, chrome: false },
+  // Crew-facing faces of the same app — hidden routes, sign-in required.
+  // Not a nicety: the security rules refuse the question queue to anyone
+  // who isn't authenticated, so these screens are empty without it.
+  mod: { render: () => modView(), wire: wireMod, live: true, auth: true },
+  screen: { render: () => screenView(), live: true, chrome: false, auth: true },
   materials: { render: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.') },
   wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.') },
   venue: { render: () => stubView('Venue', 'Map, address and parking.') },
@@ -73,16 +77,26 @@ function render() {
   unsubscribe?.()
   unsubscribe = null
 
-  app.classList.toggle('screenmode', route.chrome === false)
-  view.innerHTML = route.render(rest.join('/'))
+  // Crew routes wait for Firebase to restore any saved session before deciding
+  // anything — otherwise a reload flashes the login form at a room full of people.
+  const gated = route.auth && !user()
+  const waiting = route.auth && !authReadyYet()
+
+  app.classList.toggle('screenmode', route.chrome === false && !gated && !waiting)
+  if (waiting) view.innerHTML = '<div class="stub"><p>…</p></div>'
+  else if (gated) view.innerHTML = loginView()
+  else view.innerHTML = route.render(rest.join('/'))
+
   renderTabs(base)
-  route.wire?.(render)
+  if (gated) wireLogin(render)
+  else if (!waiting) route.wire?.(render)
   if (route.live) unsubscribe = onChange(render)
   view.scrollTop = 0
   window.scrollTo(0, 0)
 }
 
 window.addEventListener('hashchange', render)
+onAuthChange(render) // sign-in/out flips the crew routes without a reload
 render()
 
 // Keep the "Happening now" card ticking while Home is up.

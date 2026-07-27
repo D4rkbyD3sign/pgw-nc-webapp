@@ -2,14 +2,28 @@
 const wrap = (inner, sw = 1.5) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`
 
+/* The PGW mark — OFFICIAL artwork, not a trace.
+   Paths lifted from the licensee's own logo pack (PGW/brand/guide/logo-*.svg,
+   harvested 2026-07-09); the mark is Group_3 of the full lockup, cropped to its
+   measured bbox. Full lockups + standalone marks live in img/brand/.
+
+   The colourway is load-bearing and was previously WRONG in this file: in the
+   real mark the three ASCENDING BARS are lime and the RING is charcoal. The
+   hand-traced stand-in had it inverted, which is why the mark broke up on the
+   charcoal room screen — the bars vanished into the background. Adam caught it
+   on the big screen, 2026-07-27. Don't re-invert it. */
+const markPaths = (bars, ring) => `
+    <path d="M249.452,228.844l3.921-18.272,6.182-1.958-5.019,23.848A22.361,22.361,0,0,1,249.452,228.844Zm13.267,6.038,8.588-38.008-6.182,1.958-7.867,34.82A22.368,22.368,0,0,0,262.719,234.882Zm8.959-.971,11.343-48.945-6.1,1.932L265.7,234.966a22.411,22.411,0,0,0,5.908-1.033Z" transform="translate(-243.25 -184.966)" fill="${bars}"/>
+    <path d="M195.683,292.647a17.792,17.792,0,0,0,5.115-22.234l1.329-5.775a22.072,22.072,0,0,1-7.771,33.778Zm-31.64-7.489a21.987,21.987,0,0,0,3.839,7.155l1.26-5.913a17.74,17.74,0,0,1,19.45-25.323l4.324-1.38.379-1.635a22,22,0,0,0-29.252,27.1Z" transform="translate(-163 -250.575)" fill="${ring}" fill-rule="evenodd"/>`
+
+const mark = (bars, ring, h = 30) =>
+  `<svg height="${h}" viewBox="-0.011 0 44.004 50" fill="none" role="img" aria-label="PGW">${markPaths(bars, ring)}</svg>`
+
 export const icons = {
-  logo: `<svg width="30" height="30" viewBox="0 0 40 40" fill="none">
-    <path d="M20 4 a16 16 0 1 1 -11.3 4.7" stroke="#C8D562" stroke-width="3" stroke-linecap="round"/>
-    <path d="M20 36 a16 16 0 0 0 11.3 -4.7" stroke="#C8D562" stroke-width="3" stroke-linecap="round"/>
-    <rect x="12" y="22" width="4.4" height="10" rx="1.2" fill="#272728" transform="skewX(-8)"/>
-    <rect x="19" y="16" width="4.4" height="16" rx="1.2" fill="#272728" transform="skewX(-8)"/>
-    <rect x="26" y="10" width="4.4" height="22" rx="1.2" fill="#272728" transform="skewX(-8)"/>
-  </svg>`,
+  // Light grounds (cream app chrome): true two-tone.
+  logo: mark('#C8D562', '#272728'),
+  // Dark grounds (the room screen): all-white variant from the same pack.
+  logoWhite: mark('#FFFFFF', '#FFFFFF', 34),
 
   net: `<svg class="net" width="130" height="100" viewBox="0 0 140 110" fill="none">
     <g stroke="#C8D562" stroke-width="1" opacity="0.9">

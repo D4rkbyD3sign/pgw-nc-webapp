@@ -485,7 +485,7 @@ export function screenView() {
   return `
     <div class="bigscreen">
       <div class="bs-head">
-        ${icons.logo}
+        ${icons.logoWhite}
         <span class="bs-brand">PGW <b>ImplementAI</b> ${conference.year}</span>
       </div>
       <div class="bs-session">${live.session.title}</div>
@@ -496,4 +496,44 @@ export function screenView() {
       }
     </div>
   `
+}
+
+/* ---------- Crew sign-in (moderator desk + room screen only) ----------
+   Attendees never see this. It exists because the security rules refuse to
+   hand the question queue to anyone who isn't signed in — which is the point:
+   a dismissed question stays between the asker and the moderator. */
+
+let loginError = ''
+
+export function loginView() {
+  return `
+    <div class="pagehead">
+      <h2>Crew sign-in</h2>
+      <p class="sub">Moderator desk and room screen · not for attendees</p>
+    </div>
+    <form id="loginform" class="askform">
+      <input id="loginemail" type="email" autocomplete="username" placeholder="Email" required />
+      <input id="loginpass" type="password" autocomplete="current-password" placeholder="Password" required />
+      ${loginError ? `<p class="sub" style="color:#B4453C;margin-top:10px">${loginError}</p>` : ''}
+      <button type="submit" class="ask" style="margin:14px 0 0; width:100%">Sign in</button>
+    </form>
+  `
+}
+
+export function wireLogin(rerender) {
+  const form = document.getElementById('loginform')
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const email = document.getElementById('loginemail').value.trim()
+    const pass = document.getElementById('loginpass').value
+    loginError = ''
+    try {
+      await brain.signIn(email, pass)
+      // onAuthChange re-renders; the route resolves to the real view.
+    } catch (err) {
+      loginError = 'That email and password did not match.'
+      console.error('[auth]', err.code ?? err)
+      rerender()
+    }
+  })
 }

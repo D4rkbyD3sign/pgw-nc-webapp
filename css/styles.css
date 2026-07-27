@@ -882,7 +882,8 @@ h1.title .ai::after {
 .askform {
   padding: 0 24px;
 }
-.askform textarea {
+.askform textarea,
+.askform input {
   width: 100%;
   font: inherit;
   font-size: 14.5px;
@@ -895,7 +896,12 @@ h1.title .ai::after {
   resize: none;
   outline: none;
 }
-.askform textarea:focus {
+/* Crew sign-in stacks two fields; keep them off each other. */
+.askform input + input {
+  margin-top: 10px;
+}
+.askform textarea:focus,
+.askform input:focus {
   border-color: var(--lime-deep);
   box-shadow: 0 0 0 3px rgba(200, 213, 98, 0.22);
 }

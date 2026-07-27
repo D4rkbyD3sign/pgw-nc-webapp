@@ -1,0 +1,49 @@
+// Firestore security rules — PGW National Conference brain.
+//
+// These are the ONLY thing standing between the open internet and the database.
+// The apiKey in config.js is public by design; this file is what makes that safe.
+//
+// Paste into: Firebase console -> Firestore Database -> Rules -> Publish.
+// Kept in the repo so the live rules have a reviewable source of truth.
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /events/{eventId}/questions/{questionId} {
+
+      // ANYONE MAY ASK — no sign-in, no identity, that's the whole point.
+      // But only a well-formed, pending question, stamped by the SERVER clock:
+      // a phone with a wrong clock must not be able to jump the moderator queue,
+      // and nobody gets to post themselves straight onto the big screen.
+      allow create: if request.resource.data.keys().hasOnly(['sessionId', 'text', 'status', 'ts'])
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.ts == request.time
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() > 0
+                    && request.resource.data.text.size() <= 400
+                    && request.resource.data.sessionId is string
+                    && request.resource.data.sessionId.size() <= 64;
+
+      // A phone may read back a question whose id it already knows — its own,
+      // because that id is kept only on that device. It may NOT list the
+      // collection: the pending and dismissed questions are the moderator's
+      // business and nobody else's. Someone's rejected question is not public.
+      allow get: if true;
+      allow list: if request.auth != null;
+
+      // Only a signed-in moderator curates, and may only move the status —
+      // never rewrite what an attendee actually asked.
+      allow update: if request.auth != null
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+
+      allow delete: if request.auth != null;
+    }
+
+    // Everything else stays shut until it is deliberately opened.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
