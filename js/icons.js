@@ -25,6 +25,9 @@ export const icons = {
   // Dark grounds (the room screen): all-white variant from the same pack.
   logoWhite: mark('#FFFFFF', '#FFFFFF', 34),
 
+  // Checkbox tick — heavier stroke than the nav icons so it reads at 13px.
+  tick: wrap('<path d="M20 6 9 17l-5-5"/>', 2.6),
+
   net: `<svg class="net" width="130" height="100" viewBox="0 0 140 110" fill="none">
     <g stroke="#C8D562" stroke-width="1" opacity="0.9">
       <line x1="26" y1="20" x2="70" y2="14"/><line x1="70" y1="14" x2="110" y2="34"/>

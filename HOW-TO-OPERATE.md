@@ -69,6 +69,20 @@ Questions arrive in **Incoming**. Each one shows the question and, underneath in
 
 **The thing worth practising:** approving is not publishing. Two separate presses, deliberately. You can never accidentally put something on a wall in front of fifty advisers with one click.
 
+### Named vs anonymous questions
+
+**Anonymous is the default. Always.** Under the question box there's an unticked box: *"Add my name so the speaker can answer me directly"* (Johnny's ask). Tick it, type a name, and the question carries it.
+
+Three things worth knowing, because someone will ask you:
+
+- **The tick resets to off after every question.** The name is remembered on the phone so nobody retypes it all day, but *choosing to be named is a fresh decision each time.* Otherwise a person who named themselves in the morning asks something sensitive after lunch and only discovers their name is attached when it's on the wall.
+- **The Send button tells you which one you're doing** — it reads *"Send anonymously"* or *"Send with my name"*. Nobody can send named by accident.
+- **On your desk** a named question shows the name in lime before the session title. **On the big screen** the footer reads `AUDIENCE QUESTION · SARAH WHITFIELD` instead of `AUDIENCE QUESTION · ANONYMOUS`.
+
+**You cannot edit or remove a name**, and neither can anyone else — the rules only let a moderator change a question's *status*, never its words or its name. If someone names themselves and regrets it, **dismiss the question**; it never reaches the screen.
+
+**Pulse surveys are never named.** There is no name option there and there should never be one — the resonance data is only honest if it's anonymous.
+
 ### What the attendee sees
 
 Their own questions, with a status chip that updates live:

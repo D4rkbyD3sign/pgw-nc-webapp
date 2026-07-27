@@ -421,13 +421,37 @@ const STATUS_LABEL = {
 
 let askDraft = ''
 
+/* Johnny's ask, 2026-07-27: let people optionally attach their name so the
+   speaker can answer them by name.
+
+   TWO DELIBERATE CHOICES, both about not surprising anybody:
+
+   1. The NAME is remembered on the device (so nobody retypes it all day) but
+      the TICK IS NOT. It resets to off for every question. Attaching your name
+      stays a deliberate act each time — otherwise someone who named themselves
+      at 10am asks something sensitive at 3pm and only finds out it went up with
+      their name on it when it is on the wall.
+   2. The header copy changed from "nothing about you is collected, ever" to
+      "anonymous unless you choose to add your name." The old line would have
+      become a lie the moment this box existed, and it is printed exactly where
+      someone decides whether to risk an honest question. */
+const NAME_KEY = 'pgw-nc-my-name'
+let askName = (() => {
+  try {
+    return localStorage.getItem(NAME_KEY) ?? ''
+  } catch {
+    return ''
+  }
+})()
+let askNamed = false
+
 export function askView() {
   const live = liveSession()
   const mine = brain.myQuestions()
   return `
     <div class="pagehead">
       <h2>Ask a question</h2>
-      <p class="sub">Anonymous — nothing about you is collected, ever.</p>
+      <p class="sub">Anonymous unless you choose to add your name.</p>
     </div>
     <div class="now" style="margin-bottom:16px">
       <div class="row">
@@ -438,7 +462,24 @@ export function askView() {
     </div>
     <form id="askform" class="askform">
       <textarea id="asktext" rows="3" maxlength="400" placeholder="Type your question for this session…">${askDraft}</textarea>
-      <button type="submit" class="ask" style="margin:14px 0 0; width:100%">${icons.chat} Send anonymously</button>
+
+      <label class="namecheck" for="asknamed">
+        <input type="checkbox" id="asknamed" ${askNamed ? 'checked' : ''} />
+        <span class="nc-box">${icons.tick}</span>
+        <span class="nc-txt">Add my name so the speaker can answer me directly</span>
+      </label>
+      <input
+        id="askname"
+        class="nameinput${askNamed ? ' on' : ''}"
+        maxlength="60"
+        autocomplete="name"
+        placeholder="Your name"
+        value="${askName.replace(/"/g, '&quot;')}"
+      />
+
+      <button type="submit" class="ask" style="margin:14px 0 0; width:100%">
+        ${icons.chat} <span id="asksendlabel">${askNamed ? 'Send with my name' : 'Send anonymously'}</span>
+      </button>
     </form>
     ${
       mine.length
@@ -465,16 +506,48 @@ export function askView() {
 export function wireAsk(rerender) {
   const form = document.getElementById('askform')
   const text = document.getElementById('asktext')
+  const check = document.getElementById('asknamed')
+  const name = document.getElementById('askname')
+  const sendLabel = document.getElementById('asksendlabel')
+
   text?.addEventListener('input', () => {
     askDraft = text.value
   })
+
+  check?.addEventListener('change', () => {
+    askNamed = check.checked
+    name.classList.toggle('on', askNamed)
+    // Say on the button what is about to happen — no one should have to infer it.
+    sendLabel.textContent = askNamed ? 'Send with my name' : 'Send anonymously'
+    if (askNamed) name.focus()
+  })
+
+  name?.addEventListener('input', () => {
+    askName = name.value
+  })
+
   form?.addEventListener('submit', (e) => {
     e.preventDefault()
     const v = text.value.trim()
     if (!v) return
+    const who = askNamed ? name.value.trim().slice(0, 60) : ''
+    if (askNamed && !who) {
+      name.classList.add('bad')
+      name.focus()
+      return
+    }
+    if (who) {
+      try {
+        localStorage.setItem(NAME_KEY, who)
+      } catch {
+        /* private mode — they just retype it next time */
+      }
+      askName = who
+    }
     const live = liveSession()
-    brain.submitQuestion(live.session.id, v)
+    brain.submitQuestion(live.session.id, v, who)
     askDraft = ''
+    askNamed = false // back to anonymous by default for the next question
     rerender()
   })
 }
@@ -486,7 +559,9 @@ export function modView() {
     <div class="myq">
       <div style="flex:1">
         <p>${q.text}</p>
-        <span class="s" style="font-family:var(--mono);font-size:10px">${bySession(q)}</span>
+        <span class="s" style="font-family:var(--mono);font-size:10px">
+          ${q.name ? `<b class="qname">${q.name}</b> · ` : ''}${bySession(q)}
+        </span>
       </div>
       <div class="modbtns">${buttons}</div>
     </div>`
@@ -536,7 +611,7 @@ export function screenView() {
       <div class="bs-session">${live.session.title}</div>
       ${
         q
-          ? `<div class="bs-q">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ANONYMOUS</div>`
+          ? `<div class="bs-q">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? q.name.toUpperCase() : 'ANONYMOUS'}</div>`
           : `<div class="bs-idle">Ask a question — anonymously<br><span>open the conference app on your phone</span></div>`
       }
     </div>

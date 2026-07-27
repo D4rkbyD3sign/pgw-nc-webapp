@@ -1370,3 +1370,89 @@ h1.title .ai::after {
 .adwas.dim {
   color: var(--grey-light);
 }
+
+/* ---------- Optional name on a question (Johnny's ask) ----------
+   Anonymity is the resting state: the box is unticked on every visit, and the
+   name field only becomes usable once it's ticked. Nobody attaches their name
+   by accident. */
+.namecheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-top: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.namecheck input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.nc-box {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--card);
+  border: 1px solid var(--greige-line);
+  border-radius: 7px;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.nc-box svg {
+  width: 14px;
+  height: 14px;
+  color: var(--ink);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.namecheck input:checked + .nc-box {
+  background: var(--lime);
+  border-color: var(--lime-deep);
+}
+.namecheck input:checked + .nc-box svg {
+  opacity: 1;
+  transform: scale(1);
+}
+.namecheck input:focus-visible + .nc-box {
+  box-shadow: 0 0 0 3px rgba(200, 213, 98, 0.5);
+}
+.nc-txt {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--grey);
+  padding-top: 2px;
+}
+
+/* Collapsed until the box is ticked — no dead field cluttering the page. */
+.nameinput {
+  max-height: 0;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.16s ease, opacity 0.16s ease, margin-top 0.16s ease;
+}
+.nameinput.on {
+  max-height: 60px;
+  margin-top: 12px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-width: 1px;
+  opacity: 1;
+}
+.nameinput.bad {
+  border-color: #b4453c;
+}
+
+/* Name on the moderator desk — the one thing they need at a glance to decide
+   whether to read it out as "a question from Sarah" or just read it out. */
+.qname {
+  color: var(--lime-ink);
+  font-weight: 600;
+}

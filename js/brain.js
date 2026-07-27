@@ -90,6 +90,8 @@ function shape(id, data) {
     sessionId: data.sessionId,
     text: data.text,
     status: data.status,
+    // Optional, opt-in per question. Empty string = asked anonymously.
+    name: data.name ?? '',
     // serverTimestamp is null for the instant between local write and server ack.
     ts: data.ts?.toMillis?.() ?? null,
   }
@@ -144,15 +146,18 @@ export function promotedQuestion() {
 
 /* ---------- writes ---------- */
 
-/** Anonymous by structure: no identity is ever collected or stored. */
-export async function submitQuestion(sessionId, text) {
+/** Anonymous BY DEFAULT. A name is attached only when the asker ticks the box
+ *  on that question (Johnny's ask, 2026-07-27) — nothing else about them is
+ *  ever collected, named or not: no device id, no account, no tracking. */
+export async function submitQuestion(sessionId, text, name = '') {
   const body = text.trim()
+  const who = (name || '').trim().slice(0, 60)
   if (!body) return null
 
   // Show it on the asker's screen immediately — a send that appears to do
   // nothing for 300ms reads as broken, and this app is the exhibit.
   const tempId = `local-${crypto.randomUUID()}`
-  optimistic = [...optimistic, { id: tempId, sessionId, text: body, status: 'pending', ts: null }]
+  optimistic = [...optimistic, { id: tempId, sessionId, text: body, name: who, status: 'pending', ts: null }]
   notify()
 
   try {
@@ -161,6 +166,9 @@ export async function submitQuestion(sessionId, text) {
       text: body,
       status: 'pending',
       ts: serverTimestamp(), // server clock, not the phone's — moderator order must be true
+      // Field omitted entirely when anonymous, so an anonymous question carries
+      // no empty name key that could later be mistaken for "we lost the name".
+      ...(who ? { name: who } : {}),
     })
     rememberId(ref.id)
     optimistic = optimistic.filter((q) => q.id !== tempId)
