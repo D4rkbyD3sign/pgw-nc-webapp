@@ -214,3 +214,71 @@ export function upcomingAfter(nowMin, day = 1, limit = 4) {
 export function agendaForDay(day) {
   return sessions.filter((s) => s.day === day).sort((a, b) => toMin(a.start) - toMin(b.start))
 }
+
+/* ---------- live schedule overrides (the admin screen writes these) ----------
+   ARCHITECTURE (Adam's call, 2026-07-27): the code is the DEFAULT, the cloud is
+   an OVERRIDE. The app always has a working agenda from this file; Firebase only
+   carries the differences. If the cloud is empty, slow or unreachable, phones
+   still show a correct schedule — nothing on stage ever renders blank.
+
+   Overrides are applied INTO the sessions array above rather than returned as a
+   copy. Module imports are live bindings, so every helper here and every screen
+   that already imported `sessions` sees the same truth at the same moment,
+   with no refactor and no second source to keep in step. */
+
+// Pristine times, captured once at load — the thing we reset back to.
+const BASE_TIMES = new Map(sessions.map((s) => [s.id, { start: s.start, end: s.end }]))
+
+const toHHMM = (mins) => {
+  const clamped = Math.max(0, Math.min(24 * 60 - 1, mins))
+  return `${String(Math.floor(clamped / 60)).padStart(2, '0')}:${String(clamped % 60).padStart(2, '0')}`
+}
+
+/**
+ * Apply the live override document. Always call with the WHOLE document —
+ * it recomputes from the pristine base every time, so removing an override
+ * in the admin puts the original time back rather than stranding an edit.
+ *
+ * Shape: { delayMin, delayFrom, delayDay, sessions: { <id>: {start,end} } }
+ *
+ * An explicit per-session edit WINS OUTRIGHT and does not also take the
+ * running-late shift — otherwise a time you typed by hand would silently drift
+ * by another ten minutes, which is the kind of surprise you find on stage.
+ */
+export function applyScheduleOverrides(ov = {}) {
+  const per = ov.sessions ?? {}
+  const delay = Number(ov.delayMin) || 0
+  const from = Number(ov.delayFrom) || 0
+  const day = ov.delayDay ?? null
+
+  for (const s of sessions) {
+    const base = BASE_TIMES.get(s.id)
+    if (!base) continue
+    const explicit = per[s.id]
+
+    if (explicit?.start && explicit?.end) {
+      s.start = explicit.start
+      s.end = explicit.end
+      continue
+    }
+
+    s.start = base.start
+    s.end = base.end
+
+    /* Scope by END time, not start. "We're running ten minutes late" is said
+       WHILE the over-running session is still on stage — so that session's end
+       must move too, along with everything after it. Scoping by start would
+       leave the actual late session untouched and only push the ones behind it,
+       which is the opposite of what the person pressing the button means. */
+    const inScope = (day === null || s.day === day) && toMin(base.end) > from
+    if (delay && inScope) {
+      s.start = toHHMM(toMin(base.start) + delay)
+      s.end = toHHMM(toMin(base.end) + delay)
+    }
+  }
+}
+
+/** Original times, for the admin screen to show what it's changing from. */
+export function baseTimes(id) {
+  return BASE_TIMES.get(id) ?? null
+}

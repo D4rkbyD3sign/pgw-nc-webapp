@@ -22,6 +22,7 @@ import {
   orderBy,
   serverTimestamp,
   writeBatch,
+  setDoc,
 } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js'
 import {
   getAuth,
@@ -30,6 +31,7 @@ import {
   onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js'
 import { firebaseConfig, EVENT_ID } from './config.js'
+import { applyScheduleOverrides } from './data.js'
 
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
@@ -254,6 +256,52 @@ export function pulseSummary() {
       avg: row.ratings.length ? row.ratings.reduce((a, b) => a + b, 0) / row.ratings.length : 0,
     }))
     .sort((a, b) => b.avg - a.avg || b.count - a.count)
+}
+
+/* ---------- live schedule (admin writes, EVERY phone reads) ----------
+   Unlike questions and responses, this listener runs for everyone signed in or
+   not: an attendee's agenda must follow the room. Times are not private, and
+   nothing here identifies anybody. */
+
+const scheduleRef = doc(db, 'events', EVENT_ID, 'live', 'schedule')
+
+let schedule = {}
+
+onSnapshot(
+  scheduleRef,
+  (snap) => {
+    schedule = snap.exists() ? snap.data() : {}
+    applyScheduleOverrides(schedule) // mutates data.js sessions in place
+    notify()
+  },
+  (err) => {
+    // Deliberately non-fatal. No cloud schedule = the built-in agenda stands.
+    console.error('[brain] schedule listener', err)
+  },
+)
+
+/** The current override document (admin screen reads this to show state). */
+export function scheduleDoc() {
+  return schedule
+}
+
+/** Running-late control. Shifts every session that had not yet started when
+ *  the delay was set. Pass 0 to put the day back on its original times. */
+export async function setDelay(delayMin, delayFrom, delayDay) {
+  await setDoc(scheduleRef, { delayMin, delayFrom, delayDay }, { merge: true })
+}
+
+/** Hand-edit one session's times. Wins outright over the running-late shift. */
+export async function setSessionTime(sessionId, start, end) {
+  await setDoc(scheduleRef, { sessions: { [sessionId]: { start, end } } }, { merge: true })
+}
+
+/** Drop a hand-edit and let the session return to its built-in time. */
+export async function clearSessionTime(sessionId) {
+  const next = { ...(schedule.sessions ?? {}) }
+  delete next[sessionId]
+  // Whole-map write, not a merge: merge can't remove a key.
+  await setDoc(scheduleRef, { ...schedule, sessions: next })
 }
 
 /* ---------- auth (moderator + room screen only; attendees never sign in) ---------- */

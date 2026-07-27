@@ -18,6 +18,8 @@ import {
   pulseView,
   wirePulse,
   resultsView,
+  adminView,
+  wireAdmin,
 } from './views.js'
 import { icons } from './icons.js'
 import { onChange, onAuthChange, user, authReadyYet } from './brain.js'
@@ -44,6 +46,7 @@ const routes = {
   mod: { render: () => modView(), wire: wireMod, live: true, auth: true },
   screen: { render: () => screenView(), live: true, chrome: false, auth: true },
   results: { render: () => resultsView(), live: true, auth: true },
+  admin: { render: (arg) => adminView(arg), wire: wireAdmin, live: true, auth: true },
   materials: { render: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.') },
   wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.') },
   venue: { render: () => stubView('Venue', 'Map, address and parking.') },

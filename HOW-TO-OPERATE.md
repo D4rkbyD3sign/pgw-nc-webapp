@@ -19,6 +19,7 @@ It is **one app worn three ways**. Attendees open it on their phones and ask que
 | **The moderator desk** | add `#/mod` to the address | You (or whoever runs Q&A) |
 | **The room screen** | add `#/screen` to the address | The laptop driving the projector |
 | **Pulse results** | add `#/results` to the address | You — **never shown to attendees** |
+| **Admin** | add `#/admin` to the address | You — running late, session times |
 
 They are not three apps. They are three doors into one. That's why the whole thing updates itself without anyone refreshing.
 
@@ -79,6 +80,40 @@ Their own questions, with a status chip that updates live:
 - **CLOSED** — you dismissed it
 
 They see **only their own**. Nobody can browse other people's questions, and nobody can see what was dismissed. That's enforced by the database itself, not by the app being polite about it.
+
+---
+
+## Running late — the admin screen
+
+`#/admin`. **This is the one you'll actually use on the day**, because the thing that goes wrong at a conference is the clock.
+
+### Running late
+
+Four buttons: **-5, +5, +10, +15**, and **Back on time**.
+
+Press **+10** while a session is over-running and three things happen at once, on every phone in the room, in about a second:
+
+- The session **currently on stage** has its finish time pushed out 10 minutes
+- **Every session after it** moves 10 minutes later
+- Sessions that already **finished** are left exactly as they were
+
+Press it twice for twenty. Press **-5** to claw time back if you catch up. Press **Back on time** to undo the lot and return the day to its printed schedule.
+
+**You do not need to touch each session.** That's the whole point of the control.
+
+### Hand-editing one session
+
+Each row has editable start and end times. Type over them and it saves as you leave the field. A hand-edited row is outlined lime and says **hand-edited**, with a **Reset** button to put it back.
+
+**A hand-edited session ignores the running-late shift entirely.** If you typed 16:15, it stays 16:15 — pressing +10 will not quietly make it 16:25. If you want it to move with everything else, press Reset first.
+
+### What can't be changed here
+
+Titles, speakers, rooms, Wi-Fi and venue are in the code, not the admin. Changing those still needs Lumen and a push. This was a deliberate choice: a small tool you trust beats a big one you hesitate over while fifty people wait.
+
+### If the cloud is unreachable
+
+Phones fall back to the schedule built into the app. Attendees see the original printed times — never a blank agenda. Your changes reappear the moment the connection returns.
 
 ---
 
@@ -151,7 +186,7 @@ Be honest with anyone you demo this to:
 
 - **The live public site is not this version.** `d4rkbyd3sign.github.io/pgw-nc-webapp` still runs the old offline demo. Nothing here is on it until we push.
 - **No prize draw on survey completion.** Deferred deliberately — surveys first, incentive after.
-- **No admin screen yet.** Editing schedule/speakers on the day still means a code change. The database is ready for it; the screen isn't built.
+- **Admin covers TIMES ONLY.** Titles, speakers, partners, Wi-Fi and venue still need a code change.
 - **No rate limiting.** Anyone who has the address can post questions in a loop. Fine for fifty people in a room, needs fixing (Firebase App Check) before invitations go out publicly.
 - **Not load-tested.** Two browsers on one machine is not fifty phones on hotel wifi. The rehearsal is scheduled and it is Lumen's to own.
 

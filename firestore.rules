@@ -82,6 +82,15 @@ service cloud.firestore {
       allow update, delete: if isCrew();
     }
 
+    // Live schedule overrides, written by the admin screen.
+    // PUBLIC READ, deliberately: every attendee's agenda has to follow the room.
+    // These are times, not people — nothing here identifies anybody, and a phone
+    // that cannot read them simply shows the built-in schedule instead.
+    match /events/{eventId}/live/{docId} {
+      allow read: if true;
+      allow write: if isCrew();
+    }
+
     // Everything else stays shut until it is deliberately opened.
     match /{document=**} {
       allow read, write: if false;

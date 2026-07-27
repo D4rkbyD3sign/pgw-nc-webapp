@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay } from './data.js'
+import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 
@@ -680,6 +680,114 @@ export function resultsView() {
         )
         .join('')}
     </div>`
+}
+
+/* ---------- Admin: running late + hand-edited times (crew only) ----------
+   Scope deliberately narrow (Adam, 2026-07-27): times only. Titles, speakers
+   and the rest stay in code. What actually goes wrong on a conference day is
+   the clock, and a small tool you trust beats a big one you hesitate over
+   while fifty people wait. */
+
+const DELAY_STEPS = [-5, 5, 10, 15]
+
+export function adminView(dayArg) {
+  const day = Number(dayArg) === 2 ? 2 : 1
+  const ov = brain.scheduleDoc()
+  const delay = Number(ov.delayMin) || 0
+  const per = ov.sessions ?? {}
+  const list = agendaForDay(day)
+
+  const row = (s) => {
+    const base = baseTimes(s.id)
+    const edited = !!per[s.id]
+    const moved = base && (s.start !== base.start || s.end !== base.end)
+    return `
+      <div class="adrow${edited ? ' edited' : ''}">
+        <div class="adtimes">
+          <input class="adtime" data-id="${s.id}" data-f="start" value="${s.start}" maxlength="5" inputmode="numeric" />
+          <span class="addash">–</span>
+          <input class="adtime" data-id="${s.id}" data-f="end" value="${s.end}" maxlength="5" inputmode="numeric" />
+        </div>
+        <div class="admeta">
+          <p class="adtitle">${s.title}</p>
+          ${
+            moved && base
+              ? `<span class="adwas">was ${base.start}–${base.end}${edited ? ' · hand-edited' : ' · running late'}</span>`
+              : '<span class="adwas dim">on schedule</span>'
+          }
+        </div>
+        ${edited ? `<button class="mbtn" data-reset="${s.id}">Reset</button>` : ''}
+      </div>`
+  }
+
+  return `
+    <div class="pagehead">
+      <h2>Admin</h2>
+      <p class="sub">Running late · session times · crew only</p>
+    </div>
+
+    <span class="lab">// Running late</span>
+    <div class="delaybox">
+      <div class="delaynow">${delay === 0 ? 'On schedule' : `${delay > 0 ? '+' : ''}${delay} min`}</div>
+      <p class="delayhelp">Shifts the session on stage now and everything after it. Sessions you've hand-edited are left alone.</p>
+      <div class="delaybtns">
+        ${DELAY_STEPS.map((n) => `<button class="dbtn" data-step="${n}">${n > 0 ? '+' : ''}${n}</button>`).join('')}
+        <button class="dbtn reset" data-reset-delay="1">Back on time</button>
+      </div>
+    </div>
+
+    <span class="lab" style="margin-top:30px">// ${conference.days.find((d) => d.day === day)?.label ?? `Day ${day}`}</span>
+    <div class="daytabs">
+      <a href="#/admin/1" class="dtab${day === 1 ? ' on' : ''}">Day 1</a>
+      <a href="#/admin/2" class="dtab${day === 2 ? ' on' : ''}">Day 2</a>
+    </div>
+    <div class="adlist">${list.map(row).join('')}</div>
+  `
+}
+
+export function wireAdmin(rerender, dayArg) {
+  const day = Number(dayArg) === 2 ? 2 : 1
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
+
+  document.querySelectorAll('.dbtn[data-step]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      const ov = brain.scheduleDoc()
+      const next = (Number(ov.delayMin) || 0) + Number(b.dataset.step)
+      /* delayFrom is captured at the moment of the FIRST push and kept, so
+         repeatedly nudging +5 doesn't keep moving the boundary forward and
+         leave already-shifted sessions behind. */
+      const from = Number(ov.delayMin) ? Number(ov.delayFrom) || 0 : nowMin
+      await brain.setDelay(next, from, day)
+      rerender()
+    }),
+  )
+
+  document.querySelector('.dbtn[data-reset-delay]')?.addEventListener('click', async () => {
+    await brain.setDelay(0, 0, day)
+    rerender()
+  })
+
+  document.querySelectorAll('.adtime').forEach((input) =>
+    input.addEventListener('change', async () => {
+      const id = input.dataset.id
+      const row = input.closest('.adrow')
+      const start = row.querySelector('.adtime[data-f="start"]').value.trim()
+      const end = row.querySelector('.adtime[data-f="end"]').value.trim()
+      if (!/^\d{1,2}:\d{2}$/.test(start) || !/^\d{1,2}:\d{2}$/.test(end)) {
+        input.classList.add('bad')
+        return
+      }
+      await brain.setSessionTime(id, start.padStart(5, '0'), end.padStart(5, '0'))
+      rerender()
+    }),
+  )
+
+  document.querySelectorAll('[data-reset]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      await brain.clearSessionTime(b.dataset.reset)
+      rerender()
+    }),
+  )
 }
 
 /* ---------- Crew sign-in (moderator desk + room screen only) ----------
