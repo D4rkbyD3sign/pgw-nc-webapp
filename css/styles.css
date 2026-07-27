@@ -5,10 +5,21 @@
 :root {
   --lime: #c8d562;
   --lime-deep: #b4c24a;
+  /* Lime is a FILL and a BORDER colour, never type on a light ground:
+     --lime-deep as text measures 1.95:1 on white. Use --lime-ink for that. */
+  --lime-ink: #676f25; /* 5.14 on paper — lime-family text, light grounds ONLY.
+                          Never on charcoal (2.76): there, use --lime (9.35). */
   --ink: #272728;
   --ink-soft: #4a4744;
-  --grey: #7a756e;
-  --grey-light: #aba69e;
+  /* Contrast pass 2026-07-27 — measured, not eyeballed. The quiet tier failed
+     AA badly: --grey-light was #aba69e = 2.30:1 on paper, 2.07:1 on greige,
+     below even the 3:1 large-text floor, carrying 10.5px mono labels. --grey
+     was #7a756e = 4.34:1, under the 4.5:1 body bar. Both darkened along their
+     OWN hue so the warm-neutral character holds, and the four-step hierarchy
+     (ink 14.17 / ink-soft 8.76 / grey 6.70 / grey-light 5.16 on paper) is
+     preserved rather than collapsing into one flat grey. */
+  --grey: #5c5853;
+  --grey-light: #6f6960;
   --paper: #faf9f6;
   --card: #ffffff;
   --greige: #efede8;
@@ -1032,7 +1043,9 @@ h1.title .ai::after {
   font-family: var(--mono);
   font-size: clamp(10px, 1.1vw, 13px);
   letter-spacing: 0.16em;
-  color: rgba(250, 249, 246, 0.45);
+  /* 0.45 measured 4.10:1 on the charcoal ground — under AA for small text.
+     0.52 gives 4.93:1 and is visually indistinguishable at room distance. */
+  color: rgba(250, 249, 246, 0.52);
 }
 .bs-idle {
   font-size: clamp(24px, 3.6vw, 46px);
@@ -1352,7 +1365,7 @@ h1.title .ai::after {
   font-size: 9.5px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--lime-deep);
+  color: var(--lime-ink);
 }
 .adwas.dim {
   color: var(--grey-light);
