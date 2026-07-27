@@ -5,11 +5,31 @@
 //
 // Paste into: Firebase console -> Firestore Database -> Rules -> Publish.
 // Kept in the repo so the live rules have a reviewable source of truth.
+//
+// 2026-07-27, v2 — HARDENED after a real hole was found.
+// v1 said "allow list: if request.auth != null" — anyone signed in. But the
+// public apiKey plus Firebase's default "Enable create (sign-up)" meant a
+// stranger could REGISTER THEMSELVES and then read the whole queue, including
+// dismissed questions. Two fixes: sign-up is now disabled in the console, AND
+// crew access is pinned to named people below. Belt and braces — either alone
+// would do, and neither alone is enough to rely on.
+// Found because GitHub's secret scanner emailed Adam about the apiKey and he
+// forwarded it instead of ignoring it.
 
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // The crew. Add a moderator by adding their address here AND creating the
+    // user in Firebase console -> Authentication -> Users. Both are required:
+    // an account that isn't listed here can sign in but sees nothing.
+    function isCrew() {
+      return request.auth != null
+             && request.auth.token.email in [
+                  'a.graham@thesolomons.com.au'
+                ];
+    }
 
     match /events/{eventId}/questions/{questionId} {
 
@@ -28,17 +48,17 @@ service cloud.firestore {
 
       // A phone may read back a question whose id it already knows — its own,
       // because that id is kept only on that device. It may NOT list the
-      // collection: the pending and dismissed questions are the moderator's
-      // business and nobody else's. Someone's rejected question is not public.
+      // collection: pending and dismissed questions are the moderator's
+      // business. Someone's rejected question is not public.
       allow get: if true;
-      allow list: if request.auth != null;
+      allow list: if isCrew();
 
-      // Only a signed-in moderator curates, and may only move the status —
+      // Only named crew curate, and may only move the status —
       // never rewrite what an attendee actually asked.
-      allow update: if request.auth != null
+      allow update: if isCrew()
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
 
-      allow delete: if request.auth != null;
+      allow delete: if isCrew();
     }
 
     // Everything else stays shut until it is deliberately opened.
