@@ -69,6 +69,49 @@ function upcomingCard(s) {
     </div>`
 }
 
+/* How far back the pulse prompt will chase a session, in minutes.
+   90 is deliberate. Chase only the last-ended session and you lose anyone who
+   stepped out for a coffee — the next session ends, and the earlier one is
+   never asked about at all. Chase everything unanswered and you hand an adviser
+   a queue of six surveys, which is how you teach a room to ignore the app.
+   90 minutes catches the stragglers and self-limits to about two sessions. */
+const PULSE_WINDOW_MIN = 90
+
+/** The freshest finished session this device hasn't rated yet, or null.
+ *  Ben Ross's ask was responses within a minute or two of the presentation, so
+ *  this chases sessions just gone — never the one currently running. */
+export function justEndedSession(now = new Date()) {
+  const nowMin = now.getHours() * 60 + now.getMinutes()
+  const day = liveSession(now).session.day
+  return (
+    sessions
+      .filter(
+        (s) =>
+          s.day === day &&
+          s.kind !== 'BREAK' &&
+          s.kind !== 'SOCIAL' &&
+          minutes(s.end) <= nowMin &&
+          nowMin - minutes(s.end) <= PULSE_WINDOW_MIN &&
+          !brain.hasResponded(s.id),
+      )
+      // freshest first — ask about what they remember best
+      .sort((a, b) => minutes(b.end) - minutes(a.end))[0] ?? null
+  )
+}
+
+/** Shown on home only when there is something fresh left to rate. */
+function pulsePrompt() {
+  const s = justEndedSession()
+  if (!s) return ''
+  return `
+    <a href="#/pulse/${s.id}" class="pulseprompt">
+      <span class="lab">// How was it?</span>
+      <h3>${s.title}</h3>
+      <p>Rate it in ten seconds — anonymous.</p>
+      <span class="pp-go">${icons.chat} Give feedback →</span>
+    </a>`
+}
+
 export function homeView() {
   const live = liveSession()
   const upcoming = upcomingAfter(live.demoNowMin, live.session.day)
@@ -89,6 +132,8 @@ export function homeView() {
       <h1 class="title">Implement<span class="ai">AI</span> ${conference.year}</h1>
       <p class="subtitle">${conference.tagline}</p>
     </section>
+
+    ${pulsePrompt()}
 
     <span class="lab">Happening now</span>
     <div class="nowrap">
@@ -496,6 +541,145 @@ export function screenView() {
       }
     </div>
   `
+}
+
+/* ---------- Pulse survey (Ben Ross's ask) ----------
+   One 1-5 rating, one optional comment, ten seconds. Deliberately NOT a form:
+   tapping a number is the whole interaction, and the comment is there for the
+   people who want to say something. Anything longer gets abandoned mid-corridor. */
+
+/* Scale anchored by Adam, 2026-07-27: 1 = not useful at all, 5 = very useful.
+   The words answer the QUESTION ASKED ("how useful was this session?") rather
+   than grading the speaker — an adviser can honestly say a good session wasn't
+   useful to their practice, and that is the signal Ben actually wants. */
+const RATING_WORDS = {
+  1: 'Not useful at all',
+  2: 'Slightly useful',
+  3: 'Moderately useful',
+  4: 'Useful',
+  5: 'Very useful',
+}
+
+let pulseRating = 0
+let pulseComment = ''
+let pulseSentFor = null // the session just answered — NOT a boolean, see below
+let pulseFor = null // which session the draft above belongs to
+
+export function pulseView(sessionId) {
+  const s = sessions.find((x) => x.id === sessionId)
+  if (!s) return stubView('Feedback', 'That session could not be found.')
+
+  /* Both the draft and the thank-you are keyed to a session id rather than
+     held as flags. As flags they leak: rate session A, walk into session B's
+     survey, and you would be shown A's thank-you screen over B's form. */
+  if (pulseFor !== sessionId) {
+    pulseFor = sessionId
+    pulseRating = 0
+    pulseComment = ''
+  }
+
+  if (pulseSentFor === sessionId || brain.hasResponded(s.id)) {
+    return `
+      <div class="pagehead">
+        <h2>Thank you</h2>
+        <p class="sub">Your feedback is in — anonymously.</p>
+      </div>
+      <div class="pulsedone">
+        <p>${s.title}</p>
+        <a href="#/" class="ask" style="width:100%;margin-top:18px">Back to the conference</a>
+      </div>`
+  }
+
+  return `
+    <div class="pagehead">
+      <h2>How was it?</h2>
+      <p class="sub">Anonymous — nothing about you is collected, ever.</p>
+    </div>
+    <div class="now" style="margin-bottom:18px">
+      <div class="row">
+        <span class="live">${s.start}–${s.end}</span>
+        <span class="tagm">${s.kind}</span>
+      </div>
+      <h3>${s.title}</h3>
+    </div>
+    <form id="pulseform" class="askform">
+      <span class="lab" style="margin:0 0 10px">// How useful was this session?</span>
+      <div class="ratings" id="ratings">
+        ${[1, 2, 3, 4, 5]
+          .map(
+            (n) => `<button type="button" class="rate${pulseRating === n ? ' on' : ''}" data-n="${n}">${n}</button>`,
+          )
+          .join('')}
+      </div>
+      <div class="rateends"><span>Not useful at all</span><span>Very useful</span></div>
+      <span class="lab" style="margin:28px 0 10px">// Anything to add? (optional)</span>
+      <textarea id="pulsetext" rows="3" maxlength="400" placeholder="What worked, what didn't…">${pulseComment}</textarea>
+      <button type="submit" class="ask" id="pulsesend" style="margin:16px 0 0;width:100%" ${pulseRating ? '' : 'disabled'}>
+        Send feedback
+      </button>
+    </form>`
+}
+
+export function wirePulse(rerender, sessionId) {
+  document.querySelectorAll('.rate').forEach((b) =>
+    b.addEventListener('click', () => {
+      pulseRating = Number(b.dataset.n)
+      document.querySelectorAll('.rate').forEach((x) => x.classList.toggle('on', Number(x.dataset.n) === pulseRating))
+      document.getElementById('pulsesend').disabled = false
+    }),
+  )
+  const text = document.getElementById('pulsetext')
+  text?.addEventListener('input', () => {
+    pulseComment = text.value
+  })
+  document.getElementById('pulseform')?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    if (!pulseRating) return
+    await brain.submitResponse(sessionId, pulseRating, pulseComment)
+    pulseSentFor = sessionId
+    pulseRating = 0
+    pulseComment = ''
+    rerender()
+  })
+}
+
+/** Crew-only rollup — what Ben actually wants out of the day. */
+export function resultsView() {
+  const rows = brain.pulseSummary()
+  const title = (id) => sessions.find((s) => s.id === id)?.title ?? id
+  if (!rows.length) {
+    return `
+      <div class="pagehead"><h2>Pulse results</h2><p class="sub">Per-session feedback, live</p></div>
+      <p class="stub" style="padding-top:8px">No responses yet.</p>`
+  }
+  const total = rows.reduce((a, r) => a + r.count, 0)
+  return `
+    <div class="pagehead">
+      <h2>Pulse results</h2>
+      <p class="sub">${total} response${total === 1 ? '' : 's'} · ranked by average rating</p>
+    </div>
+    <div class="mylist">
+      ${rows
+        .map(
+          (r) => `
+        <div class="pulserow">
+          <div class="pr-head">
+            <span class="pr-avg">${r.avg.toFixed(1)}</span>
+            <div>
+              <p class="pr-title">${title(r.sessionId)}</p>
+              <span class="pr-n">${RATING_WORDS[Math.round(r.avg)]} · ${r.count} response${r.count === 1 ? '' : 's'}</span>
+            </div>
+          </div>
+          <div class="pr-bar"><i style="width:${(r.avg / 5) * 100}%"></i></div>
+          ${
+            r.comments.length
+              ? `<div class="pr-comments">${r.comments.map((c) => `<p>“${c}”</p>`).join('')}</div>`
+              : ''
+          }
+        </div>`,
+        )
+        .join('')}
+    </div>`
 }
 
 /* ---------- Crew sign-in (moderator desk + room screen only) ----------

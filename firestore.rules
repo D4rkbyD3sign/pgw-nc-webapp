@@ -61,6 +61,27 @@ service cloud.firestore {
       allow delete: if isCrew();
     }
 
+    // Pulse surveys — one 1-5 rating + optional comment, per session.
+    // Stricter than questions on reads: an attendee never needs to read a
+    // response back (there is no status to track), so NOBODY outside the crew
+    // reads them at all. Not even by id.
+    match /events/{eventId}/responses/{responseId} {
+
+      allow create: if request.resource.data.keys().hasOnly(['sessionId', 'rating', 'comment', 'ts'])
+                    && request.resource.data.rating is int
+                    && request.resource.data.rating >= 1
+                    && request.resource.data.rating <= 5
+                    && request.resource.data.ts == request.time
+                    && request.resource.data.sessionId is string
+                    && request.resource.data.sessionId.size() <= 64
+                    && (!('comment' in request.resource.data)
+                        || (request.resource.data.comment is string
+                            && request.resource.data.comment.size() <= 400));
+
+      allow read: if isCrew();
+      allow update, delete: if isCrew();
+    }
+
     // Everything else stays shut until it is deliberately opened.
     match /{document=**} {
       allow read, write: if false;

@@ -36,6 +36,7 @@ const db = getFirestore(app)
 const auth = getAuth(app)
 
 const questionsRef = collection(db, 'events', EVENT_ID, 'questions')
+const responsesRef = collection(db, 'events', EVENT_ID, 'responses')
 
 /* ---------- listeners ---------- */
 
@@ -185,6 +186,76 @@ export async function promote(id) {
   await batch.commit()
 }
 
+/* ---------- pulse surveys (Ben Ross's ask: per-session, native, ~1 min) ----------
+   One 1-5 rating plus an optional comment. Anonymous exactly like questions:
+   nothing identifying is collected or stored. "Have I already answered this
+   one?" is a DEVICE fact, kept in localStorage — the server has no idea who
+   answered what, only that N people rated session X. That is deliberate: the
+   moment the server could tell, the anonymity promise on the Ask screen would
+   be a half-truth. */
+
+const DONE = 'pgw-nc-my-responses'
+
+let responseCache = [] // crew-only, same as the question queue
+let responseUnsub = null
+
+function doneIds() {
+  try {
+    return JSON.parse(localStorage.getItem(DONE) ?? '[]')
+  } catch {
+    return []
+  }
+}
+
+/** Has this device already rated this session? */
+export function hasResponded(sessionId) {
+  return doneIds().includes(sessionId)
+}
+
+/** Submit a pulse response. rating 1-5, comment optional. */
+export async function submitResponse(sessionId, rating, comment = '') {
+  const body = comment.trim()
+  const payload = { sessionId, rating, ts: serverTimestamp() }
+  if (body) payload.comment = body
+
+  // Mark done locally FIRST: if the write fails we would rather a person not be
+  // nagged twice by a card they already dismissed. The data is nice to have;
+  // pestering an adviser mid-conference is not.
+  localStorage.setItem(DONE, JSON.stringify([...new Set([...doneIds(), sessionId])]))
+  notify()
+
+  try {
+    await addDoc(responsesRef, payload)
+    return true
+  } catch (err) {
+    console.error('[brain] response not sent', err)
+    return false
+  }
+}
+
+/** All responses — crew only. Empty for attendees, by design. */
+export function responses() {
+  return responseCache
+}
+
+/** Per-session rollup for the crew results screen. */
+export function pulseSummary() {
+  const bySession = new Map()
+  for (const r of responseCache) {
+    const row = bySession.get(r.sessionId) ?? { sessionId: r.sessionId, ratings: [], comments: [] }
+    if (typeof r.rating === 'number') row.ratings.push(r.rating)
+    if (r.comment) row.comments.push(r.comment)
+    bySession.set(r.sessionId, row)
+  }
+  return [...bySession.values()]
+    .map((row) => ({
+      ...row,
+      count: row.ratings.length,
+      avg: row.ratings.length ? row.ratings.reduce((a, b) => a + b, 0) / row.ratings.length : 0,
+    }))
+    .sort((a, b) => b.avg - a.avg || b.count - a.count)
+}
+
 /* ---------- auth (moderator + room screen only; attendees never sign in) ---------- */
 
 let currentUser = null
@@ -194,8 +265,11 @@ onAuthStateChanged(auth, (u) => {
   currentUser = u
   authReady = true
   queueUnsub?.()
+  responseUnsub?.()
   queueUnsub = null
+  responseUnsub = null
   cache = []
+  responseCache = []
 
   if (u) {
     // Signed in: the rules now permit listing the queue.
@@ -206,6 +280,20 @@ onAuthStateChanged(auth, (u) => {
         notify()
       },
       (err) => console.error('[brain] queue listener', err),
+    )
+    responseUnsub = onSnapshot(
+      query(responsesRef, orderBy('ts')),
+      (snap) => {
+        responseCache = snap.docs.map((d) => ({
+          id: d.id,
+          sessionId: d.data().sessionId,
+          rating: d.data().rating,
+          comment: d.data().comment ?? '',
+          ts: d.data().ts?.toMillis?.() ?? null,
+        }))
+        notify()
+      },
+      (err) => console.error('[brain] response listener', err),
     )
   }
   notify()

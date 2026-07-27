@@ -15,6 +15,9 @@ import {
   stubView,
   loginView,
   wireLogin,
+  pulseView,
+  wirePulse,
+  resultsView,
 } from './views.js'
 import { icons } from './icons.js'
 import { onChange, onAuthChange, user, authReadyYet } from './brain.js'
@@ -33,11 +36,14 @@ const routes = {
   partner: { render: (arg) => partnerView(arg) },
   tonight: { render: () => tonightView() },
   ask: { render: () => askView(), wire: wireAsk, live: true },
+  // Pulse survey for one session — reached from the home prompt after it ends.
+  pulse: { render: (arg) => pulseView(arg), wire: wirePulse },
   // Crew-facing faces of the same app — hidden routes, sign-in required.
   // Not a nicety: the security rules refuse the question queue to anyone
   // who isn't authenticated, so these screens are empty without it.
   mod: { render: () => modView(), wire: wireMod, live: true, auth: true },
   screen: { render: () => screenView(), live: true, chrome: false, auth: true },
+  results: { render: () => resultsView(), live: true, auth: true },
   materials: { render: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.') },
   wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.') },
   venue: { render: () => stubView('Venue', 'Map, address and parking.') },
@@ -89,7 +95,7 @@ function render() {
 
   renderTabs(base)
   if (gated) wireLogin(render)
-  else if (!waiting) route.wire?.(render)
+  else if (!waiting) route.wire?.(render, rest.join('/'))
   if (route.live) unsubscribe = onChange(render)
   view.scrollTop = 0
   window.scrollTo(0, 0)

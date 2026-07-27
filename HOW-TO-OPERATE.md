@@ -18,6 +18,7 @@ It is **one app worn three ways**. Attendees open it on their phones and ask que
 | **The guide** | the plain address | Every attendee, on their phone |
 | **The moderator desk** | add `#/mod` to the address | You (or whoever runs Q&A) |
 | **The room screen** | add `#/screen` to the address | The laptop driving the projector |
+| **Pulse results** | add `#/results` to the address | You — **never shown to attendees** |
 
 They are not three apps. They are three doors into one. That's why the whole thing updates itself without anyone refreshing.
 
@@ -81,6 +82,22 @@ They see **only their own**. Nobody can browse other people's questions, and nob
 
 ---
 
+## Pulse surveys (per-session feedback)
+
+**You do not operate these.** They run themselves. This section is so you can explain them and read the results.
+
+**What an attendee sees.** When a session finishes, a card appears at the top of their home screen: *"How was it?"* with the session name. One tap opens a single question — **How useful was this session?** — rated **1 (not useful at all) to 5 (very useful)**, plus an optional comment box. Ten seconds, then it's gone and it never asks again for that session.
+
+**The 90-minute window.** The card chases the freshest session they haven't rated, going back **90 minutes**. So someone who stepped out for a coffee still gets asked about the session they missed the prompt for — but nobody is ever handed a stack of six surveys to work through. If they've rated everything recent, no card appears at all.
+
+**Reading the results.** Go to `#/results`. Sessions are ranked by average rating, highest first, each showing the average out of 5, a plain-English label, how many people responded, and every comment left. It updates live as responses land.
+
+**Anonymity — say this plainly if anyone asks.** No login, no device ID, no name is attached to a rating. "Have I already rated this?" is remembered **on the phone itself**, not on the server. The server knows *"seven people rated this session"* and cannot know *who*. That is deliberate: the Ask screen promises anonymity, and a survey that quietly tracked people would make that promise a lie.
+
+**Who can see results.** Only signed-in crew, enforced twice: the screen requires sign-in, **and** the database refuses to hand over responses to anyone else — even if someone typed the URL directly. Responses are locked down harder than questions.
+
+---
+
 ## If something goes wrong
 
 **The screen has frozen / gone blank.**
@@ -109,10 +126,14 @@ Between practice runs, and before the real thing:
 
 1. Go to **console.firebase.google.com** → project **pgw-nc**
 2. **Firestore Database** → **Data**
-3. Open `events` → `nc-2026` → `questions`
-4. Delete the documents you want gone (the ⋮ menu beside each), or delete the whole `questions` collection to wipe it clean
+3. Open `events` → `nc-2026` → and clear **both** collections:
+   - `questions` — the Q&A
+   - `responses` — the pulse surveys
+4. Delete the documents you want gone (the ⋮ menu beside each), or delete a whole collection to wipe it clean
 
-Deleting questions does not break anything. The collection rebuilds itself the moment someone asks again.
+Deleting either collection breaks nothing. Both rebuild themselves the moment someone asks a question or rates a session.
+
+⚠️ **Clear `responses` too, not just `questions`.** It's the easy one to forget, and stale practice ratings would quietly skew the real numbers you hand PGW afterwards.
 
 ---
 
@@ -129,7 +150,7 @@ Deleting questions does not break anything. The collection rebuilds itself the m
 Be honest with anyone you demo this to:
 
 - **The live public site is not this version.** `d4rkbyd3sign.github.io/pgw-nc-webapp` still runs the old offline demo. Nothing here is on it until we push.
-- **No per-session surveys yet.** Ben Ross's headline ask. They'll ride the same plumbing as Q&A.
+- **No prize draw on survey completion.** Deferred deliberately — surveys first, incentive after.
 - **No admin screen yet.** Editing schedule/speakers on the day still means a code change. The database is ready for it; the screen isn't built.
 - **No rate limiting.** Anyone who has the address can post questions in a loop. Fine for fifty people in a room, needs fixing (Firebase App Check) before invitations go out publicly.
 - **Not load-tested.** Two browsers on one machine is not fifty phones on hotel wifi. The rehearsal is scheduled and it is Lumen's to own.

@@ -1061,3 +1061,165 @@ h1.title .ai::after {
   color: var(--grey);
   line-height: 1.6;
 }
+
+/* ---------- Pulse surveys ---------- */
+
+/* The prompt that appears on home once a session has finished.
+   Sits above "Happening now" deliberately — it is the most time-sensitive
+   thing on the screen, and it disappears the moment it's answered. */
+.pulseprompt {
+  display: block;
+  margin: 4px 24px 26px;
+  padding: 20px 22px 18px;
+  background: var(--greige);
+  border: 1px solid var(--greige-line);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.pulseprompt:active {
+  transform: scale(0.985);
+  background: var(--greige-line);
+}
+.pulseprompt .lab {
+  margin: 0 0 8px;
+  padding: 0;
+}
+.pulseprompt h3 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 5px;
+}
+.pulseprompt p {
+  font-size: 13px;
+  color: var(--grey);
+}
+.pp-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.pp-go svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* The rating row — five big tap targets, not a slider.
+   48px minimum so it works with a thumb, standing up, in a corridor. */
+.ratings {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.rate {
+  height: 56px;
+  font-family: var(--font);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+}
+.rate:active {
+  transform: scale(0.94);
+}
+.rate.on {
+  background: var(--lime);
+  border-color: var(--lime-deep);
+}
+.askform button[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+.pulsedone {
+  padding: 0 24px;
+  color: var(--grey);
+  font-size: 14px;
+}
+
+/* Crew results rollup */
+.pulserow {
+  padding: 18px 20px;
+  background: var(--card);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+.pr-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pr-avg {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--lime);
+  border-radius: 14px;
+}
+.pr-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.pr-n {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+.pr-bar {
+  height: 5px;
+  margin-top: 14px;
+  background: var(--greige);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.pr-bar i {
+  display: block;
+  height: 100%;
+  background: var(--lime-deep);
+}
+.pr-comments {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair);
+}
+.pr-comments p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.pr-comments p:last-child {
+  margin-bottom: 0;
+}
+
+/* Scale anchors — permanent, so the direction is obvious BEFORE anyone taps.
+   Adam, 2026-07-27: without these the meaning of "1" is a guess until you've
+   already committed to it. */
+.rateends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 9px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
