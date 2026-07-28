@@ -134,7 +134,14 @@ function applyUpdate() {
      published by hand, minutes after a push, rather than automatically at the
      moment of one. */
   const { live } = buildState()
-  location.replace(`${location.pathname}?b=${live}${location.hash}`)
+  const target = `${location.pathname}?b=${live}${location.hash}`
+  /* Tapping Refresh a second time would otherwise navigate to the URL the page
+     is already on, which most browsers treat as nothing at all — the button
+     appears dead. Found 2026-07-28 in Adam's two-device test. Reloading in that
+     case is honest: it may not get newer code (there may be none to get), but
+     the press does visibly something. */
+  if (target === `${location.pathname}${location.search}${location.hash}`) location.reload()
+  else location.replace(target)
 }
 
 function renderUpdatebar() {

@@ -217,6 +217,21 @@ bar appears above the tab bar: *"A newer version of the app is ready"* with a
 
 Everyone else's phone shows the bar within a second or two.
 
+**If you publish the wrong thing — roll it back.** If phones are nagging about a
+build that never really went live, open the admin screen on any device. It will say
+*"beacon says 17"* or whatever the wrong number is, and offer **"Roll the beacon back
+to 16."** Press it. The bars disappear everywhere within a second or two, without
+anyone touching their phone.
+
+The rule underneath: **the beacon should always match what the live site actually
+serves.** If it's higher than any real build, every phone nags and none of them can
+ever satisfy it. Rolling back is always safe — it can only ever reduce nagging.
+
+*(Rolling back was impossible until 2026-07-28. The button used to disable itself
+whenever your device was behind, which meant that once the beacon was set too high,
+every device was behind and nobody could fix it. Found by testing on two real
+devices, which is the only reason it isn't a problem you'd have met in Hobart.)*
+
 **Things worth knowing:**
 
 - **It asks. It never reloads anyone's phone by itself.** Deliberate: a silent

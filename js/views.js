@@ -816,7 +816,21 @@ const DELAY_STEPS = [-5, 5, 10, 15]
 
 /* The version beacon's crew face. Deliberately sits on the admin screen and
    nowhere else: announcing an update is a decision someone makes, standing in
-   the room, after checking the new build actually loaded on their own phone. */
+   the room, after checking the new build actually loaded on their own phone.
+
+   ⚠️ THE BUTTON IS NEVER DISABLED, and that is the whole lesson of 2026-07-28.
+   It first shipped disabled whenever your device was behind the beacon — the
+   reasoning being "you cannot announce a version you are not running," which
+   sounds right and is a deadlock. Adam's two-device test walked straight into
+   it: the beacon was pushed to a build that existed on one laptop and nowhere
+   else, so EVERY device was behind, so EVERY device had the button disabled,
+   and nothing in the app could pull it back down. Fifty phones nagging forever
+   with no way to stop them.
+
+   Publishing always writes the build the presser is actually running. Upward
+   that is an announcement; downward it is a rollback. Downward can never be
+   dangerous — it can only ever reduce nagging — so refusing it protected
+   nothing and removed the only escape hatch. */
 function versionBox() {
   const { running, live } = brain.buildState()
   const behind = live > running
@@ -824,18 +838,20 @@ function versionBox() {
   return `
     <span class="lab" style="margin-top:30px">// App version</span>
     <div class="delaybox">
-      <div class="delaynow">Build ${running}${behind ? ` · this device is BEHIND (${live} is live)` : ''}</div>
+      <div class="delaynow">Build ${running}${behind ? ` · beacon says ${live}` : ''}</div>
       <p class="delayhelp">
         ${
           behind
-            ? 'Refresh this device before publishing — you cannot announce a version you are not running.'
+            ? `Phones are being told to run build ${live}, but this device can only get ${running}. If build ${live} was never really deployed, roll the beacon back — it stops everyone nagging.`
             : announced
               ? 'Every phone has been told to run this build. Nothing to do.'
               : `Phones are still being told to run build ${live}. Publish to send everyone to build ${running}.`
         }
       </p>
       <div class="delaybtns">
-        <button class="dbtn" data-publish="1"${behind ? ' disabled' : ''}>Publish to all phones</button>
+        <button class="dbtn" data-publish="1">
+          ${behind ? `Roll the beacon back to ${running}` : 'Publish to all phones'}
+        </button>
       </div>
     </div>`
 }

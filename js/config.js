@@ -35,7 +35,7 @@ export const EVENT_ID = 'nc-2026'
  *  update is announced only after a real person has confirmed the new code
  *  actually loads, not at the moment a push leaves the laptop.
  */
-export const BUILD = 15
+export const BUILD = 16
 
 // SDK is pinned to 12.16.0 (verified present on gstatic 2026-07-27). Import
 // specifiers must be literal strings, so the version is written into each
