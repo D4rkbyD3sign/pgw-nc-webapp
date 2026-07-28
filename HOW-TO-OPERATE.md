@@ -169,6 +169,79 @@ Close the screen tab. Run the Q&A on voices for that session. The app failing is
 
 ---
 
+## Signing out — and why it matters
+
+**A signed-in browser stays signed in.** Close the tab, close the browser, come back
+tomorrow — you're still in. That's deliberate: it stops the room screen showing a
+login form to fifty people after a reload.
+
+The cost is that **the browser itself is the key.** Anyone who picks up that laptop
+can open the moderator desk and read every question, including the ones you
+dismissed. Someone's rejected question is meant to stay between them and you.
+
+So: **sign out when the device leaves your hands.** There's a **Sign out** button at
+the bottom of the moderator desk, the results screen and the admin screen. It asks
+twice — one tap arms it, the second does it — because signing out by accident
+mid-session is an irritation nobody needs.
+
+Sign out when: the conference is over · the laptop goes back to the venue · you
+borrowed someone's machine · anything is being handed to a person who isn't crew.
+
+*(Added 2026-07-28. Until then there was no way to sign out at all — the function
+existed in the code but nothing called it.)*
+
+---
+
+## Pushing a code change while people are using it
+
+Almost nothing needs this. Times, speakers and questions all live in the cloud and
+reach every phone in about a second — that's the whole design. This section is only
+for the rare case where the **code itself** has to change on the day.
+
+The problem it solves: a phone that opened the app at 9am is still running 9am's
+code at 3pm. Pushing new code does nothing for that phone until it reloads, and it
+has no reason to reload.
+
+**So the app carries a version beacon.** Every phone knows which build it is running
+and listens for which build it *should* be running. When those differ, a small dark
+bar appears above the tab bar: *"A newer version of the app is ready"* with a
+**Refresh** button.
+
+**To publish an update:**
+
+1. Push the code as normal, and wait for it to go live (about a minute).
+2. **Open the app yourself and confirm the new version actually loads.** Don't skip
+   this — it's the safety catch.
+3. Go to the admin screen (`#/admin`) → **App version**.
+4. Press **Publish to all phones.**
+
+Everyone else's phone shows the bar within a second or two.
+
+**Things worth knowing:**
+
+- **It asks. It never reloads anyone's phone by itself.** Deliberate: a silent
+  reload would delete a half-typed question out from under someone, and fifty
+  phones reloading mid-presentation is worse than a slightly stale caption. The
+  person taps when they're ready.
+- **You cannot publish a version you aren't running.** If your own device is behind,
+  the button is disabled and tells you to refresh first. That's the whole point of
+  step 2 — the announcement can only come from someone who has proven the new code
+  loads.
+- **Every phone shows its build number** at the very bottom of the Home screen —
+  small grey `BUILD 15`. When someone says "mine looks different," asking what that
+  line says tells you in one second whether their phone is stale or you're chasing a
+  real bug. Attendees will never notice it; you will need it.
+- **The build number has to be bumped in the code** (`js/config.js`, `BUILD`). If
+  whoever made the change forgot, the beacon simply says nothing. It fails quiet,
+  not loud — so the bump is part of making a change, not an afterthought.
+- **The room screen never shows the bar.** A banner across the big display in front
+  of the room is worse than a stale one. Refresh that machine by hand (F5).
+- **Within ten minutes of a push,** a refresh can still be served the old files from
+  the phone's own cache. That's why publishing is a manual press some minutes after
+  the push rather than something automatic.
+
+---
+
 ## Clearing the board
 
 Between practice runs, and before the real thing:
@@ -198,11 +271,11 @@ Deleting either collection breaks nothing. Both rebuild themselves the moment so
 
 Be honest with anyone you demo this to:
 
-- **The live public site is not this version.** `d4rkbyd3sign.github.io/pgw-nc-webapp` still runs the old offline demo. Nothing here is on it until we push.
+- ~~**The live public site is not this version.**~~ **Corrected 2026-07-28 — this was already stale when written.** `d4rkbyd3sign.github.io/pgw-nc-webapp` **is** serving the current build: verified by fetching it — the page loads `js/brain.js` (the real Firestore brain, not the mock) and `js/config.js` carries `EVENT_ID = 'nc-2026'`. `git rev-list origin/main...main` = `0 0`, so nothing is sitting unpushed. **The phone test with the guys is not blocked; the address works today.**
 - **No prize draw on survey completion.** Deferred deliberately — surveys first, incentive after.
 - **Admin covers TIMES ONLY.** Titles, speakers, partners, Wi-Fi and venue still need a code change.
 - **No rate limiting.** Anyone who has the address can post questions in a loop. Fine for fifty people in a room, needs fixing (Firebase App Check) before invitations go out publicly.
-- **Not load-tested.** Two browsers on one machine is not fifty phones on hotel wifi. The rehearsal is scheduled and it is Lumen's to own.
+- **Load-tested against the database, NOT against the room.** On 28 July 2026 Lumen ran 50 and then 100 simulated phones at the real Firestore project (in a throwaway drawer, `events/loadtest-2026-07-28`, so the conference data was never touched). **300 concurrent anonymous writes, zero errors, zero rejections**; sends acknowledged in ~0.45s at fifty, ~0.61s at a hundred. The database is not the risk. **Still untested:** hotel wifi, real phones and browsers, a sustained six-hour day, and the moderator/big-screen leg (that needs the crew sign-in). Full write-up: `Squad/PGW/PGW-NC-2026/Webapp/load-test-2026-07-28.md`.
 
 ---
 

@@ -30,7 +30,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js'
-import { firebaseConfig, EVENT_ID } from './config.js'
+import { firebaseConfig, EVENT_ID, BUILD } from './config.js'
 import { applyScheduleOverrides } from './data.js'
 
 const app = initializeApp(firebaseConfig)
@@ -310,6 +310,56 @@ export async function clearSessionTime(sessionId) {
   delete next[sessionId]
   // Whole-map write, not a merge: merge can't remove a key.
   await setDoc(scheduleRef, { ...schedule, sessions: next })
+}
+
+/* ---------- the version beacon (update discipline point 2, SCOPE.md) ----------
+   The problem it solves: content changes reach a phone instantly because they
+   live in Firestore, but CODE changes don't — a phone that loaded the app at
+   9am is still running 9am's JavaScript at 3pm, and browser caching means a
+   casual refresh may not fix that. So the cloud holds the build number that
+   should be running, every phone compares it to its own, and a stale phone
+   says so.
+
+   Same public-read path as the schedule (`live/{docId}`), so an attendee who
+   never signs in still gets told. Writing it is crew-only, per the rules. */
+
+const appDocRef = doc(db, 'events', EVENT_ID, 'live', 'app')
+
+// Assume we're current until the cloud says otherwise. A missing doc, an
+// offline phone or a malformed value must never produce a false "you're stale"
+// nag at a room full of people — the failure direction is deliberate.
+let liveBuild = BUILD
+
+onSnapshot(
+  appDocRef,
+  (snap) => {
+    const n = Number(snap.data()?.build)
+    liveBuild = Number.isFinite(n) ? n : BUILD
+    notify()
+  },
+  (err) => {
+    // Non-fatal by design, exactly like the schedule listener: no beacon simply
+    // means no update prompt. The app itself keeps working.
+    console.error('[brain] version beacon', err)
+  },
+)
+
+/** True when this phone is running older code than the cloud says it should. */
+export function updateAvailable() {
+  return liveBuild > BUILD
+}
+
+/** What this phone is running, and what it should be. For the admin screen. */
+export function buildState() {
+  return { running: BUILD, live: liveBuild }
+}
+
+/** Announce THIS build to every phone. Crew-only (enforced by the rules).
+ *  Publishes the build number of the code the presser is actually running —
+ *  which is the whole safeguard: you cannot announce a version you haven't
+ *  successfully loaded yourself. */
+export function publishBuild() {
+  return setDoc(appDocRef, { build: BUILD, at: serverTimestamp() }, { merge: true })
 }
 
 /* ---------- auth (moderator + room screen only; attendees never sign in) ---------- */

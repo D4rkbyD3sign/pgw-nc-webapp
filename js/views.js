@@ -182,7 +182,53 @@ export function homeView() {
         </a>
       </div>
     </div>
+
+    <!-- Build stamp. Deliberately dull and deliberately present: during a test
+         or a support conversation, "what does the bottom of your home screen
+         say" settles in one second whether a phone is stale or you're chasing
+         a real bug. Attendees will never notice it; you will need it. -->
+    <p class="buildstamp">BUILD ${brain.buildState().running}</p>
   `
+}
+
+/* ---------- crew footer: the way back out ----------
+   Firebase keeps a crew session in localStorage and it survives closing the
+   browser — deliberate, so the room screen doesn't flash a login form at fifty
+   people after a reload. The cost is that a signed-in browser is a standing key
+   to the moderator desk and every dismissed question, and until 2026-07-28
+   there was no way to hand that key back: signOutMod() existed in brain.js and
+   nothing called it. A borrowed laptop or a venue machine kept the key forever.
+
+   Two taps to confirm: signing out by accident mid-session is recoverable but
+   embarrassing, and the desk is used in a hurry. */
+
+export function crewFooter() {
+  return `
+    <div class="crewout">
+      <button class="dbtn" data-signout="1">Sign out</button>
+    </div>`
+}
+
+export function wireCrewFooter() {
+  const btn = document.querySelector('[data-signout]')
+  if (!btn) return
+  let armed = false
+  btn.addEventListener('click', async () => {
+    if (!armed) {
+      armed = true
+      btn.textContent = 'Tap again to sign out'
+      btn.classList.add('arm')
+      setTimeout(() => {
+        if (!armed) return
+        armed = false
+        btn.textContent = 'Sign out'
+        btn.classList.remove('arm')
+      }, 4000)
+      return
+    }
+    await brain.signOutMod()
+    // onAuthChange re-renders; the crew route falls back to the login form.
+  })
 }
 
 export function agendaView(dayArg) {
@@ -584,6 +630,7 @@ export function modView() {
     ${group('Approved — ready', approved, (q) => `<button class="mbtn go" data-act="promote" data-id="${q.id}">To screen</button><button class="mbtn" data-act="dismiss" data-id="${q.id}">Dismiss</button>`)}
     ${group('History', history, () => '')}
     ${qs.length ? '' : '<p class="stub" style="padding-top:8px">No questions yet — open the Ask tab in another tab of this browser to demo the loop.</p>'}
+    ${crewFooter()}
   `
 }
 
@@ -597,6 +644,7 @@ export function wireMod() {
       else if (act === 'shown') brain.setStatus(id, 'shown')
     }),
   )
+  wireCrewFooter()
 }
 
 export function screenView() {
@@ -754,7 +802,8 @@ export function resultsView() {
         </div>`,
         )
         .join('')}
-    </div>`
+    </div>
+    ${crewFooter()}`
 }
 
 /* ---------- Admin: running late + hand-edited times (crew only) ----------
@@ -764,6 +813,32 @@ export function resultsView() {
    while fifty people wait. */
 
 const DELAY_STEPS = [-5, 5, 10, 15]
+
+/* The version beacon's crew face. Deliberately sits on the admin screen and
+   nowhere else: announcing an update is a decision someone makes, standing in
+   the room, after checking the new build actually loaded on their own phone. */
+function versionBox() {
+  const { running, live } = brain.buildState()
+  const behind = live > running
+  const announced = live === running
+  return `
+    <span class="lab" style="margin-top:30px">// App version</span>
+    <div class="delaybox">
+      <div class="delaynow">Build ${running}${behind ? ` · this device is BEHIND (${live} is live)` : ''}</div>
+      <p class="delayhelp">
+        ${
+          behind
+            ? 'Refresh this device before publishing — you cannot announce a version you are not running.'
+            : announced
+              ? 'Every phone has been told to run this build. Nothing to do.'
+              : `Phones are still being told to run build ${live}. Publish to send everyone to build ${running}.`
+        }
+      </p>
+      <div class="delaybtns">
+        <button class="dbtn" data-publish="1"${behind ? ' disabled' : ''}>Publish to all phones</button>
+      </div>
+    </div>`
+}
 
 export function adminView(dayArg) {
   const day = Number(dayArg) === 2 ? 2 : 1
@@ -811,12 +886,15 @@ export function adminView(dayArg) {
       </div>
     </div>
 
+    ${versionBox()}
+
     <span class="lab" style="margin-top:30px">// ${conference.days.find((d) => d.day === day)?.label ?? `Day ${day}`}</span>
     <div class="daytabs">
       <a href="#/admin/1" class="dtab${day === 1 ? ' on' : ''}">Day 1</a>
       <a href="#/admin/2" class="dtab${day === 2 ? ' on' : ''}">Day 2</a>
     </div>
     <div class="adlist">${list.map(row).join('')}</div>
+    ${crewFooter()}
   `
 }
 
@@ -842,6 +920,20 @@ export function wireAdmin(rerender, dayArg) {
     rerender()
   })
 
+  document.querySelector('.dbtn[data-publish]')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget
+    btn.disabled = true
+    btn.textContent = 'Publishing…'
+    try {
+      await brain.publishBuild()
+      // The beacon listener re-renders on its own when the write lands.
+    } catch (err) {
+      console.error('[admin] publish build', err)
+      btn.disabled = false
+      btn.textContent = 'Publish failed — tap to retry'
+    }
+  })
+
   document.querySelectorAll('.adtime').forEach((input) =>
     input.addEventListener('change', async () => {
       const id = input.dataset.id
@@ -863,6 +955,8 @@ export function wireAdmin(rerender, dayArg) {
       rerender()
     }),
   )
+
+  wireCrewFooter()
 }
 
 /* ---------- Crew sign-in (moderator desk + room screen only) ----------

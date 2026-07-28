@@ -20,9 +20,10 @@ import {
   resultsView,
   adminView,
   wireAdmin,
+  wireCrewFooter,
 } from './views.js'
 import { icons } from './icons.js'
-import { onChange, onAuthChange, user, authReadyYet } from './brain.js'
+import { onChange, onAuthChange, user, authReadyYet, updateAvailable, buildState } from './brain.js'
 
 const view = document.getElementById('view')
 const tabbar = document.getElementById('tabbar')
@@ -45,7 +46,8 @@ const routes = {
   // who isn't authenticated, so these screens are empty without it.
   mod: { render: () => modView(), wire: wireMod, live: true, auth: true },
   screen: { render: () => screenView(), live: true, chrome: false, auth: true },
-  results: { render: () => resultsView(), live: true, auth: true },
+  // wire added 2026-07-28 purely to carry the sign-out; results had no wiring before.
+  results: { render: () => resultsView(), wire: wireCrewFooter, live: true, auth: true },
   admin: { render: (arg) => adminView(arg), wire: wireAdmin, live: true, auth: true },
   materials: { render: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.') },
   wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.') },
@@ -102,11 +104,63 @@ function render() {
   if (route.live) unsubscribe = onChange(render)
   view.scrollTop = 0
   window.scrollTo(0, 0)
+  // Route change can flip screenmode on or off, which decides whether the
+  // update bar is allowed to show at all.
+  renderUpdatebar()
 }
+
+/* ---------- the update bar (version beacon, SCOPE.md discipline point 2) ----------
+   It PROMPTS. It never reloads by itself, and that is a decision, not a
+   shortcut: a silent reload would wipe a half-typed question out from under
+   someone mid-session, and fifty phones deciding to reload together during a
+   presentation is a worse failure than a stale caption. The person taps when
+   they're ready.
+
+   Because it only ever prompts, it also cannot loop — the classic failure of
+   auto-updating pages, where a phone that can't get the new code refreshes
+   itself forever. Worst case here is a bar that stays visible. */
+
+const updatebar = document.createElement('div')
+updatebar.id = 'updatebar'
+updatebar.hidden = true
+document.body.appendChild(updatebar)
+
+function applyUpdate() {
+  /* GitHub Pages serves with Cache-Control: max-age=600 (measured 2026-07-28),
+     so a plain reload inside ten minutes of a push can still be handed the old
+     files from the browser's own cache. The query string moves the document to
+     a URL the cache has never seen. It is not a total guarantee — module
+     imports resolve without the query — which is precisely why the beacon is
+     published by hand, minutes after a push, rather than automatically at the
+     moment of one. */
+  const { live } = buildState()
+  location.replace(`${location.pathname}?b=${live}${location.hash}`)
+}
+
+function renderUpdatebar() {
+  // Never over the room screen: a banner across the big display in front of
+  // fifty people is worse than a stale one. The crew drive that machine and
+  // refresh it deliberately.
+  const stale = updateAvailable() && !app.classList.contains('screenmode')
+  updatebar.hidden = !stale
+  if (!stale) return
+  if (!updatebar.dataset.wired) {
+    updatebar.innerHTML = `
+      <span class="ubtext">A newer version of the app is ready.</span>
+      <button class="ubbtn" type="button">Refresh</button>`
+    updatebar.querySelector('.ubbtn').addEventListener('click', applyUpdate)
+    updatebar.dataset.wired = '1'
+  }
+}
+
+// A permanent subscription, unlike the per-route one below: the beacon has to
+// be able to speak on Home and Agenda too, not only on the live crew screens.
+onChange(renderUpdatebar)
 
 window.addEventListener('hashchange', render)
 onAuthChange(render) // sign-in/out flips the crew routes without a reload
 render()
+renderUpdatebar()
 
 // Keep the "Happening now" card ticking while Home is up.
 setInterval(() => {
