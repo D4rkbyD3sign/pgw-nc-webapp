@@ -942,7 +942,14 @@ export function wireAdmin(rerender, dayArg) {
     btn.textContent = 'Publishing…'
     try {
       await brain.publishBuild()
-      // The beacon listener re-renders on its own when the write lands.
+      /* Repaint explicitly, exactly like every sibling handler on this screen.
+         This originally leaned on the beacon listener to bounce back from
+         Firestore and re-render for us. It was the only handler here that did,
+         and on Adam's phone (2026-07-28) the write landed cleanly while the
+         screen never repainted — the button just sat on "Publishing…" until he
+         reloaded the page by hand. The write is confirmed; do not make the
+         person who pressed the button wait on a round trip to find that out. */
+      rerender()
     } catch (err) {
       console.error('[admin] publish build', err)
       btn.disabled = false
