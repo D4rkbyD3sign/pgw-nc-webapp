@@ -1,7 +1,17 @@
-// Conference content — dummy data in the exact shape the cloud brain (Firebase)
-// and admin screen will fill later. 2027 = new data, same shapes.
-// Sessions/speakers seeded from the REAL 2025 NC agenda (Adam, 2026-07-21),
-// mapped onto the 2026 dates — placeholder until the 2026 program lands.
+// Conference content — the shape the cloud brain (Firebase) and admin screen
+// fill at run time. 2027 = new data, same shapes.
+//
+// SESSIONS: the real 2026 program, transcribed from PGW's working agenda
+// 'Partner Speaking Allocation v3' (Adam, 2026-08-21). Times and partner
+// allocations confirmed; topics, panels, keynote speakers and adviser
+// spotlights are not yet supplied and are NOT invented here.
+//
+// SPEAKERS and PARTNERS below are still the 2025 line-up and are STALE:
+// 7 of the 11 partners listed are not returning in 2026, and the 14 speakers
+// belong to partners who are not coming. No 2026 session points at either —
+// sessions carry their presenting organisation in `org` instead — but the
+// Speakers and Partners tabs still render this old data. They need their own
+// pass once PGW supply names, blurbs and logos.
 
 export const conference = {
   brandName: 'PGW ImplementAI',
@@ -18,12 +28,27 @@ export const conference = {
     { day: 1, date: '2026-10-29', label: 'Thu 29 Oct' },
     { day: 2, date: '2026-10-30', label: 'Fri 30 Oct' },
   ],
+  /* ⛔ CORRECTED 2026-08-21 from PGW's own invitation. This read "Grand
+     Chancellor Hobart, 1 Davey St" — the 2025 placeholder — in every build
+     since July, including the one PGW reviewed. Different hotel, different
+     street. The `parking` line went with it: it described the Grand
+     Chancellor's car park, and nothing is known about the Crowne Plaza's, so
+     the field is REMOVED rather than guessed. The FAQ's parking question is
+     conditional on it and simply stops appearing. */
   venue: {
-    name: 'Grand Chancellor Hobart',
-    address: '1 Davey St, Hobart TAS 7000',
-    mapUrl: 'https://maps.google.com/?q=Hotel+Grand+Chancellor+Hobart',
-    parking: 'Hotel car park via Davey St — validated for attendees.',
+    name: 'Crowne Plaza by IHG',
+    address: 'Level 12, 110 Liverpool Street, Hobart TAS 7000',
+    mapUrl: 'https://maps.google.com/?q=Crowne+Plaza+Hobart+110+Liverpool+Street',
   },
+  /* Both from the invitation, and both are questions an adviser will actually
+     ask — the second one's answer is a named person's inbox. */
+  cpdPoints: 12,
+  accommodation: {
+    covered: false,
+    note: 'PGW have secured a discounted rate at the Crowne Plaza.',
+    contact: 'tracey@pgwfinancial.com.au',
+  },
+  // ⚠️ Still 2025 placeholder — not on the invitation, not confirmed for Hobart.
   wifi: { ssid: 'PGW-Conference', password: 'implement2026' },
   feedbackUrl: 'https://forms.office.com/placeholder',
 }
@@ -66,46 +91,114 @@ export const speakers = [
 const GB = 'Grand Ballroom'
 const AT = 'Atrium'
 
+/* ---------- THE REAL 2026 PROGRAM ----------
+   Transcribed slot for slot from PGW's working agenda,
+   'ImplementAI 2026 - Partner Speaking Allocation v3.docx' (Adam, 2026-08-21),
+   replacing the 2025 booklet shape that stood here since July.
+
+   ⚠️ WHAT IS CONFIRMED: every TIME and every partner ALLOCATION. Those are the
+   document's own tables and they are reproduced exactly.
+
+   ⛔ WHAT IS NOT, AND IS THEREFORE NOT WRITTEN HERE:
+     - Session TOPICS. Only 3 of 15 partners have supplied one. A slot carries
+       the presenting organisation and nothing more until the topic lands, and
+       `summary` says so rather than guessing.
+     - The three panels. The source lists SUGGESTED themes (internal PGW team,
+       cybersecurity, adviser roundtable) under "What's Still Missing" — a
+       suggestion is not a program, and putting it here would make it one.
+     - Both keynote speakers. Neither is booked; the opening candidate has not
+       replied and the closing slot has no candidate.
+     - Both adviser spotlights.
+     - ROOMS. GB/AT are carried over from the 2025 shape and are NOT confirmed
+       for Hobart. Flagged with Adam.
+
+   ⛔ EVENING EVENTS ARE ABSENT ON PURPOSE. PGW's partner tracker shows a
+   Thursday evening dinner and a Friday Annual Awards Dinner exist, but no time
+   and no venue for either. The 2025 entries were Gold Coast venues (Misono,
+   SkyPoint) and carrying those into a Hobart conference would have been worse
+   than showing nothing. Restore them the moment times and venues arrive — the
+   Tonight tile, the Tonight page and the FAQ's evening answers all read from
+   this array and will light up on their own.
+
+   ⚠️ `speakerIds` is empty on every session. The 14 speakers still in this file
+   are the 2025 line-up and belong to partners who are NOT returning. Sessions
+   name their presenting organisation via `org` instead, so nothing here points
+   at a person who is not coming.
+
+   ⚠️ `partnerId` is set ONLY for the four partners returning from 2025, whose
+   records below are still accurate. The eleven new partners have no record yet
+   — no blurb, no logo — so linking them would render a broken tile. */
 export const sessions = [
-  // ---- Day 1 · Thu 29 Oct (2025 shape: starts midday) ----
-  { id: 'd1-reg', day: 1, start: '12:00', end: '12:30', title: 'Registration & Lunch', kind: 'BREAK', room: AT, speakerIds: [], summary: '' },
-  { id: 'd1-welcome', day: 1, start: '12:30', end: '12:40', title: 'Welcome', kind: 'PLENARY', room: GB, speakerIds: [], summary: 'Opening welcome from PGW.' },
-  { id: 'd1-panel-pgw', day: 1, start: '12:40', end: '13:30', title: 'Panel Discussion — PGW', kind: 'PANEL', room: GB, speakerIds: [], summary: 'PGW panel discussion.' },
-  { id: 'd1-stropro', partnerId: 'stropro', day: 1, start: '13:30', end: '14:10', title: 'Maximising Opportunities with Structured Products', kind: 'PLENARY', room: GB, speakerIds: ['joseph'], summary: 'Stropro on structured product opportunities.' },
-  { id: 'd1-trilogy', partnerId: 'trilogy', day: 1, start: '14:10', end: '14:50', title: "Helping Solve Australia's Housing Crisis", kind: 'PLENARY', room: GB, speakerIds: ['ott'], summary: 'Trilogy Funds Management.' },
-  { id: 'd1-arvo-tea', day: 1, start: '14:50', end: '15:10', title: 'Afternoon Tea', kind: 'BREAK', room: AT, speakerIds: [], summary: '' },
-  { id: 'd1-globalx', partnerId: 'globalx', day: 1, start: '15:10', end: '15:50', title: 'Riding the AI Wave: Discipline in Disruption', kind: 'PLENARY', room: GB, speakerIds: ['leung'], summary: 'Global X.' },
-  { id: 'd1-panel-ai', day: 1, start: '15:50', end: '16:40', title: 'Panel Discussion — Investing in the Age of AI', kind: 'PANEL', room: GB, speakerIds: [], summary: 'Panel on investing in the age of AI.' },
-  { id: 'd1-wam', partnerId: 'wam', day: 1, start: '16:40', end: '17:20', title: 'The Structural Advantages of Investing in LIC', kind: 'PLENARY', room: GB, speakerIds: ['mccathie', 'kelly'], summary: 'Wilson Asset Management.' },
-  { id: 'd1-close', day: 1, start: '17:20', end: '17:30', title: 'Closing Session', kind: 'PLENARY', room: GB, speakerIds: [], summary: '' },
+  // ---- Day 1 · Thu 29 Oct · 9:00am to 5:00pm ----
+  { id: 'd1-welcome', day: 1, start: '09:00', end: '09:15', title: 'Welcome & housekeeping', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
+  { id: 'd1-keynote-open', day: 1, start: '09:15', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: [], summary: 'Guest speaker to be announced.' },
+  { id: 'd1-mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:20', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:20', end: '11:40', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-openmarkets', day: 1, start: '11:40', end: '12:00', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-spotlight', day: 1, start: '12:00', end: '12:10', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
+  { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:10', end: '12:55', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-lunch', day: 1, start: '12:55', end: '13:45', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd1-panel-1', day: 1, start: '13:45', end: '14:20', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: 'PGW', speakerIds: [], summary: 'Panel and topic to be announced.' },
+  { id: 'd1-wam', partnerId: 'wam', day: 1, start: '14:20', end: '14:40', title: 'Wilson Asset Management', kind: 'PLENARY', room: GB, org: 'Wilson Asset Management', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-paradino', day: 1, start: '14:40', end: '15:25', title: 'Paradino', kind: 'PLENARY', room: GB, org: 'Paradino', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-arvo-tea', day: 1, start: '15:25', end: '15:55', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd1-panel-2', day: 1, start: '15:55', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: [], summary: 'Panel and topic to be announced.' },
+  { id: 'd1-centuria', day: 1, start: '16:30', end: '16:50', title: 'Centuria', kind: 'PLENARY', room: GB, org: 'Centuria', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-wrap', day: 1, start: '16:50', end: '17:00', title: 'Day one wrap-up', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
-    id: 'd1-drinks', day: 1, start: '17:30', end: '19:00', title: 'Pre-Dinner Drinks', kind: 'SOCIAL', room: 'Misono Lounge Bar', speakerIds: [],
-    summary: 'Whisky lounge with 50+ varieties from around the world, including the acclaimed Nikka range. (2025 placeholder venue.)',
-    venue: { name: 'Misono Lounge Bar', address: 'Level 3/158 Ferny Ave, Surfers Paradise QLD 4217', mapUrl: 'https://maps.google.com/?q=Misono+Lounge+Bar+Surfers+Paradise', dress: 'Smart casual' },
-  },
-  {
-    id: 'd1-dinner', day: 1, start: '19:00', end: '22:00', title: 'Conference Dinner', kind: 'SOCIAL', room: 'Misono Japanese Restaurant', speakerIds: [],
-    summary: 'Teppanyaki dining — live chefs, sushi bar and the outdoor whisky bar. (2025 placeholder venue.)',
-    venue: { name: 'Misono Japanese Restaurant', address: 'Level 3/158 Ferny Ave, Surfers Paradise QLD 4217', mapUrl: 'https://maps.google.com/?q=Misono+Japanese+Restaurant+Surfers+Paradise', dress: 'Smart casual' },
+    id: 'd1-cruise', day: 1, start: '18:30', end: '21:30', title: 'Mustique — Luxury Cruising', kind: 'SOCIAL',
+    room: 'Elizabeth Street Pier', org: '', speakerIds: [],
+    summary: 'Thursday evening on the water.',
+    venue: {
+      // The PLACE, not the operator — the title already carries "Mustique",
+      // and the thing an adviser needs at 6pm is where to walk to.
+      name: 'Elizabeth Street Pier',
+      address: 'Elizabeth Street Pier, Hobart TAS 7000',
+      mapUrl: 'https://maps.google.com/?q=Elizabeth+Street+Pier+Hobart',
+    },
   },
 
-  // ---- Day 2 · Fri 30 Oct ----
-  { id: 'd2-welcome', day: 2, start: '09:00', end: '09:20', title: 'Welcome', kind: 'PLENARY', room: GB, speakerIds: [], summary: '' },
-  { id: 'd2-ausiex', partnerId: 'ausiex', day: 2, start: '09:20', end: '10:00', title: 'Fixed Income Market Update — How Do Bonds Fit Into Your Portfolio', kind: 'PLENARY', room: GB, speakerIds: ['brown'], summary: 'AUSIEX — 80% fixed income update, 20% equity/global markets.' },
-  { id: 'd2-iextend', partnerId: 'iextend', day: 2, start: '10:00', end: '10:40', title: 'iExtend in Action', kind: 'PLENARY', room: GB, speakerIds: ['sutjipto'], summary: 'iExtend.' },
-  { id: 'd2-morning-tea', day: 2, start: '10:40', end: '11:00', title: 'Morning Tea', kind: 'BREAK', room: AT, speakerIds: [], summary: '' },
-  { id: 'd2-gyrostat', partnerId: 'gyrostat', day: 2, start: '11:00', end: '11:40', title: 'Portfolio Construction for Lower Risk Investors — Accumulation to Retirement', kind: 'PLENARY', room: GB, speakerIds: ['racine'], summary: 'Gyrostat.' },
-  { id: 'd2-vaneck', partnerId: 'vaneck', day: 2, start: '11:40', end: '12:20', title: 'Beyond the Benchmark: Investing for the Next Era of Growth', kind: 'PLENARY', room: GB, speakerIds: ['mccormack'], summary: 'Van Eck.' },
-  { id: 'd2-lunch', day: 2, start: '12:20', end: '13:00', title: 'Lunch', kind: 'BREAK', room: AT, speakerIds: [], summary: '' },
-  { id: 'd2-pep', partnerId: 'pep', day: 2, start: '13:00', end: '13:40', title: 'Charting Calm Waters: Private Equity in Turbulent Markets', kind: 'PLENARY', room: GB, speakerIds: ['blanks'], summary: 'PEP.' },
-  { id: 'd2-salesitv', partnerId: 'salesitv', day: 2, start: '13:40', end: '15:00', title: 'Sales Growth Blueprint', kind: 'PLENARY', room: GB, speakerIds: ['mannix'], summary: 'Better Sales Coach (SalesITV).' },
-  { id: 'd2-arvo-tea', day: 2, start: '15:00', end: '15:20', title: 'Afternoon Tea', kind: 'BREAK', room: AT, speakerIds: [], summary: '' },
-  { id: 'd2-bradbury', day: 2, start: '15:20', end: '16:50', title: 'Guest Speaker — Steven Bradbury', kind: 'PLENARY', room: GB, speakerIds: ['bradbury'], summary: 'Guest speaker session.' },
-  { id: 'd2-close', day: 2, start: '16:50', end: '17:00', title: 'Closing Session — Partner Acknowledgement', kind: 'PLENARY', room: GB, speakerIds: [], summary: '' },
+  // ---- Day 2 · Fri 30 Oct · 9:00am to 4:50pm ----
+  { id: 'd2-welcome', day: 2, start: '09:00', end: '09:10', title: 'Welcome back & recap', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
+  { id: 'd2-macquarie', day: 2, start: '09:10', end: '09:30', title: 'Macquarie', kind: 'PLENARY', room: GB, org: 'Macquarie', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-pep', partnerId: 'pep', day: 2, start: '09:30', end: '10:15', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-tal', day: 2, start: '10:15', end: '10:35', title: 'TAL', kind: 'PLENARY', room: GB, org: 'TAL', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-morning-tea', day: 2, start: '10:35', end: '11:05', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd2-afic', day: 2, start: '11:05', end: '11:50', title: 'AFIC', kind: 'PLENARY', room: GB, org: 'AFIC', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-millbrook', day: 2, start: '11:50', end: '12:10', title: 'Millbrook Group', kind: 'PLENARY', room: GB, org: 'Millbrook Group', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-spotlight', day: 2, start: '12:10', end: '12:20', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
+  { id: 'd2-lunch', day: 2, start: '12:20', end: '13:10', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd2-hub24', day: 2, start: '13:10', end: '13:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '13:55', end: '14:15', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-panel-3', day: 2, start: '14:15', end: '15:00', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: [], summary: 'Panel and topic to be announced.' },
+  { id: 'd2-arvo-tea', day: 2, start: '15:00', end: '15:30', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: [], summary: 'Guest speaker to be announced.' },
+  { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
-    id: 'd2-awards', day: 2, start: '18:00', end: '22:30', title: 'Awards Dinner', kind: 'SOCIAL', room: 'SkyPoint, Level 78', speakerIds: [],
-    summary: 'The annual adviser awards night — the conference finale. (2025 placeholder venue.)',
-    venue: { name: 'SkyPoint, Level 78', address: 'Q1 Building, Level 78/9 Hamilton Ave, Surfers Paradise QLD 4217', mapUrl: 'https://maps.google.com/?q=SkyPoint+Q1+Building+Surfers+Paradise', dress: 'Cocktail' },
+    id: 'd2-drinks', day: 2, start: '17:00', end: '18:30', title: 'Drinks', kind: 'SOCIAL',
+    room: 'Level 4', org: '', speakerIds: [],
+    summary: 'Optional — before the awards dinner.',
+    venue: {
+      name: 'Level 4, Crowne Plaza',
+      address: '110 Liverpool Street, Hobart TAS 7000',
+      mapUrl: 'https://maps.google.com/?q=Crowne+Plaza+Hobart+110+Liverpool+Street',
+    },
+  },
+  {
+    id: 'd2-awards', day: 2, start: '18:30', end: '22:00', title: 'Annual Awards Dinner', kind: 'SOCIAL',
+    room: 'Crowne Plaza', org: '', speakerIds: [],
+    summary: 'The adviser awards night — the conference finale.',
+    /* ⚠️ END TIME IS AN ASSUMPTION, and the only invented value in this array.
+       The invitation gives a 6:30pm start and no finish. 22:00 is a guess kept
+       solely because a session needs an end for the agenda to render a range.
+       ⬜ Confirm with Adam and correct — do not let it harden by sitting here. */
+    endAssumed: true,
+    venue: {
+      name: 'Crowne Plaza by IHG',
+      address: 'Level 12, 110 Liverpool Street, Hobart TAS 7000',
+      mapUrl: 'https://maps.google.com/?q=Crowne+Plaza+Hobart+110+Liverpool+Street',
+    },
   },
 ]
 

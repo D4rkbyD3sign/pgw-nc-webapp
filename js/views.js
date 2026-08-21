@@ -36,11 +36,16 @@ export function liveSession(now = new Date()) {
      break on the Friday falls back to a Friday session rather than jumping to
      Thursday — the same fault in miniature. Off-conference it lands on day 1,
      which is what every demo before the event will show. */
+  /* ⚠️ The demo pick is "the first thing anyone actually presents", NOT "the
+     first session with a named speaker". It used to be the latter, and the
+     2026 program has NO confirmed speaker on any slot — so that test matched
+     nothing, `session` came back undefined, and the app threw on every screen
+     that asks what is on. Off-conference that is every demo, including the
+     one Adam runs in front of PGW. Keep this keyed on kind, never on people. */
   const demoDay = day ?? 1
+  const presents = (s) => s.kind !== 'BREAK' && s.kind !== 'SOCIAL'
   const session =
-    hit ??
-    sessions.find((s) => s.day === demoDay && s.speakerIds.length > 0) ??
-    sessions.find((s) => s.speakerIds.length > 0)
+    hit ?? sessions.find((s) => s.day === demoDay && presents(s)) ?? sessions.find(presents)
 
   const start = minutes(session.start)
   const dur = minutes(session.end) - start
@@ -103,12 +108,24 @@ export function askTarget(now = new Date()) {
   return { open: false, session: null, block: b }
 }
 
+/* Named people first, the presenting ORGANISATION second, the room last.
+   ⚠️ The org fallback is not cosmetic. The 2026 program has no confirmed
+   speaker for any slot, so every session runs on `org` — and the old fallback
+   here was a hardcoded "PGW", which would have labelled Macquarie's session,
+   HUB24's and every other partner's as a PGW talk. */
 function whoLine(s) {
   if (s.kind === 'SOCIAL') return `<b>${s.venue?.name ?? s.room}</b> · ${s.venue?.address ?? ''}`
   const names = s.speakerIds.map((id) => speakerById(id)?.name).filter(Boolean)
-  if (!names.length) return `<b>PGW</b> · ${s.room}`
-  const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
-  return `<b>${names.join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
+  if (names.length) {
+    const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
+    return `<b>${names.join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
+  }
+  /* While topics are unconfirmed a partner slot's TITLE is the organisation, so
+     repeating it underneath prints the same name twice in one card. Drop it and
+     show the room alone. This resolves itself the moment real topics land —
+     title becomes the topic and the org reappears beneath it. */
+  if (s.org && s.org !== s.title) return `<b>${s.org}</b> · ${s.room}`
+  return s.room
 }
 
 /** Small wayfinding icon for breaks and social events, by title. */
@@ -730,9 +747,16 @@ function faqSections() {
   const lastDown = [...day2].reverse().find((s) => s.kind !== 'SOCIAL') ?? day2[day2.length - 1]
   const v = conference.venue
 
+  /* The day label is load-bearing here, not decoration: the list runs day 1
+     then day 2, so without it Thursday's 18:30 is followed by Friday's 17:00
+     and the whole thing reads as though the times are out of order. */
   const socialLine = (s) => {
     const ven = s.venue ?? {}
-    return `<li><b>${s.title}</b> — ${s.start}, ${ven.name ?? s.room}${ven.dress ? ` · ${ven.dress}` : ''}</li>`
+    const label = conference.days.find((d) => d.day === s.day)?.label ?? ''
+    const place = ven.name && ven.name !== s.title ? ven.name : s.room
+    return `<li><b>${s.title}</b><br>${label} · ${s.start}${place ? ` · ${place}` : ''}${
+      ven.dress ? ` · ${ven.dress}` : ''
+    }</li>`
   }
   const socials = [...socialsForDay(1), ...socialsForDay(2)]
   const dressCodes = [...new Set(socials.map((s) => s.venue?.dress).filter(Boolean))]
@@ -782,6 +806,24 @@ function faqSections() {
               <p>The <a href="#/agenda">Agenda</a> is live: if a session runs over, the times here move with it.</p>`,
         },
         ...(v.parking ? [{ q: 'Is there parking?', a: `<p>${v.parking}</p>` }] : []),
+        ...(conference.accommodation
+          ? [
+              {
+                q: 'Is accommodation covered?',
+                a: `<p>No — accommodation is at your own cost.</p>
+                    <p>${conference.accommodation.note} For the booking link, email
+                    <a href="mailto:${conference.accommodation.contact}">${conference.accommodation.contact}</a>.</p>`,
+              },
+            ]
+          : []),
+        ...(conference.cpdPoints
+          ? [
+              {
+                q: 'Do I get CPD points?',
+                a: `<p>Attending may earn you up to <b>${conference.cpdPoints} accredited CPD points</b>.</p>`,
+              },
+            ]
+          : []),
         {
           q: "What's the Wi-Fi?",
           a: `<p>Network <b>${conference.wifi.ssid}</b><br>Password <b>${conference.wifi.password}</b></p>`,
@@ -1292,9 +1334,14 @@ export function wireMod() {
 function screenWho(s) {
   if (s.kind === 'SOCIAL') return s.venue?.name ?? s.room
   const names = s.speakerIds.map((id) => speakerById(id)?.name).filter(Boolean)
-  if (!names.length) return ''
-  const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
-  return `${names.join(' & ')}${orgs.length ? ` · ${orgs.join(' · ')}` : ''}`
+  if (names.length) {
+    const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
+    return `${names.join(' & ')}${orgs.length ? ` · ${orgs.join(' · ')}` : ''}`
+  }
+  /* Until speakers are confirmed the room screen shows the presenting
+     organisation — which for the 2026 program is every slot. A blank line
+     under the topic on a projector is worse than a company name. */
+  return s.org || ''
 }
 
 /* The room screen (live phone test item 3, 2026-08-04).
