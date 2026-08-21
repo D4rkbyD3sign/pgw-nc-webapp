@@ -1088,19 +1088,51 @@ h1.title .ai::after {
   justify-content: center;
   gap: 12px;
 }
+/* A watermark, not a headline (2026-08-21). At 17px/600 in full paper this was
+   the loudest text on the screen and it was the THEME — the one thing every
+   person in the room already knows. Dropped a step in weight and held at 78%
+   so it reads as a mark in the corner rather than competing with the topic.
+   78% on charcoal measures well clear of AA, and it is large text besides. */
 .bs-brand {
-  font-size: 17px;
-  font-weight: 600;
+  font-size: clamp(14px, 1.5vw, 18px);
+  font-weight: 500;
   letter-spacing: -0.01em;
-  color: var(--paper);
+  color: rgba(250, 249, 246, 0.78);
 }
-.bs-session {
-  font-family: var(--mono);
-  font-size: clamp(11px, 1.4vw, 15px);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--lime);
+
+/* ---- the orienting pair: what this session is, and who is giving it ----
+   .bs-session (a tracked mono eyebrow) was retired here — it carried the
+   topic at caption size, which is why row ten could not read it. */
+.bs-context {
   margin-bottom: 4vh;
+}
+.bs-topic {
+  font-size: clamp(24px, 3.6vw, 48px);
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+  max-width: 24ch;
+}
+.bs-speaker {
+  margin-top: 1.8vh;
+  font-size: clamp(15px, 1.8vw, 26px);
+  font-weight: 400;
+  color: var(--lime);
+}
+
+/* When a question is on screen the pair steps back to a context line — the
+   question is why anyone is looking at this display. */
+.bigscreen.hasq .bs-topic {
+  font-size: clamp(15px, 1.9vw, 26px);
+  color: var(--lime);
+  max-width: 40ch;
+}
+.bigscreen.hasq .bs-speaker {
+  margin-top: 0.8vh;
+  font-size: clamp(12px, 1.3vw, 17px);
+  /* 0.62 sits above the 0.52 floor measured on this ground in 2026-07-27. */
+  color: rgba(250, 249, 246, 0.62);
 }
 .bs-q {
   font-size: clamp(26px, 4.4vw, 58px);
@@ -1526,4 +1558,413 @@ h1.title .ai::after {
 .qname {
   color: var(--lime-ink);
   font-weight: 600;
+}
+
+/* ---------- Add to home screen (#/install + the prompt on Home) ----------
+   Colours are pulled from the tokens above, never hand-mixed. Two contrast
+   notes, because the contrast pass of 2026-07-28 was undone once already by
+   someone reaching for --grey-light out of habit:
+     - step text uses --ink, not --grey: these are instructions being followed
+       on a phone in a bright hotel foyer, one hand on a coffee.
+     - --grey (5.9:1 on paper) carries the sub-labels. NOT --grey-light. */
+
+.instbar {
+  display: flex;
+  align-items: stretch;
+  margin: 4px 24px 26px;
+  background: var(--greige);
+  border: 1px solid var(--greige-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.instbar-go {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 4px 16px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s ease;
+}
+.instbar-go:active {
+  background: var(--greige-line);
+}
+.instbar-ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--lime);
+}
+.instbar-ico svg {
+  width: 20px;
+  height: 20px;
+}
+.instbar-go b {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.instbar-go .s {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--grey);
+}
+/* A dismiss that is findable but not inviting — 44px wide so a thumb can hit
+   it, low contrast so it never competes with the thing it dismisses. */
+.instbar-x {
+  flex: none;
+  width: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--grey);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.instbar-x:active {
+  background: var(--greige-line);
+}
+
+.instwhy {
+  margin: 4px 24px 0;
+}
+/* .lab carries its own 24px side padding, for use at full page width. In here
+   the wrapper already provides that gutter, so leaving it doubles up and the
+   label's TEXT lands 24px right of the bullets it belongs to — invisible in
+   the markup, obvious the moment you measure it. */
+.instwhy .lab {
+  padding: 0;
+}
+.instwhy ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.instwhy li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 9px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.instwhy li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lime-deep);
+}
+
+.instnote {
+  margin: 0 24px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+.instnote b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.steps {
+  list-style: none;
+  margin: 0 24px;
+  padding: 0;
+}
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 15px 16px;
+  margin-bottom: 10px;
+  background: var(--card);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+/* A bare numeral, no disc behind it (Adam, 2026-08-21). The icon beside it
+   already carries a filled box; a second filled shape 12px away made the row
+   read as two badges and a sentence instead of one step.
+
+   The height is deliberately the SAME 30px as .stepico rather than sized to
+   the digit. The row top-aligns, so matching heights is what puts the two
+   centres on one line — the earlier 22px disc sat 4px high against the icon,
+   which is exactly the offset Adam picked out by eye. Change one height here
+   and you must change the other. */
+.stepn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 30px;
+  color: var(--grey);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+/* The glyph sits AFTER the number and BEFORE the words on purpose: the eye
+   lands on the shape it is hunting for on its own screen before it starts
+   reading. */
+.stepico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--greige);
+  color: var(--ink);
+}
+.stepico svg {
+  width: 17px;
+  height: 17px;
+}
+.steptxt {
+  flex: 1;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  padding-top: 4px;
+}
+.steptxt b {
+  font-weight: 600;
+}
+
+.instother {
+  margin: 22px 24px 0;
+  border-top: 1px solid var(--greige-line);
+  padding-top: 18px;
+}
+.instother summary {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+  padding: 4px 0;
+}
+.instother summary::-webkit-details-marker {
+  display: none;
+}
+.instother summary::after {
+  content: ' ↓';
+  color: var(--grey);
+}
+.instother[open] summary::after {
+  content: ' ↑';
+}
+.instother .steps,
+.instother .instnote {
+  margin-left: 0;
+  margin-right: 0;
+}
+.instother .instnote {
+  margin-top: 14px;
+}
+
+.instfoot {
+  margin: 26px 24px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+.instfoot b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.instdone {
+  margin: 0 24px;
+  padding: 26px 22px;
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.instmark {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: var(--ink);
+}
+.instmark svg {
+  width: 26px;
+  height: 26px;
+}
+.instdone p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ---------- FAQ (#/faq) ---------- */
+
+/* The catch-all card under Wi-Fi and Venue, spanning both columns. */
+.logicard.wide {
+  grid-column: 1 / -1;
+}
+
+.faqgroup {
+  margin: 0 24px;
+}
+.faqitem {
+  background: var(--card);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.faqitem summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  /* 15px top and bottom on a 13.5px line gives a ~50px target — a question
+     opened one-handed, standing up, with a coffee in the other hand. */
+  padding: 15px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+.faqitem summary::-webkit-details-marker {
+  display: none;
+}
+/* A chevron drawn in CSS rather than another SVG in icons.js — it is
+   decoration that rotates, not an icon anyone needs to recognise. */
+.faqitem summary::after {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-right: 1.5px solid var(--grey);
+  border-bottom: 1.5px solid var(--grey);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.16s ease;
+}
+.faqitem[open] summary::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+.faqitem[open] summary {
+  padding-bottom: 8px;
+}
+.faqbody {
+  padding: 0 18px 16px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.faqbody p {
+  margin: 0 0 10px;
+}
+.faqbody p:last-child {
+  margin-bottom: 0;
+}
+.faqbody b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.faqbody a {
+  color: var(--lime-ink);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(103, 111, 37, 0.3);
+}
+.faqlist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+}
+.faqlist li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 7px;
+}
+.faqlist li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lime-deep);
+}
+
+/* ---------- Welcome + last year's recap (#/welcome) ---------- */
+
+/* Full-width tile in the Jump-to grid. */
+.tile.wide {
+  grid-column: 1 / -1;
+}
+
+.welcomenote {
+  margin: 0 24px;
+  padding: 20px 22px;
+  background: var(--greige);
+  border: 1px solid var(--greige-line);
+  border-radius: var(--radius);
+}
+.welcomenote p {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.welcomenote p + p {
+  margin-top: 12px;
+}
+.welcomenote b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.videowrap {
+  margin: 0 24px;
+}
+/* aspect-ratio rather than the old padding-top hack: the box is correct before
+   the player loads, so the page does not jump when the iframe arrives. */
+.videoframe {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--ink);
+  border: 1px solid var(--hair);
+}
+.videoframe iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.videotitle {
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.videoout {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--grey);
 }

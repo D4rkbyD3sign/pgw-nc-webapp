@@ -6,6 +6,25 @@
     <meta name="theme-color" content="#FAF9F6" />
     <meta name="mobile-web-app-capable" content="yes" />
     <title>ImplementAI 2026 — PGW National Conference</title>
+
+    <!-- Add-to-home-screen. Without these, "install" produces a bookmark: a
+         screenshot for an icon, the page <title> truncated under it, and the
+         app opening inside browser chrome. The manifest is what makes it open
+         clean and wear PGW's face — and it is the right answer on BOTH
+         platforms. Safari has read the manifest since 2018 and it OVERRIDES
+         Apple's old meta tags; Apple's own guidance is not to add
+         apple-mobile-web-app-capable today, because it can harm the install
+         when the manifest is readable. So: manifest, not Apple meta tags.
+         The apple-touch-icon link stays — it costs one file and is what older
+         iPhones reach for. (Checked against Apple/WebKit/web.dev 2026-08-21,
+         not assumed.)
+
+         Every href here is RELATIVE, including start_url and scope inside the
+         manifest. The production domain is bought and not yet in hand; when it
+         lands, none of this needs rewriting. -->
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="img/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="img/icons/icon-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Stand-ins per brand guide: Poppins ≈ Nexa, JetBrains Mono for mono labels. Production swaps to licensed Nexa. -->

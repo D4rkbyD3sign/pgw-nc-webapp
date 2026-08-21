@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes } from './data.js'
+import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 
@@ -134,6 +134,10 @@ export function homeView() {
     </section>
 
     ${pulsePrompt()}
+    <!-- After the pulse prompt on purpose: rating a session that just finished
+         is time-critical and disappears after 90 minutes, while the install
+         nudge is patient and will still be here tomorrow. -->
+    ${installPrompt()}
 
     <span class="lab">Happening now</span>
     <div class="nowrap">
@@ -158,6 +162,12 @@ export function homeView() {
     <div class="navwrap">
       <span class="lab">// Jump to</span>
       <div class="grid">
+        <!-- Full width and first: it is the one tile with a reason to be
+             opened BEFORE the conference rather than during it. -->
+        <a href="#/welcome" class="tile wide">
+          <div class="ico">${icons.play}</div>
+          <div><div class="n">Welcome</div><div class="s">And last year's, on the Gold Coast</div></div>
+        </a>
         <a href="#/speakers" class="tile">
           <div class="ico">${icons.speakers}</div>
           <div><div class="n">Speakers</div><div class="s">${speakers.length} this year</div></div>
@@ -179,6 +189,13 @@ export function homeView() {
         <a href="#/venue" class="logicard">
           ${icons.pin}
           <div><div class="n">Venue</div><div class="s">Map &amp; parking</div></div>
+        </a>
+        <!-- Spans both columns. The FAQ answers questions from all three
+             tiers — evenings, conference, app — so it does not belong beside
+             Wi-Fi as a peer; it sits under them as the catch-all. -->
+        <a href="#/faq" class="logicard wide">
+          ${icons.help}
+          <div><div class="n">Questions</div><div class="s">The evenings, the venue, this app</div></div>
         </a>
       </div>
     </div>
@@ -455,6 +472,412 @@ export function stubView(title, note) {
   return `<div class="stub"><h2>${title}</h2><p>${note}</p></div>`
 }
 
+/* ---------- Welcome + last year's recap (live phone test item 5) ----------
+   Adam's shape, 2026-08-21: the note sits ABOVE the video, and the video is
+   titled for what it is — last year, on the Gold Coast — so nobody taps it
+   expecting Hobart.
+
+   The player is youtube-nocookie.com rather than youtube.com. Same video, same
+   embed, but it does not write tracking cookies before someone has chosen to
+   press play. Fifty advisers open this app; none of them agreed to be tracked
+   by Google to read a welcome note. `loading="lazy"` keeps the player off the
+   wire entirely until it is scrolled to.
+
+   The watch-on-YouTube link underneath is not decoration: corporate networks
+   and locked-down phones block embedded players, and without it those people
+   get a grey box and no way through. */
+
+export function welcomeView() {
+  const src = `https://www.youtube-nocookie.com/embed/${welcome.videoId}?rel=0`
+  return `
+    <div class="pagehead">
+      <h2>Welcome to ${conference.eventName} ${conference.year}</h2>
+      <p class="sub">${conference.dates} · ${conference.venue.name}</p>
+    </div>
+
+    <div class="welcomenote">
+      <p>Two days with the people you work alongside all year — and a theme that's
+      on everyone's desk right now: <b>${conference.tagline.replace(/\.$/, '')}</b>.</p>
+      <p>Before we get to Hobart, re-live the last one.</p>
+    </div>
+
+    <span class="lab" style="margin-top:30px">// Last year</span>
+    <div class="videowrap">
+      <div class="videoframe">
+        <iframe
+          src="${src}"
+          title="${welcome.videoTitle}"
+          loading="lazy"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <p class="videotitle">${welcome.videoTitle}</p>
+      <a class="videoout" href="https://www.youtube.com/watch?v=${welcome.videoId}" target="_blank" rel="noopener">
+        Can't see it? Watch on YouTube →
+      </a>
+    </div>
+  `
+}
+
+/* ---------- FAQ (live phone test item 4, 2026-08-04) ----------
+   Three sections, exactly as the adviser asked: the events, the conference,
+   the app.
+
+   ⚠️ EVERY TIME, VENUE, DRESS CODE AND ADDRESS BELOW IS READ FROM data.js.
+   None of it is typed into an answer. This is not tidiness — the 2026 program
+   is not in yet and data.js currently holds the 2025 shape as a placeholder.
+   An FAQ with "drinks are at 5:30 at Misono" written into it becomes a SECOND
+   source of truth that goes stale silently the day the real program lands, and
+   the person who finds out is an adviser standing in the wrong foyer. Answers
+   that cannot be derived from data are not written here at all — see the list
+   of open questions below.
+
+   ✅ ANSWERED BY ADAM, 2026-08-21 — three of the four open questions closed:
+     - Booking: not needed, PGW organise it.
+     - Guests: yes, and a form already covers it.
+     - On-the-day help: Tracey, Ben, Johnny, Adam, Alex → data.js crewContacts.
+
+   ⬜ STILL OPEN — deliberately NOT answered, because inventing conference
+   logistics is exactly the kind of confident guess this house has rules about:
+     - Speaker decks. Adam's words were "very likely but we need approval."
+       LIKELY IS NOT A PROMISE, and this FAQ is read by fifty advisers who will
+       treat anything in it as settled. PGW getting the decks and PGW being
+       cleared to hand them out are two different events; only the first is
+       confirmed. No question about decks appears here until the second lands.
+     - The guest form: named but not linked — see the guest answer below. */
+
+/* One helper contact — name, then a number you can tap to dial.
+   No titles (Adam, 2026-08-21). Renders whatever exists and nothing more, so
+   someone without a number still appears as a plain name rather than breaking
+   the list or, worse, rendering an empty tel: link that dials nothing. */
+function contactLine(c) {
+  const ways = []
+  if (c.phone) ways.push(`<a href="tel:${c.phone.replace(/\s/g, '')}">${c.phone}</a>`)
+  if (c.email) ways.push(`<a href="mailto:${c.email}">${c.email}</a>`)
+  return `<li><b>${c.name}</b>${ways.length ? `<br>${ways.join(' · ')}` : ''}</li>`
+}
+
+function faqSections() {
+  const day1 = agendaForDay(1)
+  const day2 = agendaForDay(2)
+  const firstUp = day1[0]
+  const lastDown = [...day2].reverse().find((s) => s.kind !== 'SOCIAL') ?? day2[day2.length - 1]
+  const v = conference.venue
+
+  const socialLine = (s) => {
+    const ven = s.venue ?? {}
+    return `<li><b>${s.title}</b> — ${s.start}, ${ven.name ?? s.room}${ven.dress ? ` · ${ven.dress}` : ''}</li>`
+  }
+  const socials = [...socialsForDay(1), ...socialsForDay(2)]
+  const dressCodes = [...new Set(socials.map((s) => s.venue?.dress).filter(Boolean))]
+
+  return [
+    {
+      title: 'About the events',
+      items: [
+        {
+          q: "What's on in the evenings?",
+          a: socials.length
+            ? `<ul class="faqlist">${socials.map(socialLine).join('')}</ul>
+               <p>Full details, addresses and a map link are on the <a href="#/tonight">Tonight</a> page.</p>`
+            : '<p>Nothing scheduled outside the main program.</p>',
+        },
+        ...(dressCodes.length
+          ? [
+              {
+                q: 'What should I wear?',
+                a: `<p>${dressCodes.length === 1 ? `<b>${dressCodes[0]}</b> for the evening events.` : socials.filter((s) => s.venue?.dress).map((s) => `<b>${s.title}</b> — ${s.venue.dress}`).join('<br>')}</p>
+                    <p>Business attire during the sessions.</p>`,
+              },
+            ]
+          : []),
+        {
+          q: 'Do I need to book the evening events?',
+          a: '<p>No. PGW organise the bookings — just come along.</p>',
+        },
+        /* No guest question here, deliberately (Adam, 2026-08-21). Guests were
+           settled at booking — everyone who is coming already answered it on
+           the form. Re-asking a question the reader has personally already
+           answered makes the FAQ look like it doesn't know what's going on. */
+      ],
+    },
+    {
+      title: 'About the conference',
+      items: [
+        {
+          q: 'Where is it?',
+          a: `<p><b>${v.name}</b><br>${v.address}</p>
+              ${v.mapUrl ? `<p><a href="${v.mapUrl}" target="_blank" rel="noopener">Open map &amp; directions →</a></p>` : ''}`,
+        },
+        {
+          q: 'When does it start and finish?',
+          a: `<p><b>${conference.days[0].label}</b> — from ${firstUp.start} (${firstUp.title.toLowerCase()})<br>
+              <b>${conference.days[1].label}</b> — through to about ${lastDown.end}</p>
+              <p>The <a href="#/agenda">Agenda</a> is live: if a session runs over, the times here move with it.</p>`,
+        },
+        ...(v.parking ? [{ q: 'Is there parking?', a: `<p>${v.parking}</p>` }] : []),
+        {
+          q: "What's the Wi-Fi?",
+          a: `<p>Network <b>${conference.wifi.ssid}</b><br>Password <b>${conference.wifi.password}</b></p>`,
+        },
+        ...(crewContacts.length
+          ? [
+              {
+                q: 'Who do I ask for help on the day?',
+                /* The count is derived, never typed. It said "these five" for
+                   about four minutes after the list dropped to four names,
+                   which is the whole argument for computing it. */
+                a: `<p>Any of them — they're all here for the whole conference. Tap a number to call.</p>
+                    <ul class="faqlist">${crewContacts.map(contactLine).join('')}</ul>`,
+              },
+            ]
+          : []),
+      ],
+    },
+    {
+      title: 'About the app',
+      items: [
+        {
+          q: 'Do I need to sign in or create an account?',
+          a: '<p>No — and there is no way to. The app never asks who you are.</p>',
+        },
+        {
+          q: 'Are my questions really anonymous?',
+          a: `<p>Yes. Nothing identifying is collected or sent.</p>
+              <p>You <i>can</i> choose to add your name to a question so the speaker can
+              answer you directly — that is a tick box, off by default, and it
+              <b>resets to off every time</b>. Attaching your name is always a fresh decision.</p>`,
+        },
+        {
+          q: 'What about the feedback surveys?',
+          a: `<p>Always anonymous, with no option to add a name — deliberately.
+              The ratings are only worth having if people can be honest.</p>`,
+        },
+        {
+          q: 'How do I put it on my home screen?',
+          a: `<p>Takes about ten seconds — <a href="#/install">step-by-step instructions are here</a>,
+              for iPhone and Android.</p>`,
+        },
+        {
+          q: 'Do I need to download anything?',
+          a: '<p>No. It is a web page — no app store, no install, nothing to update.</p>',
+        },
+        {
+          q: 'The times look different to the printed agenda',
+          a: `<p>The app is the live one. If a session starts late or runs over, the crew
+              update it here and every phone in the room follows within seconds.</p>`,
+        },
+      ],
+    },
+  ]
+}
+
+export function faqView() {
+  const sections = faqSections()
+    .map(
+      (sec) => `
+      <span class="lab" style="margin-top:30px">// ${sec.title}</span>
+      <div class="faqgroup">
+        ${sec.items
+          .map(
+            (it) => `
+          <details class="faqitem">
+            <summary>${it.q}</summary>
+            <div class="faqbody">${it.a}</div>
+          </details>`,
+          )
+          .join('')}
+      </div>`,
+    )
+    .join('')
+
+  return `
+    <div class="pagehead">
+      <h2>Questions</h2>
+      <p class="sub">The evenings, the conference, and this app.</p>
+    </div>
+    ${sections}
+  `
+}
+
+/* ---------- Add to home screen (live phone test item 1, 2026-08-04) ----------
+   The adviser's words were that the PWA moment is where people fall off. Two
+   things cause that and only one of them is instructions.
+
+   The first is discovery: nothing on a web page can point at the browser's own
+   Share button, so unless someone is told, they will not find it. Hence this
+   page, and hence the prompt on Home.
+
+   The second is worth it: before 2026-08-21 the app had no manifest and no
+   icon, so following the steps perfectly got you a screenshot on your home
+   screen labelled with a truncated page title, opening inside Safari chrome.
+   The instructions were never the missing piece on their own — what they lead
+   to had to be built first. See manifest.webmanifest + tools/make-icons.py. */
+
+const INSTALL_HIDDEN_KEY = 'pgw-nc-install-hidden'
+
+/** True when the app is already running FROM the home screen. */
+export function isInstalled() {
+  try {
+    // display-mode covers Android and modern iOS; navigator.standalone is the
+    // old iOS-only flag, kept because it still answers on older iPhones.
+    return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true
+  } catch {
+    return false
+  }
+}
+
+export function devicePlatform() {
+  const ua = navigator.userAgent || ''
+  if (/iPhone|iPod|iPad/.test(ua)) return 'ios'
+  // iPadOS reports itself as a Mac. Touch points are what give it away — a real
+  // Mac reports 0. Without this an iPad is handed Android's instructions.
+  if (/Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1) return 'ios'
+  if (/Android/.test(ua)) return 'android'
+  return 'desktop'
+}
+
+/* Deliberately no "Install" button anywhere in here.
+   Android CAN offer one via beforeinstallprompt; iOS cannot, and never has. A
+   button that exists on half the room's phones and not the other half makes
+   the instructions read as broken to whoever doesn't get it. One path,
+   everybody, every handset. */
+const INSTALL_GUIDE = {
+  ios: {
+    label: 'iPhone / iPad',
+    note: 'Open this page in <b>Safari</b> — the Share menu only offers it there.',
+    steps: [
+      {
+        icon: icons.share,
+        text: 'Tap <b>Share</b> — the box with an arrow coming out of the top. It sits at the bottom of the screen.',
+      },
+      { icon: icons.plusSquare, text: 'Scroll down the list and tap <b>Add to Home Screen</b>.' },
+      { icon: icons.tick, text: 'Tap <b>Add</b>, top right.' },
+    ],
+  },
+  android: {
+    label: 'Android',
+    note: 'Open this page in <b>Chrome</b>.',
+    steps: [
+      { icon: icons.dots, text: 'Tap the <b>three dots</b> at the top right of Chrome.' },
+      {
+        icon: icons.plusSquare,
+        text: 'Tap <b>Add to Home screen</b> — some phones word it <b>Install app</b>.',
+      },
+      { icon: icons.tick, text: 'Tap <b>Add</b> or <b>Install</b> to confirm.' },
+    ],
+  },
+}
+
+function guideBlock(key) {
+  const g = INSTALL_GUIDE[key]
+  return `
+    <p class="instnote">${g.note}</p>
+    <ol class="steps">
+      ${g.steps
+        .map(
+          (s, i) => `
+        <li class="step">
+          <span class="stepn">${i + 1}</span>
+          <span class="stepico">${s.icon}</span>
+          <span class="steptxt">${s.text}</span>
+        </li>`,
+        )
+        .join('')}
+    </ol>`
+}
+
+export function installView() {
+  const plat = devicePlatform()
+
+  if (isInstalled()) {
+    return `
+      <div class="pagehead">
+        <h2>You're all set</h2>
+        <p class="sub">This is already running from your home screen.</p>
+      </div>
+      <div class="instdone">
+        <span class="instmark">${icons.tick}</span>
+        <p>Nothing more to do — just open <b>PGW NC</b> whenever you need it.</p>
+        <a href="#/" class="ask" style="width:100%;margin-top:18px">Back to the conference</a>
+      </div>`
+  }
+
+  // A laptop can't add anything to a phone's home screen, so don't pretend.
+  const primary = plat === 'desktop' ? null : plat
+  const other = primary === 'ios' ? 'android' : 'ios'
+
+  return `
+    <div class="pagehead">
+      <h2>Add to your home screen</h2>
+      <p class="sub">Takes about ten seconds. No app store, no download.</p>
+    </div>
+
+    <div class="instwhy">
+      <span class="lab" style="margin:0 0 12px">// Why bother</span>
+      <ul>
+        <li>Opens <b>full screen</b> — no address bar eating the top of your phone</li>
+        <li>One tap from your home screen instead of hunting for a link</li>
+        <li>Live agenda, room changes and Q&amp;A, all in the same place</li>
+      </ul>
+    </div>
+
+    ${
+      primary
+        ? `<span class="lab" style="margin-top:28px">// On your ${INSTALL_GUIDE[primary].label}</span>
+           ${guideBlock(primary)}
+           <details class="instother">
+             <summary>Using ${INSTALL_GUIDE[other].label} instead?</summary>
+             ${guideBlock(other)}
+           </details>`
+        : `<p class="instnote" style="margin-top:26px">
+             You're on a computer. Adding to a home screen is a phone thing — open
+             this page on your phone and the steps are below.
+           </p>
+           <span class="lab" style="margin-top:26px">// On ${INSTALL_GUIDE.ios.label}</span>
+           ${guideBlock('ios')}
+           <span class="lab" style="margin-top:28px">// On ${INSTALL_GUIDE.android.label}</span>
+           ${guideBlock('android')}`
+    }
+
+    <p class="instfoot">Look for <b>PGW NC</b> on your home screen when you're done.</p>
+  `
+}
+
+/** The slim prompt on Home. Hidden once installed, and once dismissed. */
+export function installPrompt() {
+  if (isInstalled() || devicePlatform() === 'desktop') return ''
+  try {
+    if (localStorage.getItem(INSTALL_HIDDEN_KEY)) return ''
+  } catch {
+    /* private mode — they get the prompt again, which is a small cost */
+  }
+  return `
+    <div class="instbar">
+      <a href="#/install" class="instbar-go">
+        <span class="instbar-ico">${icons.plusSquare}</span>
+        <span>
+          <b>Add to your home screen</b>
+          <span class="s">Opens full screen · ten seconds</span>
+        </span>
+      </a>
+      <button class="instbar-x" type="button" data-install-hide="1" aria-label="Dismiss">&times;</button>
+    </div>`
+}
+
+export function wireHome(rerender) {
+  document.querySelector('[data-install-hide]')?.addEventListener('click', () => {
+    try {
+      localStorage.setItem(INSTALL_HIDDEN_KEY, '1')
+    } catch {
+      /* nothing to do — the prompt simply returns next visit */
+    }
+    rerender()
+  })
+}
+
 /* ---------- Live Q&A (runs on the brain adapter — mock now, Firebase later) ---------- */
 
 const STATUS_LABEL = {
@@ -647,16 +1070,54 @@ export function wireMod() {
   wireCrewFooter()
 }
 
+/* Who is on stage, as one plain line for the room screen. Deliberately not
+   whoLine(): that one is built for a phone card, carries markup, and falls
+   back to "PGW · Grand Ballroom" when nobody is listed — a room number is
+   noise on a screen everyone is already sitting in front of. Here, no named
+   speaker means no line at all. */
+function screenWho(s) {
+  if (s.kind === 'SOCIAL') return s.venue?.name ?? s.room
+  const names = s.speakerIds.map((id) => speakerById(id)?.name).filter(Boolean)
+  if (!names.length) return ''
+  const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
+  return `${names.join(' & ')}${orgs.length ? ` · ${orgs.join(' · ')}` : ''}`
+}
+
+/* The room screen (live phone test item 3, 2026-08-04).
+
+   The adviser's note was "show the speaker's SESSION TOPIC, not the theme."
+   SCOPE.md recorded that as the cheapest item on the list — "a data-field
+   change" — and that reading was wrong. The topic was ALREADY on the screen.
+   What was wrong was the hierarchy: the theme sat at 17px semibold white while
+   the topic sat under it as an 11–15px tracked mono eyebrow in lime. On a
+   projector, the caption-sized thing is the one nobody in row ten can read.
+   He was right about what he saw and the scope was wrong about why.
+
+   So this is a typographic fix plus one addition: the room screen never showed
+   WHO was speaking at all. In a room, "who is this and what are they talking
+   about" is the orienting pair, and half of it was missing.
+
+   TWO STATES, and the difference is the whole design:
+     - idle → the topic is the hero, because orienting the room is the job.
+     - a question is up → the QUESTION is the hero and the topic drops back to
+       a context line, because the question is why this screen exists.
+   The .hasq class is what switches between them. The brand lockup stays a
+   quiet watermark in both: everyone in the room already knows whose
+   conference they are at. */
 export function screenView() {
   const live = liveSession()
   const q = brain.promotedQuestion()
+  const who = screenWho(live.session)
   return `
-    <div class="bigscreen">
+    <div class="bigscreen${q ? ' hasq' : ''}">
       <div class="bs-head">
         ${icons.logoWhite}
         <span class="bs-brand">PGW <b>ImplementAI</b> ${conference.year}</span>
       </div>
-      <div class="bs-session">${live.session.title}</div>
+      <div class="bs-context">
+        <div class="bs-topic">${live.session.title}</div>
+        ${who ? `<div class="bs-speaker">${who}</div>` : ''}
+      </div>
       ${
         q
           ? `<div class="bs-q">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? q.name.toUpperCase() : 'ANONYMOUS'}</div>`

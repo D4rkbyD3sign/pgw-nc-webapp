@@ -19,6 +19,11 @@ $mime = @{
     '.css'  = 'text/css; charset=utf-8'
     '.js'   = 'text/javascript; charset=utf-8'
     '.json' = 'application/json'
+    # Without this the manifest goes out as application/octet-stream and the
+    # browser refuses it — the icon and standalone launch silently do nothing,
+    # locally only, while the file itself is perfectly fine. Added 2026-08-21
+    # when the manifest landed.
+    '.webmanifest' = 'application/manifest+json'
     '.svg'  = 'image/svg+xml'
     '.png'  = 'image/png'
     '.jpg'  = 'image/jpeg'

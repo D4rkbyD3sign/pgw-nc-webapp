@@ -95,4 +95,30 @@ export const icons = {
   dinner: wrap(
     `<path d="M8 21v-8.2"/><path d="M6 3v4.5a2 2 0 0 0 4 0V3"/><path d="M8 3v9.8"/><path d="M16 21v-6.5"/><path d="M18.5 3c-1.7 0-2.5 2.6-2.5 5.5v6h2.5V3z"/>`,
   ),
+
+  /* Add-to-home-screen glyphs. These three are drawn to LOOK LIKE the buttons
+     people are being told to hunt for on their own phone — the iOS share box,
+     Android's overflow menu, the plus-square. Someone scanning the steps should
+     be able to match the shape on the page to the shape on their screen without
+     reading a word. That matching is the whole job of these icons. */
+  share: wrap(
+    `<path d="M12 15V3.5"/><path d="M8.5 7L12 3.5 15.5 7"/><path d="M6.5 11H5.5a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5v-7a1.5 1.5 0 0 0-1.5-1.5h-1"/>`,
+    1.6,
+  ),
+  dots: wrap(
+    `<circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>`,
+    1.6,
+  ),
+  play: wrap(
+    `<circle cx="12" cy="12" r="9"/><path d="M10.2 8.6l5.2 3.4-5.2 3.4z"/>`,
+    1.6,
+  ),
+  help: wrap(
+    `<circle cx="12" cy="12" r="9"/><path d="M9.4 9.3a2.7 2.7 0 0 1 5.2.9c0 1.8-2.6 2.3-2.6 3.9"/><circle cx="12" cy="17.4" r="1.05" fill="currentColor" stroke="none"/>`,
+    1.6,
+  ),
+  plusSquare: wrap(
+    `<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>`,
+    1.6,
+  ),
 }

@@ -24,6 +24,22 @@ export const conference = {
   feedbackUrl: 'https://forms.office.com/placeholder',
 }
 
+/* ---------- Welcome note + last year's recap (to-do 12) ----------
+   Asked for unprompted by an adviser at the 2026-08-04 phone test, which is
+   better evidence than either Adam or Lumen weighing it.
+
+   ⚠️ THE VIDEO IS UNLISTED AND THIS REPO IS PUBLIC. The id below is readable
+   by anyone who opens the source, so "unlisted" here means UNADVERTISED, not
+   confidential. That is a KNOWING, RECORDED acceptance, not an oversight:
+   Lumen recommended linking out on exposure grounds and Adam overruled on the
+   content itself — a conference recap is not sensitive material (2026-08-06,
+   "i think lets embedd it - not an issue given the type of video it is
+   anyway"). Do not "fix" this back to a link-out without asking him. */
+export const welcome = {
+  videoId: 'ZIosyj8JZwM',
+  videoTitle: 'Our National Conference 2025 — Gold Coast',
+}
+
 // photo: URL to headshot (empty = initials avatar). linkedin: public profile URL.
 // Bios condensed from the 2025 NC booklet (see Squad/PGW/PGW-NC-2026/Webapp/booklet-2025-extract.md).
 export const speakers = [
@@ -174,6 +190,44 @@ export const partners = [
 export function partnerById(id) {
   return partners.find((p) => p.id === id)
 }
+
+/* ---------- On-the-day help (to-do 5, the emergency-contacts ask) ----------
+   The people an adviser calls when something goes wrong at the venue.
+   Names and numbers supplied by Adam, 2026-08-21, verbatim.
+
+   NO TITLES, deliberately (Adam's call). This is a list you scan while
+   something has already gone wrong; a job title does not help you decide who
+   to ring, and four names read faster than four names and four roles.
+
+   ⚠️⚠️ THE NUMBERS BELOW ARE PLACEHOLDERS. THE REAL ONES ARE NOT IN THIS REPO
+   AND MUST NOT BE PUT IN IT.
+
+   This repository is PUBLIC (free-tier Pages requires it). Four of these five
+   mobiles belong to people who are not Adam; they were given for conference
+   use, which is not the same as agreeing to be findable on the open internet.
+   And git history is permanent — deleting a committed number removes it from
+   the file, never from the history of a repo that has already been cloned.
+
+   Agreed with Adam, 2026-08-21: names + placeholders here so the screen can be
+   seen and reviewed, real numbers delivered at runtime from Firestore
+   (events/{EVENT_ID}/live/contacts), same pattern as the schedule overrides —
+   code is the default, cloud is the override.
+   ⬜ NOT BUILT YET. Until it is, this page shows placeholder numbers, so it is
+   NOT fit to put in front of an attendee. Blocker for shipping to-do 5.
+
+   Real numbers live at ~/.house-keys/pgw-nc-contacts.json — outside every
+   repo, never ferried.
+
+   The 0400 000 0XX shape is deliberate: it matches the dummy-phone convention
+   already used for speakers further up this file, and it is obviously fake at
+   a glance, so nobody mistakes a placeholder for a number that will dial. */
+export const crewContacts = [
+  { id: 'ross', name: 'Ben Ross', phone: '0400 000 020' },
+  { id: 'gould', name: 'Tracey Gould', phone: '0400 000 021' },
+  { id: 'griffin', name: 'Alex Griffin', phone: '0400 000 022' },
+  { id: 'shin', name: 'Johnny Shin', phone: '0400 000 023' },
+  { id: 'graham', name: 'Adam Graham', phone: '0400 000 024' },
+]
 
 export const materials = [
   { id: 'm1', sessionId: 'd1-stropro', label: 'Deck — Maximising Opportunities with Structured Products', type: 'deck', url: '#' },

@@ -13,6 +13,10 @@ import {
   wireMod,
   screenView,
   stubView,
+  installView,
+  faqView,
+  welcomeView,
+  wireHome,
   loginView,
   wireLogin,
   pulseView,
@@ -30,7 +34,10 @@ const tabbar = document.getElementById('tabbar')
 const app = document.querySelector('.app')
 
 const routes = {
-  '': { render: () => homeView() },
+  '': { render: () => homeView(), wire: wireHome },
+  install: { render: () => installView() },
+  faq: { render: () => faqView() },
+  welcome: { render: () => welcomeView() },
   agenda: { render: (arg) => agendaView(arg) },
   session: { render: (arg) => sessionView(arg) },
   speakers: { render: () => speakersView() },
