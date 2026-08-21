@@ -1968,3 +1968,115 @@ h1.title .ai::after {
   font-size: 12.5px;
   color: var(--grey);
 }
+
+/* ---------- back control (regression fix, 2026-08-21) ----------
+   Present because v18 made the app open standalone: no address bar, no browser
+   back. Android keeps its system button; iOS had nothing. */
+.backbar {
+  padding: 14px 18px 0;
+}
+.backbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  /* Generous padding, not a big visible box — the target is ~44px tall while
+     the mark stays quiet. A back control has to be hittable with a thumb on
+     the move and must never compete with the page title beneath it. */
+  padding: 10px 12px 10px 6px;
+  margin-left: -6px;
+  border-radius: 12px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--grey);
+  background: transparent;
+}
+.backbtn svg {
+  width: 19px;
+  height: 19px;
+}
+.backbtn:active {
+  background: var(--greige);
+  color: var(--ink);
+}
+/* The speaker and partner pages open on a full-bleed hero, so the bar sits
+   over it rather than pushing it down the screen. */
+.backbar + .sphero,
+.backbar + .ptheroband {
+  margin-top: -6px;
+}
+
+/* ---------- Ask closed between sessions (Adam's ruling, 2026-08-21) ---------- */
+.askshut {
+  margin: 0 24px;
+  padding: 26px 22px;
+  text-align: center;
+  background: var(--greige);
+  border: 1px solid var(--greige-line);
+  border-radius: var(--radius);
+}
+.askshut-ico {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--grey);
+}
+.askshut-ico svg {
+  width: 22px;
+  height: 22px;
+}
+.askshut p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.askshut p + p {
+  margin-top: 8px;
+}
+.askshut b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* The line on a session page that is NOT the one on stage. Quiet on purpose —
+   it replaces a button, and it must not look like one. */
+.asklater {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+.asklater svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+.asklater b {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+/* "Next up — X at 11:05" inside the break card. */
+.nownext {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid var(--greige-line);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+.nownext b {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.now.brk {
+  background: var(--greige);
+  border-color: var(--greige-line);
+  box-shadow: none;
+}

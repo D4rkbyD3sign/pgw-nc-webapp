@@ -10,9 +10,13 @@ export const conference = {
   tagline: 'Turning technology into results.',
   eyebrow: 'National Conference · 29 Oct · Hobart',
   dates: '29–30 October 2026',
+  /* `date` is load-bearing, not decoration. Without it the app had no way to
+     know WHICH DAY it was, and the "what's on now" lookup matched on clock
+     time alone across both days at once. See conferenceNow() below. ISO, and
+     it means the date in CONFERENCE_TZ. */
   days: [
-    { day: 1, label: 'Thu 29 Oct' },
-    { day: 2, label: 'Fri 30 Oct' },
+    { day: 1, date: '2026-10-29', label: 'Thu 29 Oct' },
+    { day: 2, date: '2026-10-30', label: 'Fri 30 Oct' },
   ],
   venue: {
     name: 'Grand Chancellor Hobart',
@@ -253,6 +257,68 @@ export function socialsForDay(day) {
 const toMin = (t) => {
   const [h, m] = t.split(':').map(Number)
   return h * 60 + m
+}
+
+/* ---------- what time is it, and which conference day is it? ----------
+
+   WHY THIS EXISTS. Until 2026-08-21 the app asked the DEVICE what time it was
+   and then searched EVERY session on BOTH days for one whose start/end
+   straddled that clock. It never checked the date. Day 1 sits earlier in the
+   array, so it always won: on the Friday the app would announce Thursday's
+   session, file every question against a Thursday session id, and score every
+   pulse rating against the wrong session. With the 2025 placeholder agenda
+   (day 1 started at noon) that broke 8 of 13 Friday slots. With the real v3
+   agenda — BOTH DAYS 9:00 to ~17:00 — it would have been wrong for
+   essentially all of Friday.
+
+   Found because PGW tested from Adelaide on 2026-08-21 and were half an hour
+   behind Adam, which surfaced that "on now" was device-relative. Chasing that
+   turned up the larger fault underneath: the app had no concept of the date.
+
+   WHOSE CLOCK. The conference timezone, not the device's. Adam's read is right
+   that everyone will be in Hobart together, so this is belt and braces rather
+   than the main event — but a timezone is a DEVICE SETTING, not a fact about
+   where someone is standing: a phone with its timezone set by hand, a laptop
+   brought from interstate, or anyone following along remotely would otherwise
+   see the wrong session. Deciding which day it is needs a date basis anyway,
+   so this costs nothing extra and removes the whole class of fault.
+
+   IANA name, never a fixed offset — Hobart is AEDT in late October and the
+   browser holds the DST rules, we should not. */
+export const CONFERENCE_TZ = 'Australia/Hobart'
+
+const TZ_FMT = new Intl.DateTimeFormat('en-AU', {
+  timeZone: CONFERENCE_TZ,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  // h23 rather than hour12:false — some engines report midnight as "24" under
+  // hour12:false, which would put the clock 24 hours out for one minute a day.
+  hourCycle: 'h23',
+})
+
+/**
+ * The moment `now` expressed in conference time.
+ *
+ * Returns { date, nowMin, day } where `day` is the conference day number, or
+ * NULL when today is not a conference day at all. Null is a real answer and
+ * callers must handle it — it is what makes "nothing is on" expressible.
+ */
+export function conferenceNow(now = new Date()) {
+  const parts = Object.fromEntries(
+    TZ_FMT.formatToParts(now)
+      .filter((p) => p.type !== 'literal')
+      .map((p) => [p.type, p.value]),
+  )
+  const date = `${parts.year}-${parts.month}-${parts.day}`
+  const match = conference.days.find((d) => d.date === date)
+  return {
+    date,
+    nowMin: Number(parts.hour) * 60 + Number(parts.minute),
+    day: match ? match.day : null,
+  }
 }
 
 /** Everything after the given wall-clock minute on a day, in order —

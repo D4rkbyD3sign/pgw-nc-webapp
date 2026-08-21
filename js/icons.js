@@ -109,6 +109,7 @@ export const icons = {
     `<circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>`,
     1.6,
   ),
+  arrowLeft: wrap(`<path d="M15 5l-7 7 7 7"/>`, 1.8),
   play: wrap(
     `<circle cx="12" cy="12" r="9"/><path d="M10.2 8.6l5.2 3.4-5.2 3.4z"/>`,
     1.6,

@@ -33,21 +33,32 @@ const view = document.getElementById('view')
 const tabbar = document.getElementById('tabbar')
 const app = document.querySelector('.app')
 
+/* `back` names the page this one belongs UNDER, and its presence is what puts a
+   back control on the screen. The five tab roots deliberately have none — they
+   are the floor, and a back button on the floor invites people to leave the app.
+
+   ⚠️ THIS IS A REGRESSION FIX, NOT A FEATURE (Ben Ross, 2026-08-21). Until v18
+   the app opened inside the browser, so Safari's chrome and Android's system
+   back were the way out of a speaker profile. v18 added the manifest and the
+   app now opens STANDALONE — no address bar, no browser back. Android still
+   has its system button; on iOS there was suddenly no way back at all except
+   the tab bar. We made the app better and removed the escape hatch in the same
+   push, and Ben found it within hours of the room-screen test. */
 const routes = {
   '': { render: () => homeView(), wire: wireHome },
-  install: { render: () => installView() },
-  faq: { render: () => faqView() },
-  welcome: { render: () => welcomeView() },
+  install: { render: () => installView(), back: '' },
+  faq: { render: () => faqView(), back: '' },
+  welcome: { render: () => welcomeView(), back: '' },
   agenda: { render: (arg) => agendaView(arg) },
-  session: { render: (arg) => sessionView(arg) },
-  speakers: { render: () => speakersView() },
-  speaker: { render: (arg) => speakerView(arg) },
+  session: { render: (arg) => sessionView(arg), back: 'agenda' },
+  speakers: { render: () => speakersView(), back: '' },
+  speaker: { render: (arg) => speakerView(arg), back: 'speakers' },
   partners: { render: () => partnersView() },
-  partner: { render: (arg) => partnerView(arg) },
-  tonight: { render: () => tonightView() },
+  partner: { render: (arg) => partnerView(arg), back: 'partners' },
+  tonight: { render: () => tonightView(), back: '' },
   ask: { render: () => askView(), wire: wireAsk, live: true },
   // Pulse survey for one session — reached from the home prompt after it ends.
-  pulse: { render: (arg) => pulseView(arg), wire: wirePulse },
+  pulse: { render: (arg) => pulseView(arg), wire: wirePulse, back: '' },
   // Crew-facing faces of the same app — hidden routes, sign-in required.
   // Not a nicety: the security rules refuse the question queue to anyone
   // who isn't authenticated, so these screens are empty without it.
@@ -57,8 +68,47 @@ const routes = {
   results: { render: () => resultsView(), wire: wireCrewFooter, live: true, auth: true },
   admin: { render: (arg) => adminView(arg), wire: wireAdmin, live: true, auth: true },
   materials: { render: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.') },
-  wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.') },
-  venue: { render: () => stubView('Venue', 'Map, address and parking.') },
+  wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.'), back: '' },
+  venue: { render: () => stubView('Venue', 'Map, address and parking.'), back: '' },
+}
+
+/* ---------- going back without leaving the app ----------
+
+   Two ways back, and the choice between them matters.
+
+   history.back() is the right one when there IS somewhere to go back to: it
+   returns you where you actually came from, so a speaker reached from a
+   session page goes back to that session rather than to the speaker list.
+
+   But it is WRONG on a cold open. Someone who scans a QR code straight to a
+   speaker profile, or taps a shared link, has no in-app history — and
+   history.back() there walks them OUT of the app entirely, which in standalone
+   mode means out to nothing. So we count our own navigations and fall back to
+   the route's declared parent when the stack is empty.
+
+   `depth` counts hash changes since load. Going back decrements rather than
+   incrementing, which is what the flag is for — without it a back press would
+   look like forward navigation and the count would only ever climb. */
+let depth = 0
+let goingBack = false
+
+function goBack(parent) {
+  if (depth > 0) {
+    goingBack = true
+    history.back()
+  } else {
+    location.hash = `#/${parent}`
+  }
+}
+
+function backBar(parent) {
+  const label = parent === '' ? 'Home' : parent.charAt(0).toUpperCase() + parent.slice(1)
+  return `
+    <div class="backbar">
+      <button class="backbtn" type="button" data-back="${parent}" aria-label="Back to ${label}">
+        ${icons.arrowLeft}<span>Back</span>
+      </button>
+    </div>`
 }
 
 // v4: Me/My Agenda dropped — single-track conference, everyone attends everything.
@@ -101,11 +151,17 @@ function render() {
   const waiting = route.auth && !authReadyYet()
 
   app.classList.toggle('screenmode', route.chrome === false && !gated && !waiting)
+  /* No back control over a login form or the room screen: the first is a
+     dead end by design and the second is a projector nobody navigates. */
+  const showBack = route.back !== undefined && !gated && !waiting
   if (waiting) view.innerHTML = '<div class="stub"><p>…</p></div>'
   else if (gated) view.innerHTML = loginView()
-  else view.innerHTML = route.render(rest.join('/'))
+  else view.innerHTML = (showBack ? backBar(route.back) : '') + route.render(rest.join('/'))
 
   renderTabs(base)
+  if (showBack) {
+    view.querySelector('[data-back]')?.addEventListener('click', (e) => goBack(e.currentTarget.dataset.back))
+  }
   if (gated) wireLogin(render)
   else if (!waiting) route.wire?.(render, rest.join('/'))
   if (route.live) unsubscribe = onChange(render)
@@ -171,7 +227,15 @@ function renderUpdatebar() {
 // be able to speak on Home and Agenda too, not only on the live crew screens.
 onChange(renderUpdatebar)
 
-window.addEventListener('hashchange', render)
+window.addEventListener('hashchange', () => {
+  if (goingBack) {
+    depth = Math.max(0, depth - 1)
+    goingBack = false
+  } else {
+    depth++
+  }
+  render()
+})
 onAuthChange(render) // sign-in/out flips the crew routes without a reload
 render()
 renderUpdatebar()

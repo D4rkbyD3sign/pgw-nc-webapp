@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome } from './data.js'
+import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 
@@ -7,24 +7,100 @@ const minutes = (t) => {
   return h * 60 + m
 }
 
-/** The session on right now (wall clock vs session times).
- *  Outside conference hours we demo the first speaker session so the screen never sits empty. */
+/** The session on right now, in CONFERENCE time, on TODAY's program only.
+ *
+ *  ⚠️ The day filter is the whole point — see conferenceNow() in data.js for
+ *  what went wrong without it. Never widen this search back across both days.
+ *
+ *  Outside conference hours it still demos a session so the room screen never
+ *  sits empty, and `live` says which of the two you are looking at. Callers
+ *  that must not act on a fiction — filing a question, scoring a survey —
+ *  should check `live` rather than assume `session` is really on stage.
+ */
 export function liveSession(now = new Date()) {
-  const nowMin = now.getHours() * 60 + now.getMinutes()
-  const hit = sessions.find(
-    (s) => s.kind !== 'BREAK' && s.kind !== 'SOCIAL' && nowMin >= minutes(s.start) && nowMin < minutes(s.end),
-  )
-  const session = hit ?? sessions.find((s) => s.speakerIds.length > 0)
+  const { nowMin, day } = conferenceNow(now)
+
+  const hit =
+    day === null
+      ? null
+      : sessions.find(
+          (s) =>
+            s.day === day &&
+            s.kind !== 'BREAK' &&
+            s.kind !== 'SOCIAL' &&
+            nowMin >= minutes(s.start) &&
+            nowMin < minutes(s.end),
+        )
+
+  /* The demo session is picked from TODAY's day where there is one, so that a
+     break on the Friday falls back to a Friday session rather than jumping to
+     Thursday — the same fault in miniature. Off-conference it lands on day 1,
+     which is what every demo before the event will show. */
+  const demoDay = day ?? 1
+  const session =
+    hit ??
+    sessions.find((s) => s.day === demoDay && s.speakerIds.length > 0) ??
+    sessions.find((s) => s.speakerIds.length > 0)
+
   const start = minutes(session.start)
   const dur = minutes(session.end) - start
   const minIn = hit ? nowMin - start : Math.round(dur * 0.44)
   return {
     session,
+    live: !!hit, // true only when this session is genuinely on stage right now
+    conferenceDay: day, // null when today is not a conference day
     pct: Math.round((minIn / dur) * 100),
     minIn,
     minLeft: dur - minIn,
     demoNowMin: hit ? nowMin : start + minIn,
   }
+}
+
+/* ---------- what is ACTUALLY happening right now ----------
+   (Adam's ruling, 2026-08-21: "only allow questions asked about the current
+   session.")
+
+   liveSession() above answers "what should the room screen show", and it
+   deliberately invents a session when nothing is on so a projector never sits
+   blank. That invention is right for a projector and WRONG everywhere a
+   decision hangs off it — filing a question, rating a session — because it
+   hands back a fiction that looks exactly like a fact.
+
+   This is the honest answer, with no fallback:
+     live   — a speaker is on stage right now
+     break  — morning tea, lunch, drinks: something is on, nobody is presenting
+     gap    — a conference day, between the ends and the starts
+     ended  — the day's program is finished
+     demo   — not a conference day at all, so nothing is real and everything is
+              a preview. Kept OPEN deliberately: Adam demos this app constantly
+              and gating the demo would have removed the loop from every
+              rehearsal, including the one PGW ran this morning.
+
+   Both this and liveSession() read conferenceNow(), so they can disagree about
+   what is worth showing but never about the time or the day. */
+export function currentBlock(now = new Date()) {
+  const { nowMin, day } = conferenceNow(now)
+  if (day === null) return { state: 'demo', session: liveSession(now).session, next: null }
+
+  const today = sessions.filter((s) => s.day === day)
+  const onAny = today.find((s) => nowMin >= minutes(s.start) && nowMin < minutes(s.end))
+  const next =
+    today
+      .filter((s) => minutes(s.start) > nowMin)
+      .sort((a, b) => minutes(a.start) - minutes(b.start))[0] ?? null
+
+  if (onAny && onAny.kind !== 'BREAK' && onAny.kind !== 'SOCIAL') {
+    return { state: 'live', session: onAny, next }
+  }
+  if (onAny) return { state: 'break', session: onAny, next }
+  return { state: next ? 'gap' : 'ended', session: null, next }
+}
+
+/** Can a question be filed right now, and against what? */
+export function askTarget(now = new Date()) {
+  const b = currentBlock(now)
+  if (b.state === 'live' || b.state === 'demo') return { open: true, session: b.session, block: b }
+  return { open: false, session: null, block: b }
 }
 
 function whoLine(s) {
@@ -81,8 +157,13 @@ const PULSE_WINDOW_MIN = 90
  *  Ben Ross's ask was responses within a minute or two of the presentation, so
  *  this chases sessions just gone — never the one currently running. */
 export function justEndedSession(now = new Date()) {
-  const nowMin = now.getHours() * 60 + now.getMinutes()
-  const day = liveSession(now).session.day
+  const cn = conferenceNow(now)
+  const nowMin = cn.nowMin
+  /* On a conference day, chase only THAT day's sessions. Off-conference, fall
+     back to the demo session's day so the prompt can still be shown in a demo
+     — losing that would quietly remove the thing Ben asked for from every
+     rehearsal before the event. */
+  const day = cn.day ?? liveSession(now).session.day
   return (
     sessions
       .filter(
@@ -112,9 +193,82 @@ function pulsePrompt() {
     </a>`
 }
 
+/* ⛔ THE HERO CARD USED TO SAY "ON NOW" DURING MORNING TEA.
+   liveSession()'s fallback invents a session whenever nothing is on stage, so
+   across every break of the conference the biggest card on the home screen
+   would have announced a talk that had already finished — to fifty people
+   holding phones. It also carried the Ask button, which is how the misfiled
+   questions Adam saw at the 21 Aug test got in.
+
+   Now the card says what is true, and the Ask button only exists where a
+   question has somewhere honest to go. Off-conference nothing changes: a
+   preview is allowed to look alive. */
+
+function homeNowLabel(block) {
+  if (block.state === 'break') return 'Happening now'
+  if (block.state === 'gap') return 'Up next'
+  if (block.state === 'ended') return "That's today"
+  return 'Happening now'
+}
+
+function homeNowCard(block, live) {
+  // Live, or a pre-conference preview — the card as it has always been.
+  if (block.state === 'live' || block.state === 'demo') {
+    const s = block.state === 'live' ? block.session : live.session
+    return `
+      <div class="now">
+        <div class="row">
+          <span class="live"><span class="dot"></span>ON NOW · ${s.start}–${s.end}</span>
+          <span class="tagm">${s.kind}</span>
+        </div>
+        <h3>${s.title}</h3>
+        <div class="who">
+          ${s.speakerIds.length ? '<span class="pic"></span>' : ''}
+          <span class="txt">${whoLine(s)}</span>
+        </div>
+        <div class="prog"><i style="width:${live.pct}%"></i></div>
+        <div class="foot"><span>${live.minIn} MIN IN</span><span>${live.minLeft} MIN LEFT</span></div>
+        <a href="#/ask" class="ask askin">${icons.chat} Ask a question — anonymously</a>
+      </div>`
+  }
+
+  // A break is genuinely on — name it, and say what follows.
+  if (block.state === 'break' && block.session) {
+    const s = block.session
+    return `
+      <div class="now brk">
+        <div class="row">
+          <span class="live"><span class="dot up"></span>ON NOW · ${s.start}–${s.end}</span>
+          <span class="evico">${eventIcon(s)}</span>
+        </div>
+        <h3>${s.title}</h3>
+        <div class="who"><span class="txt">${s.room}</span></div>
+        ${block.next ? `<p class="nownext">Next up — <b>${block.next.title}</b> at ${block.next.start}.</p>` : ''}
+      </div>`
+  }
+
+  // Between things, with the day still to run.
+  if (block.state === 'gap' && block.next) return upcomingCard(block.next)
+
+  return `
+    <div class="now">
+      <h3 style="margin-top:0">That's a wrap for today</h3>
+      <div class="who"><span class="txt">See you tomorrow.</span></div>
+    </div>`
+}
+
 export function homeView() {
   const live = liveSession()
-  const upcoming = upcomingAfter(live.demoNowMin, live.session.day)
+  const block = currentBlock()
+  const cn = conferenceNow()
+  /* On a conference day the carousel runs off the REAL clock. Off-conference it
+     runs off the demo session's position, which is what keeps a preview looking
+     like a live event. */
+  const all =
+    cn.day !== null ? upcomingAfter(cn.nowMin, cn.day) : upcomingAfter(live.demoNowMin, live.session.day)
+  /* In a gap the hero card IS the next session, so it would otherwise appear
+     twice side by side. */
+  const upcoming = block.state === 'gap' ? all.slice(1) : all
   const social = nextSocial()
 
   return `
@@ -139,22 +293,9 @@ export function homeView() {
          nudge is patient and will still be here tomorrow. -->
     ${installPrompt()}
 
-    <span class="lab">Happening now</span>
+    <span class="lab">${homeNowLabel(block)}</span>
     <div class="nowrap">
-      <div class="now">
-        <div class="row">
-          <span class="live"><span class="dot"></span>ON NOW · ${live.session.start}–${live.session.end}</span>
-          <span class="tagm">${live.session.kind}</span>
-        </div>
-        <h3>${live.session.title}</h3>
-        <div class="who">
-          ${live.session.speakerIds.length ? '<span class="pic"></span>' : ''}
-          <span class="txt">${whoLine(live.session)}</span>
-        </div>
-        <div class="prog"><i style="width:${live.pct}%"></i></div>
-        <div class="foot"><span>${live.minIn} MIN IN</span><span>${live.minLeft} MIN LEFT</span></div>
-        <a href="#/ask" class="ask askin">${icons.chat} Ask a question — anonymously</a>
-      </div>
+      ${homeNowCard(block, live)}
       ${upcoming.map(upcomingCard).join('')}
     </div>
     <a href="#/agenda" class="seemore">SEE MORE →</a>
@@ -462,10 +603,33 @@ export function sessionView(id) {
       </a>`,
       )
       .join('')}
+    ${askFromSession(s)}
+  `
+}
+
+/* ⛔ THE MISFILING BUG, and it bit even during a session.
+   This page used to carry a plain "Ask a question" button linking to `#/ask`,
+   which files against whatever is on stage NOW — not the session you are
+   reading. So an adviser browsing tomorrow's PEP talk, tapping Ask, had their
+   question land on the moderator's desk attributed to the session currently
+   running. No break required, and nothing on screen said otherwise.
+
+   The button now appears ONLY when the session you are looking at is the one
+   you would actually be asking about. Otherwise it says when the box opens,
+   which is more use than a button that quietly does the wrong thing. */
+function askFromSession(s) {
+  const t = askTarget()
+  if (t.open && t.session?.id === s.id) {
+    return `
     <div style="padding:20px 24px">
       <a href="#/ask" class="ask" style="margin:0">${icons.chat} Ask a question — anonymously</a>
-    </div>
-  `
+    </div>`
+  }
+  if (s.kind === 'BREAK' || s.kind === 'SOCIAL') return ''
+  return `
+    <div style="padding:20px 24px">
+      <p class="asklater">${icons.chat} Questions for this session open at <b>${s.start}</b>, while it's on.</p>
+    </div>`
 }
 
 export function stubView(title, note) {
@@ -914,20 +1078,80 @@ let askName = (() => {
 })()
 let askNamed = false
 
-export function askView() {
-  const live = liveSession()
+/** The list of your own questions — shown whether the box is open or closed,
+ *  because someone who asked ten minutes ago still wants to know where it got to. */
+function myQuestionsBlock() {
   const mine = brain.myQuestions()
+  if (!mine.length) return ''
+  return `
+    <span class="lab" style="margin-top:28px">// Your questions</span>
+    <div class="mylist">
+      ${mine
+        .slice()
+        .reverse()
+        .map(
+          (q) => `
+      <div class="myq">
+        <p>${q.text}</p>
+        <span class="chip s-${q.status}">${STATUS_LABEL[q.status] ?? q.status}</span>
+      </div>`,
+        )
+        .join('')}
+    </div>`
+}
+
+export function askView() {
+  const t = askTarget()
+
+  /* ⛔ CLOSED BETWEEN SESSIONS — Adam's ruling, 2026-08-21.
+     Before this, the box was always open and every question was stamped with
+     whatever liveSession() returned. During a break that was a session which
+     had already finished; before the doors opened it was a session from the
+     other day. The moderator received real questions filed against the wrong
+     talk, and the asker had no way to know.
+
+     The closed state names what IS happening and when the box reopens. A dead
+     end that explains itself is a different thing from a dead end. */
+  if (!t.open) {
+    const b = t.block
+    const nextLine = b.next
+      ? `<p>The box opens again at <b>${b.next.start}</b>, for <b>${b.next.title}</b>.</p>`
+      : `<p>That's the program done for today.</p>`
+    const nowLine =
+      b.state === 'break' && b.session
+        ? `<p><b>${b.session.title}</b> until ${b.session.end}.</p>`
+        : b.state === 'ended'
+          ? ''
+          : `<p>Nothing is on stage at the moment.</p>`
+    return `
+      <div class="pagehead">
+        <h2>Questions open during sessions</h2>
+        <p class="sub">So every question reaches the right speaker.</p>
+      </div>
+      <div class="askshut">
+        <span class="askshut-ico">${icons.chat}</span>
+        ${nowLine}
+        ${nextLine}
+      </div>
+      ${myQuestionsBlock()}
+    `
+  }
+
+  const session = t.session
   return `
     <div class="pagehead">
       <h2>Ask a question</h2>
       <p class="sub">Anonymous unless you choose to add your name.</p>
     </div>
+    <!-- The session is named here on purpose: this card IS the answer to
+         "which talk is my question going to?", and it is the reason the
+         session-detail pages no longer carry their own Ask button. -->
     <div class="now" style="margin-bottom:16px">
       <div class="row">
-        <span class="live"><span class="dot"></span>ON NOW · ${live.session.start}–${live.session.end}</span>
-        <span class="tagm">${live.session.kind}</span>
+        <span class="live"><span class="dot"></span>ON NOW · ${session.start}–${session.end}</span>
+        <span class="tagm">${session.kind}</span>
       </div>
-      <h3>${live.session.title}</h3>
+      <h3>${session.title}</h3>
     </div>
     <form id="askform" class="askform">
       <textarea id="asktext" rows="3" maxlength="400" placeholder="Type your question for this session…">${askDraft}</textarea>
@@ -950,25 +1174,7 @@ export function askView() {
         ${icons.chat} <span id="asksendlabel">${askNamed ? 'Send with my name' : 'Send anonymously'}</span>
       </button>
     </form>
-    ${
-      mine.length
-        ? `
-    <span class="lab" style="margin-top:28px">// Your questions</span>
-    <div class="mylist">
-      ${mine
-        .slice()
-        .reverse()
-        .map(
-          (q) => `
-      <div class="myq">
-        <p>${q.text}</p>
-        <span class="chip s-${q.status}">${STATUS_LABEL[q.status] ?? q.status}</span>
-      </div>`,
-        )
-        .join('')}
-    </div>`
-        : ''
-    }
+    ${myQuestionsBlock()}
   `
 }
 
@@ -1013,8 +1219,16 @@ export function wireAsk(rerender) {
       }
       askName = who
     }
-    const live = liveSession()
-    brain.submitQuestion(live.session.id, v, who)
+    /* Re-checked at SUBMIT, not just at render. The Ask page can sit open on a
+       phone in someone's pocket while a session ends — without this, a question
+       typed at 10:34 and sent at 10:42 would still be filed against the talk
+       that finished, which is the exact fault this gate exists to close. */
+    const t = askTarget()
+    if (!t.open) {
+      rerender()
+      return
+    }
+    brain.submitQuestion(t.session.id, v, who)
     askDraft = ''
     askNamed = false // back to anonymous by default for the next question
     rerender()
@@ -1377,7 +1591,10 @@ export function adminView(dayArg) {
 
 export function wireAdmin(rerender, dayArg) {
   const day = Number(dayArg) === 2 ? 2 : 1
-  const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
+  /* Conference time, not the laptop's. The crew laptop driving this screen is
+     as likely to have a stale timezone as any phone, and "running late from
+     now" has to mean the same instant to every device in the room. */
+  const nowMin = conferenceNow().nowMin
 
   document.querySelectorAll('.dbtn[data-step]').forEach((b) =>
     b.addEventListener('click', async () => {
