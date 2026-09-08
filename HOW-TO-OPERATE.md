@@ -23,7 +23,9 @@ It is **one app worn three ways**. Attendees open it on their phones and ask que
 
 They are not three apps. They are three doors into one. That's why the whole thing updates itself without anyone refreshing.
 
-**Right now, while we're building:** the addresses are `localhost:8080`, `localhost:8080/#/mod` and `localhost:8080/#/screen`, and they only work on Adam's machine while the preview server is running. When the real domain lands, the addresses change and everything else stays identical.
+**The real address, since 2026-09-08:** **`app.pgwconference.com.au`** — so the moderator desk is `app.pgwconference.com.au/#/mod`, the room screen `app.pgwconference.com.au/#/screen`, results `/#/results`, admin `/#/admin`. This is the app's permanent home; it never moves once attendees have it. The old `d4rkbyd3sign.github.io/pgw-nc-webapp` address redirects here.
+
+~~**Right now, while we're building:** the addresses are `localhost:8080`, `localhost:8080/#/mod` and `localhost:8080/#/screen`, and they only work on Adam's machine while the preview server is running. When the real domain lands, the addresses change and everything else stays identical.~~ *(superseded 2026-09-08 — the domain landed.)*
 
 ---
 

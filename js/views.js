@@ -548,20 +548,61 @@ export function partnersView() {
 export function partnerView(id) {
   const p = partnerById(id)
   if (!p) return stubView('Partner', 'Partner not found.')
+  /* 2026: every block is DERIVED from what PGW's partner sheet holds for this
+     partner — a blank in the sheet is a missing block here, never filler copy.
+     The 2025 view carried editorial tagline/positioning/themeFit fields Lumen
+     wrote from the booklet; PGW supplies none of those for 2026, so they are
+     gone rather than faked. Sessions come from the agenda by `partnerId`, so
+     the "At ImplementAI" block re-derives itself when the program moves. */
+  const theirSessions = sessions.filter((x) => x.partnerId === p.id)
+  const speakers = p.speakers ?? []
+  const dayOf = (x) => conference.days.find((d) => d.day === x.day)?.label ?? ''
   return `
     <div class="ptheroband"><img class="ptlogo big" src="${p.logo}" alt="${p.name}"></div>
     <div class="pagehead" style="padding-top:20px">
       <h2>${p.name}</h2>
-      <p class="sub">${p.positioning}</p>
+      ${p.topic ? `<p class="sub">${p.topic}</p>` : ''}
     </div>
+    ${p.blurb ? `
     <div class="spdetail">
       <p class="spbio">${p.blurb}</p>
-    </div>
-    <span class="lab" style="margin-top:26px">// ImplementAI ${conference.year}</span>
+    </div>` : `
+    <div class="spdetail">
+      <p class="spbio" style="opacity:.6">Partner details to come.</p>
+    </div>`}
+    ${theirSessions.length ? `
+    <span class="lab" style="margin-top:26px">// At ImplementAI ${conference.year}</span>
+    <div class="aglist">
+      ${theirSessions
+        .map(
+          (x) => `
+      <div class="agrow">
+        <div class="agtime">${x.start}</div>
+        <a href="#/session/${x.id}" class="agcard">
+          <div class="row"><span class="live">${dayOf(x)} · ${x.start}–${x.end}</span><span class="tagm">${x.kind}</span></div>
+          <h3>${x.title}</h3>
+        </a>
+      </div>`,
+        )
+        .join('')}
+    </div>` : ''}
+    ${speakers.length ? `
+    <span class="lab" style="margin-top:26px">// Presenting</span>
+    ${speakers
+      .map(
+        (sp) => `
     <div class="now" style="margin-bottom:14px">
-      <p class="spbio" style="margin-top:0">${p.themeFit}</p>
-    </div>
-    <div class="quotebar">“${p.tagline}”</div>
+      <div class="sphero" style="padding:0">
+        ${sp.photo ? `<img class="spportrait" src="${sp.photo}" alt="${sp.name}">` : `<span class="spportrait spinit">${initials(sp.name)}</span>`}
+        <div class="pagehead" style="padding-top:18px">
+          <h3>${sp.name}</h3>
+          ${sp.title ? `<p class="sub">${sp.title} · ${p.short ?? p.name}</p>` : `<p class="sub">${p.short ?? p.name}</p>`}
+        </div>
+      </div>
+      ${sp.bio ? `<p class="spbio" style="margin-top:10px">${sp.bio}</p>` : ''}
+    </div>`,
+      )
+      .join('')}` : ''}
   `
 }
 

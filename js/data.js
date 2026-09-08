@@ -125,26 +125,26 @@ const AT = 'Atrium'
    name their presenting organisation via `org` instead, so nothing here points
    at a person who is not coming.
 
-   ⚠️ `partnerId` is set ONLY for the four partners returning from 2025, whose
-   records below are still accurate. The eleven new partners have no record yet
-   — no blurb, no logo — so linking them would render a broken tile. */
+   ~~⚠️ `partnerId` is set ONLY for the four partners returning from 2025.~~
+   ✅ 2026-09-08: all fifteen 2026 partners have records + logos; every partner
+   session is linked, and its summary carries the topic where PGW has one. */
 export const sessions = [
   // ---- Day 1 · Thu 29 Oct · 9:00am to 5:00pm ----
   { id: 'd1-welcome', day: 1, start: '09:00', end: '09:15', title: 'Welcome & housekeeping', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
   { id: 'd1-keynote-open', day: 1, start: '09:15', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: [], summary: 'Guest speaker to be announced.' },
-  { id: 'd1-mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:20', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:20', end: '11:40', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd1-openmarkets', day: 1, start: '11:40', end: '12:00', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-openmarkets', partnerId: 'openmarkets', day: 1, start: '11:40', end: '12:00', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Tokenisation of real-world assets' },
   { id: 'd1-spotlight', day: 1, start: '12:00', end: '12:10', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
-  { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:10', end: '12:55', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:10', end: '12:55', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Structural weakness in retirement portfolio construction — the SMILE risks: Sequencing, Market, Inflation, Longevity, Emotional' },
   { id: 'd1-lunch', day: 1, start: '12:55', end: '13:45', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-panel-1', day: 1, start: '13:45', end: '14:20', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: 'PGW', speakerIds: [], summary: 'Panel and topic to be announced.' },
   { id: 'd1-wam', partnerId: 'wam', day: 1, start: '14:20', end: '14:40', title: 'Wilson Asset Management', kind: 'PLENARY', room: GB, org: 'Wilson Asset Management', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd1-paradino', day: 1, start: '14:40', end: '15:25', title: 'Paradino', kind: 'PLENARY', room: GB, org: 'Paradino', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-paradino', partnerId: 'paradino', day: 1, start: '14:40', end: '15:25', title: 'Paradino', kind: 'PLENARY', room: GB, org: 'Paradino', speakerIds: [], summary: 'The little things that make AI work in advice — a practical session with workflow examples, adviser use cases and Q&A' },
   { id: 'd1-arvo-tea', day: 1, start: '15:25', end: '15:55', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-panel-2', day: 1, start: '15:55', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: [], summary: 'Panel and topic to be announced.' },
-  { id: 'd1-centuria', day: 1, start: '16:30', end: '16:50', title: 'Centuria', kind: 'PLENARY', room: GB, org: 'Centuria', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-centuria', partnerId: 'centuria', day: 1, start: '16:30', end: '16:50', title: 'Centuria', kind: 'PLENARY', room: GB, org: 'Centuria', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd1-wrap', day: 1, start: '16:50', end: '17:00', title: 'Day one wrap-up', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
     id: 'd1-cruise', day: 1, start: '18:30', end: '21:30', title: 'Mustique — Luxury Cruising', kind: 'SOCIAL',
@@ -161,15 +161,15 @@ export const sessions = [
 
   // ---- Day 2 · Fri 30 Oct · 9:00am to 4:50pm ----
   { id: 'd2-welcome', day: 2, start: '09:00', end: '09:10', title: 'Welcome back & recap', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
-  { id: 'd2-macquarie', day: 2, start: '09:10', end: '09:30', title: 'Macquarie', kind: 'PLENARY', room: GB, org: 'Macquarie', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-macquarie', partnerId: 'macquarie', day: 2, start: '09:10', end: '09:30', title: 'Macquarie', kind: 'PLENARY', room: GB, org: 'Macquarie', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd2-pep', partnerId: 'pep', day: 2, start: '09:30', end: '10:15', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd2-tal', day: 2, start: '10:15', end: '10:35', title: 'TAL', kind: 'PLENARY', room: GB, org: 'TAL', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-tal', partnerId: 'tal', day: 2, start: '10:15', end: '10:35', title: 'TAL', kind: 'PLENARY', room: GB, org: 'TAL', speakerIds: [], summary: 'Life insurance market update' },
   { id: 'd2-morning-tea', day: 2, start: '10:35', end: '11:05', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd2-afic', day: 2, start: '11:05', end: '11:50', title: 'AFIC', kind: 'PLENARY', room: GB, org: 'AFIC', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd2-millbrook', day: 2, start: '11:50', end: '12:10', title: 'Millbrook Group', kind: 'PLENARY', room: GB, org: 'Millbrook Group', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-afic', partnerId: 'afic', day: 2, start: '11:05', end: '11:50', title: 'AFIC', kind: 'PLENARY', room: GB, org: 'AFIC', speakerIds: [], summary: 'Technology insights from the recent company profit reporting season' },
+  { id: 'd2-millbrook', partnerId: 'millbrook', day: 2, start: '11:50', end: '12:10', title: 'Millbrook Group', kind: 'PLENARY', room: GB, org: 'Millbrook Group', speakerIds: [], summary: 'Building resilient portfolios: the growing role of private credit' },
   { id: 'd2-spotlight', day: 2, start: '12:10', end: '12:20', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
   { id: 'd2-lunch', day: 2, start: '12:20', end: '13:10', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd2-hub24', day: 2, start: '13:10', end: '13:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-hub24', partnerId: 'hub24', day: 2, start: '13:10', end: '13:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '13:55', end: '14:15', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd2-panel-3', day: 2, start: '14:15', end: '15:00', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: [], summary: 'Panel and topic to be announced.' },
   { id: 'd2-arvo-tea', day: 2, start: '15:00', end: '15:30', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
@@ -202,85 +202,117 @@ export const sessions = [
   },
 ]
 
-// Educational partners — booklet order = order of importance (PEP top billing).
-// Blurbs condensed from the 2025 booklet; themeFit = how they connect to this year's theme.
+// Educational partners — 2026 line-up, from PGW's Education Partners sheet
+// (Adam, 2026-09-08). Order = the conference artwork: PEP (main partner) first,
+// then alphabetical. NO tiers in the app — Adam ruled it; advisers don't care
+// who paid what, and a Gold partner shouldn't read second-class on a phone.
+//
+// Every field is DERIVED from the sheet, never written here: `blurb` is the
+// partner's own company blurb, `speaker.bio` is their own booklet blurb, `topic`
+// is what they told PGW. Where the sheet is blank the field is absent and the
+// view hides that block — no invented copy. Three typos corrected in transit
+// (Afics → AFIC's, Deustche → Deutsche, McNeiill → McNeill); the sheet is
+// PGW's, so the fix lives here, not there.
+//
+// ⛔ Speakers carry NAME + TITLE only. No mobiles, no emails: this repo is
+// public, and the sheet's contact columns stay in the fenced Squad folder.
+// Speaker photos arrive later (Adam) — `photo` is absent until they do.
+//
+// The 2025 set (eleven partners, four returning) lives in git at v20 `8e9a039`.
 export const partners = [
   {
-    id: 'pep', name: 'Pacific Equity Partners', logo: 'img/partners/pep.png',
-    tagline: "Navigating Markets with Australia's Private Equity Leader",
-    positioning: 'Your Gateway into Private Markets.',
-    blurb: "Australia's largest private equity firm — 27 years, $17 billion under management, 28% Net IRR across economic environments. PEP Gateway, their fund-of-funds, gives advisers' wholesale clients access to world-class PE firms including Bain Capital, Nordic Capital and Veritas, with $50,000 minimums and availability on Netwealth and Hub24.",
-    themeFit: 'Institutional-grade private markets, made accessible through platform technology — private equity as a practical adviser tool, not an institutional privilege.',
+    id: 'pep', name: 'Pacific Equity Partners', short: 'PEP', logo: 'img/partners/2026/pep.png',
+    blurb: 'Pacific Equity Partners (PEP) is an Australia-based Private Markets Fund Manager. Founded in 1998, we are a leader in Australian and New Zealand markets. We work in partnership with management teams to drive business success through transformational profit improvement and have built a reputation for delivering world-class returns.',
+    speakers: [
+      { name: 'Cameron Blanks', title: 'Managing Director', bio: 'Cameron joined Pacific Equity Partners in 2002. Prior to joining PEP, Cameron spent three years with Bain & Company in Australia and North America. Previously, Cameron worked for seven years in the mining and construction industry in Australia, Asia and North America. He received an MBA from MIT Sloan, and a MEng and BEng (First Class Honours) from the University of South Australia where he was a Graduate Society Scholar.' },
+      { name: 'Paul Ryan', bio: 'Paul joined Pacific Equity Partners in 2013. Before joining PEP, he was at Deutsche Bank and Dakota Capital. He holds a BCom (Hons) from the University of Auckland.' },
+    ],
   },
   {
-    id: 'ausiex', name: 'AUSIEX', logo: 'img/partners/ausiex.png',
-    tagline: 'Turning Market Volatility into Strategic Advantages',
-    positioning: 'From volatility to opportunity, seamlessly.',
-    blurb: '25+ years serving Australian advisers; a comprehensive trading and investment platform supporting 4,600+ advisers and 475,000 investors. Backed by Nomura Research Institute, with proprietary trading intelligence and — via the FIIG acquisition — Australia\'s most extensive fixed income platform.',
-    themeFit: 'Proprietary market-data intelligence turned into adviser insight — technology reading the market so advisers can act on it.',
+    id: 'afic', name: 'Australian Foundation Investment Company', short: 'AFIC', logo: 'img/partners/2026/afic.png',
+    blurb: "AFIC is the largest Listed Investment Company in Australia. AFIC's investment style is to buy shares in quality companies and hold them for the medium to long term. The investment objectives are to pay a stable to growing dividend over time and to provide attractive total returns over the medium to long term.",
+    topic: 'Technology insights from the recent company profit reporting season',
+    speakers: [
+      { name: 'Brett McNeill', title: 'Portfolio Manager', bio: 'Brett joined the AFIC Group in October 2019 as the Portfolio Manager for Djerriwarrh Investments. Brett also became the Portfolio Manager of Australian Foundation Investment Company in October 2025. Brett has over 23 years of investment experience. Prior to joining AFIC, Brett spent 14 years at Antares Capital (previously called Portfolio Partners and Aviva Investors) as a Portfolio Manager and Analyst. Brett holds a Bachelor of Commerce (Economics) and is a CFA Charterholder.' },
+    ],
   },
   {
-    id: 'globalx', name: 'Global X', logo: 'img/partners/globalx.png',
-    tagline: 'Beyond Ordinary: Harnessing Structural Growth Through Market Cycles',
-    positioning: 'Smart beta leadership, active-like results.',
-    blurb: 'Over $9 billion in Australia ($632 billion globally) through intelligently designed ETF strategies — thematic megatrends, covered-call income, Australia\'s largest commodity suite and a pioneering bitcoin ETF. Their dynamic GXDW strategy rotates across themes using proprietary momentum indicators.',
-    themeFit: 'ETFs engineered around AI infrastructure, defence tech and semiconductors — investing in the technology transformation the conference is about.',
+    id: 'centuria', name: 'Centuria', logo: 'img/partners/2026/centuria.png',
   },
   {
-    id: 'gyrostat', name: 'Gyrostat', logo: 'img/partners/gyrostat.png',
-    tagline: 'Turning Uncertainty into Opportunity with Dynamic Protection',
-    positioning: 'Harnessing volatility for peace of mind.',
-    blurb: 'Risk-managed equity funds with a 14-year track record: proprietary dynamic hedging that has never exceeded 3% quarterly downside (Class A) while delivering genuine non-correlation to the ASX 200. Available on Hub24, Netwealth and Mason Stevens with SQM 4-star rating.',
-    themeFit: 'Proprietary hedging technology that identifies volatility pricing anomalies — an algorithmic answer to sequencing risk in retirement portfolios.',
+    id: 'ellerston', name: 'Ellerston Capital', logo: 'img/partners/2026/ellerston.png',
   },
   {
-    id: 'iextend', name: 'iExtend', logo: 'img/partners/iextend.png',
-    tagline: 'Transforming Policy Cancellation into Client Retention',
-    positioning: 'Maintaining coverage when clients need it most.',
-    blurb: 'When clients face cancelling life insurance, iExtend steps in to co-own policies — assuming premiums on the co-owned portion and sharing claim proceeds. One in four policies assessed is ultimately retained fully. QuickCalc gives advisers 24/7 pre-assessment with auditable trails.',
-    themeFit: 'A digital-first model (QuickCalc, data-driven assessment) that turns a hard client conversation into a technology-enabled retention strategy.',
+    id: 'gyrostat', name: 'Gyrostat', logo: 'img/partners/2026/gyrostat.png',
+    blurb: 'Gyrostat Capital Management specialises in Retirement Portfolio Resilience — the discipline of helping investors remain financially and emotionally invested throughout their retirement journey, regardless of the path markets take. Gyrostat is an Australian investment manager focused on a structural weakness in portfolio construction — that the approach used to build portfolios in accumulation is often carried unchanged into retirement, despite fundamentally different risk dynamics. Gyrostat’s approach is based on a simple principle: risk is not something to be predicted, but something that is continuously priced and can be managed through structure. Its strategies combine equity exposure with systematic protection, designed to reduce the impact of large market declines while maintaining participation in rising markets. The objective is not to maximise returns, but to improve the consistency of outcomes — particularly for investors exposed to sequencing risk.',
+    topic: 'Structural weakness in retirement portfolio construction, leaving retirees exposed to the SMILE risks — Sequencing, Market, Inflation, Longevity and Emotional risk',
+    speakers: [
+      { name: 'Craig Racine', title: 'Founder', bio: 'Craig Racine has held senior executive positions based in Australia and Hong Kong in asset management, private equity, investment banking, equity research, and industry. He commenced his career in the chartered accounting industry with KPMG. In Hong Kong, his senior management experience included Executive Director at The Asian Infrastructure, Soros Funds Management, Frank Russell Investments, and AMP Capital. During that time, he held Board positions in multi-national companies in China, India, Indonesia, The Philippines, Pakistan, and globally. He was a Managing Director and Head of Sector Research at ING Barings (Asia) and Peregrine Investment Bank. Upon returning to Australia, he founded boutique asset management firm Gyrostat Capital Management.' },
+    ],
   },
   {
-    id: 'stropro', name: 'Stropro', logo: 'img/partners/stropro.png',
-    tagline: 'Institutional Alternatives Democratised for Navigating Every Market Cycle',
-    positioning: 'Turning market cycles into defined returns.',
-    blurb: 'Structured products platform — $1.6bn+ deployed since 2019 across 10 global investment banks (Morgan Stanley, Citi, BNP Paribas, Barclays and more), serving 50+ advisory firms. AI-assisted product screening, multi-bank price tendering and Australia\'s first multi-issuer Protected Equity Loan.',
-    themeFit: 'AI-assisted product screening on the Investment Desk — literally the conference theme applied to structured investments.',
+    id: 'hub24', name: 'HUB24', logo: 'img/partners/2026/hub24.png',
+    blurb: 'HUB24 is a leading provider of integrated platform and technology solutions for financial advisers, offering a flexible and innovative investment platform designed to improve efficiency and deliver better client outcomes. Backed by award-winning functionality and a strong focus on adviser experience, HUB24 helps simplify complexity and drive better financial futures.',
+    speakers: [{ name: 'Jack Rooke' }],
   },
   {
-    id: 'trilogy', name: 'Trilogy Funds', logo: 'img/partners/trilogy.png',
-    tagline: 'Battle-Tested Resilience Through 25+ Years of Market Cycles',
-    positioning: 'Stability through volatility, growth through cycles.',
-    blurb: 'Quarter-century property and mortgage fund manager — $3.4 billion for 5,300+ investors. The flagship Monthly Income Trust has held its $1.00 unit price for 18 years through GFC, COVID and rate cycles. Diversified across residential, commercial, industrial, childcare and NDIS.',
-    themeFit: 'Real-time market intelligence from operating as both lender and fund manager — dual-perspective data advisers can use.',
+    id: 'macquarie', name: 'Macquarie', logo: 'img/partners/2026/macquarie.png',
+    blurb: 'Macquarie’s Banking and Financial Services group and Macquarie Asset Management are part of Macquarie Group, a diversified financial group providing clients with asset management, finance, banking, advisory, and risk and capital solutions across debt, equity and commodities. Founded in 1969, Macquarie Group employs approximately 20,000+ in 34 markets and is listed on the Australian Securities Exchange. Macquarie’s Banking and Financial Services group comprises Macquarie’s retail businesses, providing a diverse range of personal banking, wealth management and business banking products and services to retail clients, advisers, brokers and business clients.',
+    speakers: [{ name: 'Laura Khoury' }],
   },
   {
-    id: 'vaneck', name: 'VanEck', logo: 'img/partners/vaneck.png',
-    tagline: 'Smart Beta Leadership for All-Season Performance',
-    positioning: 'Enhancing Your Financial Portfolio.',
-    blurb: "70 years of global heritage, $23 billion in Australia across 45+ ETFs. Flagship QUAL ETF has delivered 15.19% p.a. since 2014; the suite spans covered calls, thematic AI-infrastructure and defence ETFs, a pioneering bitcoin ETF and the ALFA long-short ETF.",
-    themeFit: '"Intelligently designed investment strategies" — systematic, rules-based investing that shows what disciplined technology does across full market cycles.',
+    id: 'millbrook', name: 'Millbrook Group', logo: 'img/partners/2026/millbrook.png',
+    blurb: "Established in 2005, Millbrook Group is a specialist Australian property credit fund manager focused on delivering income-generating investment opportunities secured by real property. With more than $330 million in funds under management and over 2,400 investors, Millbrook has funded more than $1.3 billion in property loans across Australia, building a strong track record in mortgage-backed private credit. Millbrook's investment philosophy centres on capital preservation, disciplined credit assessment, and generating attractive risk-adjusted returns through first and second mortgage lending secured against Australian real estate. The firm combines institutional-grade credit processes with a relationship-driven approach, offering advisers access to private credit solutions designed to complement traditional fixed income and equity allocations.",
+    topic: 'Building resilient portfolios: the growing role of private credit',
+    speakers: [
+      { name: 'Andrew Slattery', title: 'Head of Investments', bio: 'Andrew Slattery has over 17 years of experience in the financial services sector with expertise in investment management, credit structuring, private banking and relationship management. He has held senior roles at leading firms NAB Private Wealth and ANZ Private. Andrew started his banking career at Citigroup in their Global Transactions business. As Head of Investments, Andrew oversees Millbrook’s capital raising activities, fund strategy, portfolio management, distribution and investor relations.' },
+    ],
   },
   {
-    id: 'wam', name: 'Wilson Asset Management', logo: 'img/partners/wam.png',
-    tagline: 'Catalyst-Driven Excellence Through a Quarter-Century of Market Cycles',
-    positioning: 'Time in the market, not timing the market.',
-    blurb: "From Geoff Wilson's $20m in 1999 to a $6 billion platform serving 130,000+ retail investors through nine Listed Investment Companies. Catalyst-driven investing backed by 4,000+ company meetings a year; 2025's WAM Income Maximiser is Australia's first monthly franked-dividend LIC structure.",
-    themeFit: 'Research at industrial scale — thousands of company meetings distilled into catalyst identification before the broader market moves.',
+    id: 'mst', name: 'MST Financial', logo: 'img/partners/2026/mst.png',
+    blurb: "MST Financial is a premier equity research and institutional services platform founded in 2017 and wholly owned by its staff and representatives. Built by an experienced team of highly regarded investment professionals, MST Financial serves more than 150 institutional investors with research and advisory services consistently rated among the best in the market. As an Australian owned firm, MST Financial brings an alignment of interest and depth of conviction that sets it apart. From this research foundation, MST Financial has evolved into a fully integrated platform purpose built to support advice firms and their clients. Sandstone Insights delivers equity research, market insights and adviser education, while MST Investment Solutions provides portfolio consulting and bespoke implementation across SMA, IMA and MDA structures. MST Income Solutions rounds out the offering with hybrid and credit portfolios, listed and OTC income strategies, and transition portfolios giving advisers institutional grade tools to meet a broad range of client income needs. Underpinning it all, MST Financial's execution and capital markets capabilities ensure seamless end to end implementation. From listed and OTC execution with institutional liquidity access, through to primary market participation via its Equity and Debt Capital Markets division, advisers partnering with MST Financial gain access to infrastructure and expertise that was once the exclusive domain of the largest institutional investors.",
+    speakers: [
+      { name: 'John Lockton', title: 'Chief Investment Officer & Portfolio Manager', bio: 'John brings over two decades of experience in equity strategy and portfolio management to his role as Chief Investment Officer at MST Financial. John joined MST Financial in 2022. As CIO, John is responsible for the multi-asset-class views and sits on investment committees of some of Australia’s leading private wealth firms. Prior to MST, John held senior positions at Wilsons Advisory. John held multiple roles at Wilsons over his 12 years at the Firm, including Head of Asset Allocation and Portfolio Manager for the Australian Equities and Global Equities portfolios.' },
+    ],
   },
   {
-    id: 'zurich', name: 'Zurich', logo: 'img/partners/zurich.png',
-    tagline: '100 years of Australian heritage, global strength',
-    positioning: 'A century of protection, continuously modernised.',
-    blurb: 'Dual brands Zurich and OnePath serve 1.5 million life-insurance customers, with a fortress 256% Swiss Solvency ratio. The all-in-one Adviser Portal gives single sign-on access to both product suites, real-time Portfolio Insights analytics and intelligent quoting.',
-    themeFit: 'AI-enhanced underwriting streamlining mental-health applications — a live example of AI making advice outcomes faster and fairer.',
+    id: 'openmarkets', name: 'Openmarkets', logo: 'img/partners/2026/openmarkets.png',
+    blurb: "Openmarkets Group (OMG) is a leading Australian B2B fintech, providing trading, wealth management infrastructure and technology solutions to financial institutions, advisers and fintechs. We deliver a unique, end-to-end ecosystem that connects investors to markets through scalable, compliant and innovative technology. Operating within Australia's highly regulated financial system under our AFSL and as a clearing broker of ASX, we are trusted by partners to power critical trading and investment capabilities. We also provide wealth management products and services, such as Portfolio Administration, MDA, tax engine and model rebalancing technology.",
+    topic: 'Tokenisation of real-world assets',
+    speakers: [
+      { name: 'Dan Jowett', title: 'Chief Executive Officer', bio: 'Dan is the CEO of Openmarkets and has served as OMG’s Chief Executive Officer since March 2022. Prior to joining Openmarkets, Mr Jowett was the Chief Operating Officer and Chief Financial Officer of Shaw and Partners Limited, an Australian investment and wealth management firm, between 2012 and 2021. Dan commenced his career providing financial assurance and advisory services while at PwC Australia and KPMG UK, and has 30 years of professional experience across stockbroking, wealth management, funds management and investment banking. Mr Jowett is a Fellow of the Institute of Chartered Accountants in England and Wales, holds a Professional Diploma in Stockbroking, and is a Responsible Executive under the ASIC Market Integrity Rules (ASX).' },
+    ],
   },
   {
-    id: 'salesitv', name: 'SalesITV / Dean Mannix', logo: 'img/partners/salesitv.png',
-    tagline: 'World-class sales training, accessible to all advisers',
-    positioning: 'Better People… Better Sales.',
-    blurb: "Australia's largest single-source sales and service training library — 125+ video sessions on a mobile cloud platform, built by Dean Mannix over 25 years and trusted by Goldman Sachs, Westpac, CBA, Macquarie and BT. The Sales ROI Methodology gives advisers replicable, ethical frameworks.",
-    themeFit: 'Cloud-delivered, on-demand coaching — practice-growth capability that lives on the same phone this app does.',
+    id: 'paradino', name: 'Paradino', logo: 'img/partners/2026/paradino.png',
+    blurb: 'Paradino is an end-to-end AI advice automation platform built for Australian financial advisers. It helps advice teams move from discovery to review-ready advice documents by capturing meeting context, organising client knowledge, supporting strategy work, and reducing the manual handling that slows advice down. The platform is built around a simple belief: AI should make advice more effective, not just faster. Advisers stay in control, while Paradino helps make the work more consistent, more traceable, and easier to review. The aim is not to replace judgement, but to give advisers and support teams better tools for the work they already do every day. Paradino works with advice practices, licensees and partners across Australia to bring practical AI into real advice workflows. That includes integrations with key advice, modelling and practice tools, so firms can modernise how advice gets prepared without losing the human judgement, compliance discipline and client context that matter most.',
+    topic: 'The little things that make AI work in advice — a practical session with workflow examples, adviser use cases and Q&A',
+    speakers: [
+      { name: 'Alex Gassner', title: 'Co-Founder & CEO', bio: 'Alex Gassner is Co-Founder and CEO of Paradino, an end-to-end AI advice automation platform for financial advisers. Alex has spent his career inside the advice process. He began in paraplanning and financial advice, before moving into practice development and advice auditing with KPMG. Before co-founding Paradino, he led Scale Up Paraplanning, building workflows that supported hundreds of advisers and the delivery of thousands of Statements of Advice. That experience gives Alex a practical view of where advice work slows down: documentation, review, compliance, handoffs and the small details that can get lost between a client meeting and the final advice document. At Paradino, he works closely with advice practices to build solutions that fit the way advisers actually work, with adviser judgement and approval remaining central.' },
+    ],
+  },
+  {
+    id: 'russell', name: 'Russell Investments', logo: 'img/partners/2026/russell.png',
+    blurb: 'Since 1936, Russell Investments has been building a legacy of continuous innovation to deliver exceptional value to clients, working every day to improve people’s financial security. Russell Investments leverages its global research capabilities to identify and assess the best ideas from across the investment management universe. We then apply these insights through a disciplined portfolio construction process, helping advisers access diversified, professionally managed investment solutions.',
+  },
+  {
+    id: 'tal', name: 'TAL', logo: 'img/partners/2026/tal.png',
+    topic: 'Life insurance market update',
+    speakers: [{ name: 'Mark Olivier', title: 'Business Development Manager NSW' }],
+  },
+  {
+    id: 'trilogy', name: 'Trilogy Funds', logo: 'img/partners/2026/trilogy.png',
+    blurb: 'For over 25 years, Trilogy Funds has specialised in property backed, income investments. We have successfully navigated numerous economic, property and interest rate cycles, seeking to maximise returns while preserving capital in our credit portfolios and pursuing growth in our property investments. Our experience, expertise and reputation enable us to source high quality opportunities for our retail, wholesale and institutional investors.',
+    speakers: [
+      { name: 'Walter Raspopin', title: 'Distribution Manager — QLD, SA & TAS', bio: "Walter Raspopin is the Distribution Manager for Queensland, South Australia and Tasmania at Trilogy Funds. With more than 30 years of experience in the financial services industry, Walter has built an extensive career working across boutique fund managers, banks, building societies and financial planning firms. Walter joined Trilogy Funds over 11 years ago and has played a key role during a period of significant growth for the business. During his tenure, Trilogy's funds under management (FUM) have expanded from approximately $30 million to more than $1.6 billion, reflecting the strength of the firm's investment offering and its growing presence in the market. Drawing on his deep industry knowledge and broad distribution experience, Walter works closely with financial advisers and investment professionals across his regions, helping them identify solutions that support their clients' wealth creation and investment objectives." },
+    ],
+  },
+  {
+    id: 'wam', name: 'Wilson Asset Management', logo: 'img/partners/2026/wam.png',
+    blurb: 'Established in 1997 by Geoff Wilson AO, Wilson Asset Management is an independently owned investment manager based in Sydney, Australia. As the investment manager for nine leading listed investment companies (LICs) listed on the ASX and three unlisted funds, Wilson Asset Management invests $6 billion on behalf of more than 130,000 retail investors. Wilson Asset Management created and is the lead supporter of the first LICs to deliver both investment and social returns: Future Generation Australia (ASX: FGX) and Future Generation Global (ASX: FGG), as well as Future Generation Women.',
+    speakers: [
+      { name: 'Chris Boyd', title: 'Investment Specialist', bio: "Chris Boyd is an Investment Specialist at Wilson Asset Management (WAM), where he works closely with financial advisers, research houses, consultants and professional investors across Australia. With more than 25 years of experience in investment management and wealth distribution, Chris has held senior distribution roles at Pengana Capital Group, HMC Capital and Schroders. He specialises in helping advisers access differentiated investment solutions and is actively involved in the growth of WAM's alternative investment capabilities, including the WAM Founders Fund and WAM Real Assets Fund." },
+    ],
   },
 ]
 
