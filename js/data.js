@@ -240,7 +240,7 @@ export const partners = [
   {
     id: 'hub24', name: 'HUB24', logo: 'img/partners/2026/hub24.png',
     blurb: 'HUB24 is a leading provider of integrated platform and technology solutions for financial advisers, offering a flexible and innovative investment platform designed to improve efficiency and deliver better client outcomes. Backed by award-winning functionality and a strong focus on adviser experience, HUB24 helps simplify complexity and drive better financial futures.',
-    speakers: [{ name: 'Jack Rooke' }],
+    speakers: [{ name: 'Jack Rooke', photo: 'img/speakers/2026/hub24-rooke.jpg' }],
   },
   {
     id: 'macquarie', name: 'Macquarie', logo: 'img/partners/2026/macquarie.png',
