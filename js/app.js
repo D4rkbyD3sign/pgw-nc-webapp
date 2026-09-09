@@ -67,7 +67,7 @@ const routes = {
   // wire added 2026-07-28 purely to carry the sign-out; results had no wiring before.
   results: { render: () => resultsView(), wire: wireCrewFooter, live: true, auth: true },
   admin: { render: (arg) => adminView(arg), wire: wireAdmin, live: true, auth: true },
-  materials: { render: () => stubView('Materials', 'Decks & handouts shelf — receives Phase 2 AI later.') },
+  materials: { render: () => stubView('Materials', 'Speaker decks and handouts will appear here as partners share them, before and after each session.') },
   wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.'), back: '' },
   venue: { render: () => stubView('Venue', 'Map, address and parking.'), back: '' },
 }
