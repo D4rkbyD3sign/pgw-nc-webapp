@@ -344,6 +344,40 @@ onSnapshot(
   },
 )
 
+/* ---------- help contacts (admin writes, EVERY phone reads) ----------
+   The on-the-day help numbers are personal mobiles for people who are not
+   Adam. They must never sit in this PUBLIC repo (permanent git history, bots),
+   so data.js carries NAMES ONLY and the numbers live in Firestore at
+   live/contacts — same public-read, crew-write path as the schedule and the
+   beacon. No doc = names only on the Help page, never a placeholder number.
+   Agreed with Adam 2026-08-21; built 2026-09-09. */
+
+const contactsRef = doc(db, 'events', EVENT_ID, 'live', 'contacts')
+
+let contacts = null
+
+onSnapshot(
+  contactsRef,
+  (snap) => {
+    const list = snap.data()?.contacts
+    contacts = Array.isArray(list) ? list : null
+    notify()
+  },
+  (err) => {
+    console.error('[brain] contacts listener', err)
+  },
+)
+
+/** The cloud contact list ([{id, name, phone}]) or null when none is published. */
+export function liveContacts() {
+  return contacts
+}
+
+/** Replace the published contact list. Crew-only (enforced by the rules). */
+export async function setContacts(list) {
+  await setDoc(contactsRef, { contacts: list })
+}
+
 /** True when this phone is running older code than the cloud says it should. */
 export function updateAvailable() {
   return liveBuild > BUILD

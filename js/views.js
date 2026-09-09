@@ -781,6 +781,13 @@ export function welcomeView() {
    No titles (Adam, 2026-08-21). Renders whatever exists and nothing more, so
    someone without a number still appears as a plain name rather than breaking
    the list or, worse, rendering an empty tel: link that dials nothing. */
+/** Names from data.js, numbers from the cloud, merged by id. A name with no
+ *  published number shows as a name — never a dummy number. */
+function helpContacts() {
+  const live = brain.liveContacts() ?? []
+  return crewContacts.map((c) => ({ ...c, ...(live.find((l) => l.id === c.id) ?? {}) }))
+}
+
 function contactLine(c) {
   const ways = []
   if (c.phone) ways.push(`<a href="tel:${c.phone.replace(/\s/g, '')}">${c.phone}</a>`)
@@ -883,8 +890,8 @@ function faqSections() {
                 /* The count is derived, never typed. It said "these five" for
                    about four minutes after the list dropped to four names,
                    which is the whole argument for computing it. */
-                a: `<p>Any of them — they're all here for the whole conference. Tap a number to call.</p>
-                    <ul class="faqlist">${crewContacts.map(contactLine).join('')}</ul>`,
+                a: `<p>Any of them — they're all here for the whole conference.${helpContacts().some((c) => c.phone) ? ' Tap a number to call.' : ' Numbers appear here closer to the day.'}</p>
+                    <ul class="faqlist">${helpContacts().map(contactLine).join('')}</ul>`,
               },
             ]
           : []),
@@ -1697,6 +1704,8 @@ export function adminView(dayArg) {
 
     ${versionBox()}
 
+    ${contactsBox()}
+
     <span class="lab" style="margin-top:30px">// ${conference.days.find((d) => d.day === day)?.label ?? `Day ${day}`}</span>
     <div class="daytabs">
       <a href="#/admin/1" class="dtab${day === 1 ? ' on' : ''}">Day 1</a>
@@ -1705,6 +1714,25 @@ export function adminView(dayArg) {
     <div class="adlist">${list.map(row).join('')}</div>
     ${crewFooter()}
   `
+}
+
+/* Help numbers. One line per person, "Name, number". The names come from
+   data.js so the crew only ever types numbers; a line whose name is not on the
+   list is ignored rather than published. Saved to live/contacts. */
+function contactsBox() {
+  const live = brain.liveContacts()
+  const text = crewContacts
+    .map((c) => `${c.name}, ${live?.find((l) => l.id === c.id)?.phone ?? ''}`)
+    .join('\n')
+  return `
+    <span class="lab" style="margin-top:30px">// Help numbers</span>
+    <div class="delaybox">
+      <p class="delayhelp">Shown on the Help page for attendees to call. One per line: name, mobile. ${live ? 'Published.' : 'Not published yet — the Help page shows names only.'}</p>
+      <textarea id="adcontacts" class="adcontacts" rows="5" spellcheck="false">${text}</textarea>
+      <div class="delaybtns">
+        <button class="dbtn" data-save-contacts="1">Save numbers</button>
+      </div>
+    </div>`
 }
 
 export function wireAdmin(rerender, dayArg) {
@@ -1730,6 +1758,28 @@ export function wireAdmin(rerender, dayArg) {
   document.querySelector('.dbtn[data-reset-delay]')?.addEventListener('click', async () => {
     await brain.setDelay(0, 0, day)
     rerender()
+  })
+
+  document.querySelector('.dbtn[data-save-contacts]')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget
+    const lines = document.getElementById('adcontacts').value.split('\n')
+    const list = []
+    for (const line of lines) {
+      const [name, ...rest] = line.split(',')
+      const phone = rest.join(',').trim()
+      const c = crewContacts.find((x) => x.name.toLowerCase() === (name ?? '').trim().toLowerCase())
+      if (c && phone) list.push({ id: c.id, name: c.name, phone })
+    }
+    btn.disabled = true
+    btn.textContent = 'Saving…'
+    try {
+      await brain.setContacts(list)
+      rerender()
+    } catch (err) {
+      console.error('[admin] save contacts', err)
+      btn.disabled = false
+      btn.textContent = 'Save failed — tap to retry'
+    }
   })
 
   document.querySelector('.dbtn[data-publish]')?.addEventListener('click', async (e) => {

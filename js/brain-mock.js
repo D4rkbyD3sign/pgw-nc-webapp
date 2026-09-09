@@ -86,3 +86,9 @@ export function promote(id) {
 export function promotedQuestion() {
   return questions().find((q) => q.status === 'promoted') ?? null
 }
+
+/** Mock has no cloud contacts; the Help page shows names only. */
+export function liveContacts() {
+  return null
+}
+export async function setContacts() {}

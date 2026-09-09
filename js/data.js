@@ -330,21 +330,23 @@ export function partnerById(id) {
    seen and reviewed, real numbers delivered at runtime from Firestore
    (events/{EVENT_ID}/live/contacts), same pattern as the schedule overrides —
    code is the default, cloud is the override.
-   ⬜ NOT BUILT YET. Until it is, this page shows placeholder numbers, so it is
-   NOT fit to put in front of an attendee. Blocker for shipping to-do 5.
+   ✅ BUILT 2026-09-09 (v28): brain.js listens on live/contacts, the Help page
+   merges by id, and #/admin has a "Help numbers" box the crew type into.
 
    Real numbers live at ~/.house-keys/pgw-nc-contacts.json — outside every
-   repo, never ferried.
-
-   The 0400 000 0XX shape is deliberate: it matches the dummy-phone convention
-   already used for speakers further up this file, and it is obviously fake at
-   a glance, so nobody mistakes a placeholder for a number that will dial. */
+   repo, never ferried. (The 0400 000 0XX placeholders that sat here from
+   21 Aug to 9 Sep are gone: a name with no published number now shows as a
+   name, which is honest, instead of a number that dials nowhere.) */
+// ⛔ NAMES ONLY. The numbers are personal mobiles and live in Firestore at
+// events/{EVENT_ID}/live/contacts (crew-written from #/admin); brain.js merges
+// them in by id. Nothing in this public file should ever carry a real number,
+// and since 2026-09-09 it carries no placeholder either.
 export const crewContacts = [
-  { id: 'ross', name: 'Ben Ross', phone: '0400 000 020' },
-  { id: 'gould', name: 'Tracey Gould', phone: '0400 000 021' },
-  { id: 'griffin', name: 'Alex Griffin', phone: '0400 000 022' },
-  { id: 'shin', name: 'Johnny Shin', phone: '0400 000 023' },
-  { id: 'graham', name: 'Adam Graham', phone: '0400 000 024' },
+  { id: 'ross', name: 'Ben Ross' },
+  { id: 'gould', name: 'Tracey Gould' },
+  { id: 'griffin', name: 'Alex Griffin' },
+  { id: 'shin', name: 'Johnny Shin' },
+  { id: 'graham', name: 'Adam Graham' },
 ]
 
 export const materials = [

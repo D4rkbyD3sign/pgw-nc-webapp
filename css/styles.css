@@ -1383,6 +1383,22 @@ h1.title .ai::after {
   line-height: 1.45;
   color: var(--grey);
 }
+.adcontacts {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px 0 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--greige-line);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  font: 500 14px/1.5 var(--mono);
+  color: var(--ink);
+  resize: vertical;
+}
+.adcontacts:focus {
+  outline: none;
+  border-color: var(--lime-deep);
+}
 .delaybtns {
   display: flex;
   flex-wrap: wrap;
