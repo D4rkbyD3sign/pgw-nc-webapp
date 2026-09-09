@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow } from './data.js'
+import { conference, sessions, speakers, speakerById, speakersForSession, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 
@@ -115,10 +115,12 @@ export function askTarget(now = new Date()) {
    HUB24's and every other partner's as a PGW talk. */
 function whoLine(s) {
   if (s.kind === 'SOCIAL') return `<b>${s.venue?.name ?? s.room}</b> · ${s.venue?.address ?? ''}`
-  const names = s.speakerIds.map((id) => speakerById(id)?.name).filter(Boolean)
-  if (names.length) {
-    const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
-    return `<b>${names.join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
+  /* 2026-09-09: presenters derive from the partner sheet, so a partner slot
+     now reads "Cameron Blanks & Paul Ryan · PEP" instead of the room alone. */
+  const sps = speakersForSession(s)
+  if (sps.length) {
+    const orgs = [...new Set(sps.map((sp) => sp.orgShort))]
+    return `<b>${sps.map((sp) => sp.name).join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
   }
   /* While topics are unconfirmed a partner slot's TITLE is the organisation, so
      repeating it underneath prints the same name twice in one card. Drop it and
@@ -464,6 +466,9 @@ function initials(name) {
 }
 
 export function speakersView() {
+  /* 2026: derived from the partners (see data.js). Title and bio are present
+     only where PGW's sheet carries them — a blank is a missing line, never
+     filler. No contact block anywhere on a speaker: the repo is public. */
   const cards = speakers
     .map(
       (s) => `
@@ -471,8 +476,8 @@ export function speakersView() {
         ${s.photo ? `<img class="spavatar" src="${s.photo}" alt="${s.name}">` : `<span class="spavatar spinit">${initials(s.name)}</span>`}
         <div class="spbody">
           <div class="n">${s.name}</div>
-          <div class="s">${s.title} · ${s.org}</div>
-          <p class="spbio clamp">${s.bio}</p>
+          <div class="s">${s.title ? `${s.title} · ` : ''}${s.orgShort}</div>
+          ${s.bio ? `<p class="spbio clamp">${s.bio}</p>` : ''}
         </div>
       </a>`,
     )
@@ -481,33 +486,35 @@ export function speakersView() {
   return `
     <div class="pagehead">
       <h2>Speakers</h2>
-      <p class="sub">${speakers.length} across the two days</p>
+      <p class="sub">${speakers.length} presenting across the two days</p>
     </div>
     <div class="splist">${cards}</div>
   `
 }
 
 export function speakerView(id) {
-  const s = speakers.find((x) => x.id === id)
+  const s = speakerById(id)
   if (!s) return stubView('Speaker', 'Speaker not found.')
-  const theirSessions = sessions.filter((x) => x.speakerIds.includes(s.id))
+  const theirSessions = sessions.filter((x) => speakersForSession(x).some((sp) => sp.id === s.id))
   return `
     <div class="sphero">
       ${s.photo ? `<img class="spportrait" src="${s.photo}" alt="${s.name}">` : `<span class="spportrait spinit">${initials(s.name)}</span>`}
       <div class="pagehead" style="padding-top:18px">
         <h2>${s.name}</h2>
-        <p class="sub">${s.title} · ${s.org}</p>
+        <p class="sub">${s.title ? `${s.title} · ` : ''}${s.org}</p>
       </div>
     </div>
+    ${s.bio ? `
     <div class="spdetail">
       <p class="spbio">${s.bio}</p>
-    </div>
-    <span class="lab" style="margin-top:26px">// Contact</span>
-    <div class="contactlist">
-      ${s.email ? `<a class="contactrow" href="mailto:${s.email}">${icons.mail}<span>${s.email}</span></a>` : ''}
-      ${s.phone ? `<a class="contactrow" href="tel:${s.phone.replace(/\s/g, '')}">${icons.phone}<span>${s.phone}</span></a>` : ''}
-      ${s.linkedin ? `<a class="contactrow" href="${s.linkedin}" target="_blank" rel="noopener"><span class="limark">in</span><span>LinkedIn profile</span></a>` : ''}
-    </div>
+    </div>` : ''}
+    <a href="#/partner/${s.partnerId}" class="spcard" style="margin-top:14px">
+      <img class="spavatar" src="${partnerById(s.partnerId)?.logo ?? ''}" alt="${s.org}" style="object-fit:contain;background:#fff">
+      <div class="spbody">
+        <div class="n">${s.org}</div>
+        <div class="s">Education partner · view profile</div>
+      </div>
+    </a>
     ${theirSessions.length ? `
     <span class="lab" style="margin-top:26px">// Speaking at</span>
     <div class="aglist">
@@ -641,7 +648,7 @@ export function tonightView() {
 export function sessionView(id) {
   const s = sessions.find((x) => x.id === id)
   if (!s) return stubView('Session', 'Session not found.')
-  const sps = s.speakerIds.map(speakerById).filter(Boolean)
+  const sps = speakersForSession(s)
   return `
     <div class="stub">
       <span class="eyebrow">${s.kind} · ${s.start}–${s.end} · ${s.room}</span>
@@ -655,8 +662,8 @@ export function sessionView(id) {
         ${sp.photo ? `<img class="spavatar" src="${sp.photo}" alt="${sp.name}">` : `<span class="spavatar spinit">${initials(sp.name)}</span>`}
         <div class="spbody">
           <div class="n">${sp.name}</div>
-          <div class="s">${sp.title} · ${sp.org}</div>
-          <p class="spbio clamp">${sp.bio}</p>
+          <div class="s">${sp.title ? `${sp.title} · ` : ''}${sp.orgShort}</div>
+          ${sp.bio ? `<p class="spbio clamp">${sp.bio}</p>` : ''}
         </div>
       </a>`,
       )
@@ -1237,7 +1244,8 @@ export function askView() {
       <h3>${session.title}</h3>
     </div>
     <form id="askform" class="askform">
-      <textarea id="asktext" rows="3" maxlength="400" placeholder="Type your question for this session…">${askDraft}</textarea>
+      <textarea id="asktext" rows="3" maxlength="${ASK_MAX}" placeholder="Type your question for this session…">${askDraft}</textarea>
+      <div id="askcount" class="askcount${ASK_MAX - askDraft.length <= 40 ? ' near' : ''}">${askDraft.length} / ${ASK_MAX}</div>
 
       <label class="namecheck" for="asknamed">
         <input type="checkbox" id="asknamed" ${askNamed ? 'checked' : ''} />
@@ -1261,6 +1269,15 @@ export function askView() {
   `
 }
 
+/* ⛔ Room-screen overflow (found in the 8 Sep loop test on the live host): a
+   rambling question at 400 characters ran off the bottom of the projector and
+   into the PGW eyebrow. Two halves, this is the first — the cap is now 280
+   with a live counter so the asker can see the edge. The second half is on
+   the screen itself: `screenView` steps the type down by length (see below).
+   Questions already in Firestore may still be up to 400; the screen handles
+   them, the box just stops making new ones. */
+export const ASK_MAX = 280
+
 export function wireAsk(rerender) {
   const form = document.getElementById('askform')
   const text = document.getElementById('asktext')
@@ -1268,8 +1285,13 @@ export function wireAsk(rerender) {
   const name = document.getElementById('askname')
   const sendLabel = document.getElementById('asksendlabel')
 
+  const count = document.getElementById('askcount')
   text?.addEventListener('input', () => {
     askDraft = text.value
+    if (count) {
+      count.textContent = `${askDraft.length} / ${ASK_MAX}`
+      count.classList.toggle('near', ASK_MAX - askDraft.length <= 40)
+    }
   })
 
   check?.addEventListener('change', () => {
@@ -1374,10 +1396,10 @@ export function wireMod() {
    speaker means no line at all. */
 function screenWho(s) {
   if (s.kind === 'SOCIAL') return s.venue?.name ?? s.room
-  const names = s.speakerIds.map((id) => speakerById(id)?.name).filter(Boolean)
-  if (names.length) {
-    const orgs = [...new Set(s.speakerIds.map((id) => speakerById(id)?.org).filter(Boolean))]
-    return `${names.join(' & ')}${orgs.length ? ` · ${orgs.join(' · ')}` : ''}`
+  const sps = speakersForSession(s)
+  if (sps.length) {
+    const orgs = [...new Set(sps.map((sp) => sp.org))]
+    return `${sps.map((sp) => sp.name).join(' & ')}${orgs.length ? ` · ${orgs.join(' · ')}` : ''}`
   }
   /* Until speakers are confirmed the room screen shows the presenting
      organisation — which for the 2026 program is every slot. A blank line
@@ -1406,6 +1428,14 @@ function screenWho(s) {
    The .hasq class is what switches between them. The brand lockup stays a
    quiet watermark in both: everyone in the room already knows whose
    conference they are at. */
+/* Type size steps DOWN with length so the whole question always fits: short
+   questions stay big (they are the point of the screen), long ones shrink
+   rather than overflow. Thresholds are characters, tuned on a 16:9 projector. */
+function qSize(t) {
+  const n = (t || '').length
+  return n > 180 ? 'len-l' : n > 90 ? 'len-m' : ''
+}
+
 export function screenView() {
   const live = liveSession()
   const q = brain.promotedQuestion()
@@ -1422,7 +1452,7 @@ export function screenView() {
       </div>
       ${
         q
-          ? `<div class="bs-q">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? q.name.toUpperCase() : 'ANONYMOUS'}</div>`
+          ? `<div class="bs-q ${qSize(q.text)}">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? q.name.toUpperCase() : 'ANONYMOUS'}</div>`
           : `<div class="bs-idle">Ask a question — anonymously<br><span>open the conference app on your phone</span></div>`
       }
     </div>

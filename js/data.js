@@ -6,12 +6,13 @@
 // allocations confirmed; topics, panels, keynote speakers and adviser
 // spotlights are not yet supplied and are NOT invented here.
 //
-// SPEAKERS and PARTNERS below are still the 2025 line-up and are STALE:
-// 7 of the 11 partners listed are not returning in 2026, and the 14 speakers
-// belong to partners who are not coming. No 2026 session points at either —
-// sessions carry their presenting organisation in `org` instead — but the
-// Speakers and Partners tabs still render this old data. They need their own
-// pass once PGW supply names, blurbs and logos.
+// ✅ 2026-09-09: the 2025 speaker list is GONE. `speakers` is now DERIVED from
+// each partner's `speakers` block below (one source of truth: PGW's partner
+// sheet), so the Speakers tab, a speaker page and a session page can never
+// disagree with the Partners tab. Rule from Adam, 2026-09-09: the presenter
+// named on the sheet; where the sheet says TBC or names nobody, the partner's
+// MAIN CONTACT stands in. Centuria names neither, so it has no speaker yet.
+// The 2025 set (fourteen people, four returning partners) lives in git at v22.
 
 export const conference = {
   brandName: 'PGW ImplementAI',
@@ -71,23 +72,6 @@ export const welcome = {
 
 // photo: URL to headshot (empty = initials avatar). linkedin: public profile URL.
 // Bios condensed from the 2025 NC booklet (see Squad/PGW/PGW-NC-2026/Webapp/booklet-2025-extract.md).
-export const speakers = [
-  { id: 'ross', name: 'Benjamin Ross', title: 'National Operations Manager', org: 'PGW Financial Services', bio: 'Responsible Manager of PGW Financial Services for 10 years. An economics graduate of the University of Adelaide with experience across stockbroking, trade settlements, financial advising and licensee compliance, Ben works with advisers to integrate compliant practices and practice growth within PGW.', photo: 'img/speakers/ross.png', linkedin: '#', email: 'b.ross@example.com', phone: '0400 000 000' },
-  { id: 'joseph', name: 'Anto Joseph', title: 'CEO & Founder', org: 'Stropro', bio: 'Founder of Stropro, the multi-award-winning alternative investments platform — $1.6bn+ arranged across 600+ strategies for 100+ advisers. Previously spent a decade in private wealth at Citi, including Vice President of Citi Partnerships and Senior Private Banker to high-net-worth clients across Asia and Australia.', photo: 'img/speakers/joseph.png', linkedin: '#', email: 'a.joseph@example.com', phone: '0400 000 001' },
-  { id: 'ott', name: 'Nicole Ott', title: 'National Manager — Dealer Groups & Platforms', org: 'Trilogy Funds', bio: "Leads Trilogy Funds' engagement with dealer groups, independent advisers and platforms nationally. Active in the adviser community: FAAA Brisbane Metro Community Committee, Future2 Foundation National Grants Committee, and formerly Education Chair of the AFA Queensland State Committee.", photo: 'img/speakers/ott.png', linkedin: '#', email: 'n.ott@example.com', phone: '0400 000 002' },
-  { id: 'leung', name: 'Billy Leung', title: 'Senior Investment Strategist', org: 'Global X ETFs', bio: 'Joined Global X in 2024, leading investment research and technology-sector ETF analysis. Previously an equity analyst at Optiver and Director of Equity Research for China Internet at Haitong International in Hong Kong, ranked a top regional analyst by Asiamoney. BCom (Melbourne), CPA Australia.', photo: 'img/speakers/leung.png', linkedin: '#', email: 'b.leung@example.com', phone: '0400 000 003' },
-  { id: 'stodart', name: 'Charles Stodart', title: 'Investment Specialist', org: 'Zurich', bio: "With Zurich since 2015 and 20+ years in financial services, providing investment commentary and support to advisers on Zurich's managed funds. Prior roles across Five Oceans, Pengana's Asian Equities Fund, Perennial and Murray Johnstone. CFA and CAIA charterholder.", photo: 'img/speakers/stodart.png', linkedin: '#', email: 'c.stodart@example.com', phone: '0400 000 004' },
-  { id: 'mccathie', name: 'Martyn McCathie', title: 'Investment Specialist', org: 'Wilson Asset Management', bio: 'Provides investment insights and manages relationships with brokers, planners, research houses and platforms at WAM. 20+ years across domestic and international financial services, and a member of the Investment Committee for Future Generation Australia (FGX) and Future Generation Global (FGG) since inception.', photo: 'img/speakers/mccathie.png', linkedin: '#', email: 'm.mccathie@example.com', phone: '0400 000 005' },
-  { id: 'kelly', name: 'Nick Kelly', title: 'Portfolio Manager, WAM Alternative Assets', org: 'Wilson Asset Management', bio: 'Joined WAM in 2025 with 20+ years in investment. Previously 12 years at Willis Towers Watson in Sydney as Asia-Pacific Head of Private Markets, and before that eight years in risk advisory at PwC.', photo: 'img/speakers/kelly.png', linkedin: '#', email: 'n.kelly@example.com', phone: '0400 000 006' },
-  { id: 'brown', name: 'Philip Brown', title: 'Head of Research', org: 'FIIG Securities (for AUSIEX)', bio: 'Head of Research at FIIG Securities since late 2023, with 20 years in bank research teams. Formerly Senior Fixed Income Strategist at CBA, part of the team awarded best government-bond research by KangaNews five years running. Also worked at Citigroup and Deutsche Bank; degree in statistics.', photo: 'img/speakers/brown.png', linkedin: '#', email: 'p.brown@example.com', phone: '0400 000 007' },
-  { id: 'sutjipto', name: 'David Sutjipto', title: 'National Business Development Specialist', org: 'iExtend', bio: 'Drives adviser engagement and business growth at iExtend. 21+ years in financial services across life insurance, adviser engagement and retention strategy, including national sales and retention leadership at AMP and Resolution Life.', photo: 'img/speakers/sutjipto.png', linkedin: '#', email: 'd.sutjipto@example.com', phone: '0400 000 008' },
-  { id: 'racine', name: 'Craig Racine', title: 'Founder', org: 'Gyrostat Capital Management', bio: 'Founder of Gyrostat Capital Management, with senior executive experience across Australia and Hong Kong in asset management, private equity, investment banking and equity research — including Executive Director roles at the Asian Infrastructure Trust, ADB, Soros Funds Management and AMP Capital, and MD & Head of Sector Research at ING Barings (Asia).', photo: 'img/speakers/racine.png', linkedin: '#', email: 'c.racine@example.com', phone: '0400 000 009' },
-  { id: 'mccormack', name: 'Cameron McCormack', title: 'Senior Portfolio Manager', org: 'VanEck', bio: 'Leads investment performance analytics at VanEck and is responsible for trade execution across equity and fixed income ETFs. Previously at Pacific Life Re Australia in pricing and client solutions. BCom (UNSW, Actuarial Studies & Finance), Associate of the Society of Actuaries.', photo: 'img/speakers/mccormack.png', linkedin: '#', email: 'c.mccormack@example.com', phone: '0400 000 010' },
-  { id: 'blanks', name: 'Cameron Blanks', title: 'Managing Director', org: 'Pacific Equity Partners', bio: 'Managing Director at PEP, with the firm since 2002. Previously three years at Bain & Company across Australia and North America, and seven years in mining and construction. MBA (MIT Sloan), Master of Engineering and Bachelor of Engineering with First Class Honours (UniSA).', photo: 'img/speakers/blanks.png', linkedin: '#', email: 'c.blanks@example.com', phone: '0400 000 011' },
-  { id: 'mannix', name: 'Dean Mannix', title: 'Founder & CEO', org: 'SalesITV / Better Sales Coach', bio: 'A world-leading authority on sales growth and mindset with 25+ years across 25+ countries — clients include Goldman Sachs, Morgan Stanley, Macquarie, CBA and UBS. Best-selling author and doctoral candidate researching sales coaching; holds a Law degree and Executive MBA.', photo: 'img/speakers/mannix.png', linkedin: '#', email: 'd.mannix@example.com', phone: '0400 000 012' },
-  { id: 'bradbury', name: 'Steven Bradbury', title: 'OAM — Olympic Champion & Motivational Speaker', org: 'Guest Speaker', bio: "Australia's most recognised Olympic underdog story and a sought-after keynote speaker — 1,350+ conferences across 21 countries over 15 years, translating elite speed-skating discipline into strategies for business success. Success often comes to those who stay in the race when others fall away.", photo: 'img/speakers/bradbury.png', linkedin: '#', email: 's.bradbury@example.com', phone: '0400 000 013' },
-]
-
 const GB = 'Grand Ballroom'
 const AT = 'Atrium'
 
@@ -241,6 +225,8 @@ export const partners = [
   },
   {
     id: 'ellerston', name: 'Ellerston Capital', logo: 'img/partners/2026/ellerston.png',
+    // No presenter on the sheet — main contact stands in (Adam, 2026-09-09).
+    speakers: [{ name: 'Lisa Salamon' }],
   },
   {
     id: 'gyrostat', name: 'Gyrostat', logo: 'img/partners/2026/gyrostat.png',
@@ -294,6 +280,8 @@ export const partners = [
   {
     id: 'russell', name: 'Russell Investments', logo: 'img/partners/2026/russell.png',
     blurb: 'Since 1936, Russell Investments has been building a legacy of continuous innovation to deliver exceptional value to clients, working every day to improve people’s financial security. Russell Investments leverages its global research capabilities to identify and assess the best ideas from across the investment management universe. We then apply these insights through a disciplined portfolio construction process, helping advisers access diversified, professionally managed investment solutions.',
+    // No presenter on the sheet — main contact stands in (Adam, 2026-09-09).
+    speakers: [{ name: 'Nesh Subotic' }],
   },
   {
     id: 'tal', name: 'TAL', logo: 'img/partners/2026/tal.png',
@@ -363,8 +351,30 @@ export const materials = [
   { id: 'm2', sessionId: 'd2-gyrostat', label: 'Handout — Portfolio Construction for Lower Risk Investors', type: 'handout', url: '#' },
 ]
 
+/** Every presenter, derived from the partners above. Ids are stable
+ *  (`<partnerId>-<surname>`) so a photo can be named for them and a
+ *  `#/speaker/…` link survives a re-derivation. */
+const slug = (t) => t.toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
+export const speakers = partners.flatMap((p) =>
+  (p.speakers ?? []).map((sp) => ({
+    id: `${p.id}-${slug(sp.name.split(' ').at(-1))}`,
+    partnerId: p.id,
+    org: p.name,
+    orgShort: p.short ?? p.name,
+    ...sp,
+  })),
+)
+
 export function speakerById(id) {
   return speakers.find((s) => s.id === id)
+}
+
+/** Who is presenting a session: named speakers if the agenda names any,
+ *  otherwise the presenting partner's people. */
+export function speakersForSession(s) {
+  const named = (s.speakerIds ?? []).map(speakerById).filter(Boolean)
+  if (named.length) return named
+  return s.partnerId ? speakers.filter((sp) => sp.partnerId === s.partnerId) : []
 }
 
 /** Next social event (dinner etc) for the "Tonight" tile. */
