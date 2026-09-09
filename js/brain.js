@@ -30,10 +30,31 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js'
-import { firebaseConfig, EVENT_ID, BUILD } from './config.js'
+import {
+  initializeAppCheck,
+  ReCaptchaEnterpriseProvider,
+} from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check.js'
+import { firebaseConfig, EVENT_ID, BUILD, RECAPTCHA_SITE_KEY } from './config.js'
 import { applyScheduleOverrides } from './data.js'
 
 const app = initializeApp(firebaseConfig)
+
+/* App Check (built 2026-09-09, held since July for the domain). Every request
+   to Firestore now carries a reCAPTCHA Enterprise token proving it came from a real
+   browser on our domain. Must run BEFORE getFirestore() or the first reads go
+   out untokened. On localhost the SDK asks for a DEBUG token instead: it is
+   printed once in the console, and it must be registered in Firebase console
+   -> App Check -> Apps -> Manage debug tokens before local reads pass once
+   enforcement is on. Until enforcement is on, nothing here can refuse anyone —
+   the console just counts verified vs unverified. */
+if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true
+}
+initializeAppCheck(app, {
+  provider: new ReCaptchaEnterpriseProvider(RECAPTCHA_SITE_KEY),
+  isTokenAutoRefreshEnabled: true,
+})
+
 const db = getFirestore(app)
 const auth = getAuth(app)
 

@@ -16,6 +16,15 @@ export const firebaseConfig = {
 // ships it in the browser. Security lives entirely in firestore.rules.
 // Analytics deliberately omitted: this app collects nothing about who holds the phone.
 
+/** App Check — reCAPTCHA ENTERPRISE site key (public by design, like the apiKey; it
+ *  is bound to app.pgwconference.com.au + localhost, so it is useless anywhere
+ *  else). Registered by Adam 2026-09-09 on the pgw-nc Cloud project. The
+ *  Enterprise provider needs no secret anywhere — Firebase verifies tokens
+ *  against the Cloud project directly. (Classic v3 is deprecated in the console.)
+ *  MONITORING MODE until the console shows essentially every request verified;
+ *  enforcement is a console toggle, not a code change. */
+export const RECAPTCHA_SITE_KEY = '6Lftc7EtAAAAAO0g67kxQG04AMm-Aqho8kDu_iUW'
+
 /** The drawer everything for this conference lives in. Bump for 2027. */
 export const EVENT_ID = 'nc-2026'
 
@@ -35,7 +44,7 @@ export const EVENT_ID = 'nc-2026'
  *  update is announced only after a real person has confirmed the new code
  *  actually loads, not at the moment a push leaves the laptop.
  */
-export const BUILD = 29
+export const BUILD = 30
 
 // SDK is pinned to 12.16.0 (verified present on gstatic 2026-07-27). Import
 // specifiers must be literal strings, so the version is written into each
