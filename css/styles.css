@@ -627,6 +627,14 @@ h1.title .ai::after {
 .pill:active {
   background-color: var(--greige);
 }
+/* Person-page contact slot (LinkedIn / work email) — empty until consent. */
+.spcontact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 0 24px;   /* same gutter as .spdetail / .splist */
+}
 
 /* Agenda list */
 .aglist {

@@ -84,9 +84,11 @@ const AT = 'Atrium'
    document's own tables and they are reproduced exactly.
 
    ⛔ WHAT IS NOT, AND IS THEREFORE NOT WRITTEN HERE:
-     - Session TOPICS. Only 3 of 15 partners have supplied one. A slot carries
-       the presenting organisation and nothing more until the topic lands, and
-       `summary` says so rather than guessing.
+     - Session TOPICS a partner has not supplied. A slot carries the presenting
+       organisation and nothing more until the topic lands, and `summary` says
+       so rather than guessing. (29 Sep sheet: WAM and HUB24 still blank.)
+       ⚠ `summary` is TYPED here, not derived from the partner's `topic` —
+       when a topic changes on the sheet, change it in BOTH places.
      - The three panels. The source lists SUGGESTED themes (internal PGW team,
        cybersecurity, adviser roundtable) under "What's Still Missing" — a
        suggestion is not a program, and putting it here would make it one.
@@ -104,10 +106,10 @@ const AT = 'Atrium'
    Tonight tile, the Tonight page and the FAQ's evening answers all read from
    this array and will light up on their own.
 
-   ⚠️ `speakerIds` is empty on every session. The 14 speakers still in this file
-   are the 2025 line-up and belong to partners who are NOT returning. Sessions
-   name their presenting organisation via `org` instead, so nothing here points
-   at a person who is not coming.
+   `speakerIds` is used ONLY on panels (29 Sep), because a panel has no single
+   presenting partner: it names the panellists the sheet confirms, by speaker
+   id (`<partnerId>-<surname>`). Partner slots leave it empty and derive their
+   speaker from `partnerId`.
 
    ~~⚠️ `partnerId` is set ONLY for the four partners returning from 2025.~~
    ✅ 2026-09-08: all fifteen 2026 partners have records + logos; every partner
@@ -116,9 +118,9 @@ export const sessions = [
   // ---- Day 1 · Thu 29 Oct · 9:00am to 5:00pm ----
   { id: 'd1-welcome', day: 1, start: '09:00', end: '09:15', title: 'Welcome & housekeeping', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
   { id: 'd1-keynote-open', day: 1, start: '09:15', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: [], summary: 'Guest speaker to be announced.' },
-  { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook' },
   { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:20', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:20', end: '11:40', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:20', end: '11:40', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
   { id: 'd1-openmarkets', partnerId: 'openmarkets', day: 1, start: '11:40', end: '12:00', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Tokenisation of real-world assets' },
   { id: 'd1-spotlight', day: 1, start: '12:00', end: '12:10', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
   { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:10', end: '12:55', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Structural weakness in retirement portfolio construction — the SMILE risks: Sequencing, Market, Inflation, Longevity, Emotional' },
@@ -127,8 +129,8 @@ export const sessions = [
   { id: 'd1-wam', partnerId: 'wam', day: 1, start: '14:20', end: '14:40', title: 'Wilson Asset Management', kind: 'PLENARY', room: GB, org: 'Wilson Asset Management', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd1-paradino', partnerId: 'paradino', day: 1, start: '14:40', end: '15:25', title: 'Paradino', kind: 'PLENARY', room: GB, org: 'Paradino', speakerIds: [], summary: 'The little things that make AI work in advice — a practical session with workflow examples, adviser use cases and Q&A' },
   { id: 'd1-arvo-tea', day: 1, start: '15:25', end: '15:55', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd1-panel-2', day: 1, start: '15:55', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: [], summary: 'Panel and topic to be announced.' },
-  { id: 'd1-centuria', partnerId: 'centuria', day: 1, start: '16:30', end: '16:50', title: 'Centuria', kind: 'PLENARY', room: GB, org: 'Centuria', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-panel-2', day: 1, start: '15:55', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['ellerston-coggins'], summary: 'Topic to be announced.' },
+  { id: 'd1-centuria', partnerId: 'centuria', day: 1, start: '16:30', end: '16:50', title: 'Centuria', kind: 'PLENARY', room: GB, org: 'Centuria', speakerIds: [], summary: 'Protected Cropping: Where Agriculture Meets Technology' },
   { id: 'd1-wrap', day: 1, start: '16:50', end: '17:00', title: 'Day one wrap-up', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
     id: 'd1-cruise', day: 1, start: '18:30', end: '21:30', title: 'Mustique — Luxury Cruising', kind: 'SOCIAL',
@@ -145,8 +147,8 @@ export const sessions = [
 
   // ---- Day 2 · Fri 30 Oct · 9:00am to 4:50pm ----
   { id: 'd2-welcome', day: 2, start: '09:00', end: '09:10', title: 'Welcome back & recap', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
-  { id: 'd2-macquarie', partnerId: 'macquarie', day: 2, start: '09:10', end: '09:30', title: 'Macquarie', kind: 'PLENARY', room: GB, org: 'Macquarie', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd2-pep', partnerId: 'pep', day: 2, start: '09:30', end: '10:15', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-macquarie', partnerId: 'macquarie', day: 2, start: '09:10', end: '09:30', title: 'Macquarie', kind: 'PLENARY', room: GB, org: 'Macquarie', speakerIds: [], summary: 'The ‘modern heist’: Safeguarding your practice, your clients, and their wealth' },
+  { id: 'd2-pep', partnerId: 'pep', day: 2, start: '09:30', end: '10:15', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
   { id: 'd2-tal', partnerId: 'tal', day: 2, start: '10:15', end: '10:35', title: 'TAL', kind: 'PLENARY', room: GB, org: 'TAL', speakerIds: [], summary: 'Life insurance market update' },
   { id: 'd2-morning-tea', day: 2, start: '10:35', end: '11:05', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd2-afic', partnerId: 'afic', day: 2, start: '11:05', end: '11:50', title: 'AFIC', kind: 'PLENARY', room: GB, org: 'AFIC', speakerIds: [], summary: 'Technology insights from the recent company profit reporting season' },
@@ -154,8 +156,8 @@ export const sessions = [
   { id: 'd2-spotlight', day: 2, start: '12:10', end: '12:20', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
   { id: 'd2-lunch', day: 2, start: '12:20', end: '13:10', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd2-hub24', partnerId: 'hub24', day: 2, start: '13:10', end: '13:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '13:55', end: '14:15', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd2-panel-3', day: 2, start: '14:15', end: '15:00', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: [], summary: 'Panel and topic to be announced.' },
+  { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '13:55', end: '14:15', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'The Road Ahead - Opportunities in Property & Private Credit' },
+  { id: 'd2-panel-3', day: 2, start: '14:15', end: '15:00', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['afm-gosselin'], summary: 'Topic to be announced.' },
   { id: 'd2-arvo-tea', day: 2, start: '15:00', end: '15:30', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: [], summary: 'Guest speaker to be announced.' },
   { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
@@ -187,9 +189,11 @@ export const sessions = [
 ]
 
 // Educational partners — 2026 line-up, from PGW's Education Partners sheet
-// (Adam, 2026-09-08). Order = the conference artwork: PEP (main partner) first,
-// then alphabetical. NO tiers in the app — Adam ruled it; advisers don't care
-// who paid what, and a Gold partner shouldn't read second-class on a phone.
+// (Adam, 2026-09-08; refreshed from the 29 Sep sheet).
+// ORDER — ⚖ RULING CHANGED 29 Sep (Adam): package tier first, then A–Z within
+// a tier. Supersedes the 8 Sep ruling (artwork order, "no tiers in the app").
+// The tier map + sort sit just below the array; the ARRAY order is irrelevant.
+// Tier labels only, never prices — prices stay in the fenced sheet.
 //
 // Every field is DERIVED from the sheet, never written here: `blurb` is the
 // partner's own company blurb, `speaker.bio` is their own booklet blurb, `topic`
@@ -208,6 +212,7 @@ export const partners = [
   {
     id: 'pep', name: 'Pacific Equity Partners', short: 'PEP', logo: 'img/partners/2026/pep.png',
     blurb: 'Pacific Equity Partners (PEP) is an Australia-based Private Markets Fund Manager. Founded in 1998, we are a leader in Australian and New Zealand markets. We work in partnership with management teams to drive business success through transformational profit improvement and have built a reputation for delivering world-class returns.',
+    topic: 'Choosing the Winners: The Art of Manager Selection',
     speakers: [
       { name: 'Cameron Blanks', photo: 'img/speakers/2026/pep-blanks.jpg', title: 'Managing Director', bio: 'Cameron joined Pacific Equity Partners in 2002. Prior to joining PEP, Cameron spent three years with Bain & Company in Australia and North America. Previously, Cameron worked for seven years in the mining and construction industry in Australia, Asia and North America. He received an MBA from MIT Sloan, and a MEng and BEng (First Class Honours) from the University of South Australia where he was a Graduate Society Scholar.' },
       { name: 'Paul Ryan', photo: 'img/speakers/2026/pep-ryan.jpg', bio: 'Paul joined Pacific Equity Partners in 2013. Before joining PEP, he was at Deutsche Bank and Dakota Capital. He holds a BCom (Hons) from the University of Auckland.' },
@@ -218,16 +223,38 @@ export const partners = [
     blurb: "AFIC is the largest Listed Investment Company in Australia. AFIC's investment style is to buy shares in quality companies and hold them for the medium to long term. The investment objectives are to pay a stable to growing dividend over time and to provide attractive total returns over the medium to long term.",
     topic: 'Technology insights from the recent company profit reporting season',
     speakers: [
-      { name: 'Brett McNeill', title: 'Portfolio Manager', bio: 'Brett joined the AFIC Group in October 2019 as the Portfolio Manager for Djerriwarrh Investments. Brett also became the Portfolio Manager of Australian Foundation Investment Company in October 2025. Brett has over 23 years of investment experience. Prior to joining AFIC, Brett spent 14 years at Antares Capital (previously called Portfolio Partners and Aviva Investors) as a Portfolio Manager and Analyst. Brett holds a Bachelor of Commerce (Economics) and is a CFA Charterholder.' },
+      { name: 'Brett McNeill', photo: 'img/speakers/2026/afic-mcneill.jpg', title: 'Portfolio Manager', bio: 'Brett joined the AFIC Group in October 2019 as the Portfolio Manager for Djerriwarrh Investments. Brett also became the Portfolio Manager of Australian Foundation Investment Company in October 2025. Brett has over 23 years of investment experience. Prior to joining AFIC, Brett spent 14 years at Antares Capital (previously called Portfolio Partners and Aviva Investors) as a Portfolio Manager and Analyst. Brett holds a Bachelor of Commerce (Economics) and is a CFA Charterholder.' },
     ],
   },
   {
+    // New on the 29 Sep sheet (row "FundMontitors"). Name taken from their own
+    // logo artwork, which outranks the tracker's typo (Adam, 29 Sep). ⏳ Name +
+    // logo PROVISIONAL — Adam confirming with PGW 30 Sep. Panel only;
+    // no blurb or topic supplied, so neither block renders.
+    id: 'afm', name: 'Australian Fund Monitors', short: 'AFM', logo: 'img/partners/2026/afm.png',
+    speakers: [{ name: 'Chris Gosselin' }],
+  },
+  {
     id: 'centuria', name: 'Centuria', logo: 'img/partners/2026/centuria.png',
+    blurb: 'Centuria Capital Group is a leading S&P/ASX 200 Australian real estate funds management company with a 25+ year track record of helping investors build long-term wealth. The Group manages $22.2 billion of assets across a diversified range of sectors, including industrial, office, retail, agriculture, healthcare, commercial real estate debt, and investment bonds.',
+    topic: 'Protected Cropping: Where Agriculture Meets Technology',
+    speakers: [
+      { name: 'Chris De Livera', photo: 'img/speakers/2026/centuria-livera.jpg', bio: "Chris De Livera is Centuria's Distribution Manager for NSW and ACT, responsible for managing and developing relationships with financial advisers regarding investments across Centuria's property and credit fund offerings. He has held this role for more than four years and brings over a decade of experience in the financial services industry. Chris has worked with leading firms including Centuria, Netwealth, Colonial First State and Gallagher Bassett, providing him with broad experience across funds management and wealth platforms." },
+    ],
   },
   {
     id: 'ellerston', name: 'Ellerston Capital', logo: 'img/partners/2026/ellerston.png',
-    // No presenter on the sheet — main contact stands in (Adam, 2026-09-09).
-    speakers: [{ name: 'Lisa Salamon' }],
+    blurb: 'As a firm majority owned by its principals and employees, our clients’ objectives are our objectives. Ellerston Capital has been managing money since 2002. Our clients include sovereign wealth, industry and corporate superannuation funds, international funds, family offices and high net worth investors. As a dedicated investment manager, we aim to do one thing exceptionally well: grow and protect our clients’ wealth through investing. We are passionate about creating value for our clients by identifying outstanding investment ideas and designing portfolios that perform over the long term. Our Funds target a diverse range of strategies including, but not limited to, long only Australian, global and Asian equities, Australian and global long-short equity, fixed income and private equity. Our investment approach is designed to focus on opportunities the market may have overlooked – exploiting inefficiencies by identifying stocks that are temporarily misunderstood and fundamentally mispriced.',
+    // Panel only (sheet topic: "N/A, panel only") — no topic, no plenary slot.
+    // Jason Coggins is named on the sheet as the panel speaker (29 Sep sheet).
+    speakers: [
+      { name: 'Jason Coggins', photo: 'img/speakers/2026/ellerston-coggins.jpg', bio: 'Jason joined Ellerston in late 2023 as Head of Product Strategy. He has over 20 years of experience in financial services, spanning banking, private wealth, and asset consultancy. Until 2023, he spent nearly a decade at Koda Capital as Head of Funds Research, playing a key role in shaping the firm’s investment strategy from its inception. His responsibilities included supporting asset allocation, portfolio construction, and strategy selection. During his tenure, the Investment Strategy Group (ISG) gained recognition for introducing and seeding innovative strategies in the Australian market. The team also played a pivotal role in securing some of the country’s largest non-profit organisations and high-net-worth family offices. Prior to Koda Capital, Jason co-led the research team at ANZ Global Wealth, overseeing ANZ’s centralised advice research function. Earlier in his career, he worked at CPG/Grove Financial Services, an institutional asset consultancy firm' },
+    ],
+  },
+  {
+    // New on the 29 Sep sheet — a partner with nothing else supplied yet
+    // (Adam, 29 Sep: "just add them in as a partner"). Logo only.
+    id: 'gda', name: 'GDA', logo: 'img/partners/2026/gda.png',
   },
   {
     id: 'gyrostat', name: 'Gyrostat', logo: 'img/partners/2026/gyrostat.png',
@@ -245,7 +272,10 @@ export const partners = [
   {
     id: 'macquarie', name: 'Macquarie', logo: 'img/partners/2026/macquarie.png',
     blurb: 'Macquarie’s Banking and Financial Services group and Macquarie Asset Management are part of Macquarie Group, a diversified financial group providing clients with asset management, finance, banking, advisory, and risk and capital solutions across debt, equity and commodities. Founded in 1969, Macquarie Group employs approximately 20,000+ in 34 markets and is listed on the Australian Securities Exchange. Macquarie’s Banking and Financial Services group comprises Macquarie’s retail businesses, providing a diverse range of personal banking, wealth management and business banking products and services to retail clients, advisers, brokers and business clients.',
-    speakers: [{ name: 'Laura Khoury' }],
+    topic: 'The ‘modern heist’: Safeguarding your practice, your clients, and their wealth',
+    speakers: [
+      { name: 'Hannah Ou', photo: 'img/speakers/2026/macquarie-ou.jpg', title: 'Business Development Manager', bio: 'Hannah has over a decade of industry experience and deep expertise across Macquarie’s key functions. As a Business Development Manager within Macquarie, her focus is on partnering with advice businesses to accelerate their growth while helping clients build and protect their wealth.' },
+    ],
   },
   {
     id: 'millbrook', name: 'Millbrook Group', logo: 'img/partners/2026/millbrook.png',
@@ -258,6 +288,8 @@ export const partners = [
   {
     id: 'mst', name: 'MST Financial', logo: 'img/partners/2026/mst.png',
     blurb: "MST Financial is a premier equity research and institutional services platform founded in 2017 and wholly owned by its staff and representatives. Built by an experienced team of highly regarded investment professionals, MST Financial serves more than 150 institutional investors with research and advisory services consistently rated among the best in the market. As an Australian owned firm, MST Financial brings an alignment of interest and depth of conviction that sets it apart. From this research foundation, MST Financial has evolved into a fully integrated platform purpose built to support advice firms and their clients. Sandstone Insights delivers equity research, market insights and adviser education, while MST Investment Solutions provides portfolio consulting and bespoke implementation across SMA, IMA and MDA structures. MST Income Solutions rounds out the offering with hybrid and credit portfolios, listed and OTC income strategies, and transition portfolios giving advisers institutional grade tools to meet a broad range of client income needs. Underpinning it all, MST Financial's execution and capital markets capabilities ensure seamless end to end implementation. From listed and OTC execution with institutional liquidity access, through to primary market participation via its Equity and Debt Capital Markets division, advisers partnering with MST Financial gain access to infrastructure and expertise that was once the exclusive domain of the largest institutional investors.",
+    // Topic verbatim as MST wrote it — "Bathla" included (Adam, 29 Sep: "put it in as they say").
+    topic: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook',
     speakers: [
       { name: 'John Lockton', photo: 'img/speakers/2026/mst-lockton.jpg', title: 'Chief Investment Officer & Portfolio Manager', bio: 'John brings over two decades of experience in equity strategy and portfolio management to his role as Chief Investment Officer at MST Financial. John joined MST Financial in 2022. As CIO, John is responsible for the multi-asset-class views and sits on investment committees of some of Australia’s leading private wealth firms. Prior to MST, John held senior positions at Wilsons Advisory. John held multiple roles at Wilsons over his 12 years at the Firm, including Head of Asset Allocation and Portfolio Manager for the Australian Equities and Global Equities portfolios.' },
     ],
@@ -281,19 +313,26 @@ export const partners = [
   {
     id: 'russell', name: 'Russell Investments', logo: 'img/partners/2026/russell.png',
     blurb: 'Since 1936, Russell Investments has been building a legacy of continuous innovation to deliver exceptional value to clients, working every day to improve people’s financial security. Russell Investments leverages its global research capabilities to identify and assess the best ideas from across the investment management universe. We then apply these insights through a disciplined portfolio construction process, helping advisers access diversified, professionally managed investment solutions.',
-    // No presenter on the sheet — main contact stands in (Adam, 2026-09-09).
-    speakers: [{ name: 'Nesh Subotic' }],
+    // Presenter column still blank, but the booklet blurb is Laurence Gamboa's —
+    // Adam, 29 Sep: he replaces the main contact who stood in.
+    speakers: [
+      { name: 'Laurence Gamboa', photo: 'img/speakers/2026/russell-gamboa.jpg', bio: 'Laurence Gamboa is Regional Manager – NSW/ACT at Russell Investments, bringing over 18 years of experience in financial services and adviser distribution. He holds a Bachelor of Commerce in Finance and Economics from Curtin University and has extensive experience working with Financial Advisers and Licensees across managed funds and managed portfolios. Laurence is passionate about building strong relationships and helping Advisers deliver better investment outcomes for their clients.' },
+    ],
   },
   {
     id: 'tal', name: 'TAL', logo: 'img/partners/2026/tal.png',
     topic: 'Life insurance market update',
-    speakers: [{ name: 'Mark Olivier', title: 'Business Development Manager NSW' }],
+    speakers: [
+      { name: 'Mark Olivier', photo: 'img/speakers/2026/tal-olivier.jpg', title: 'Business Development Manager NSW', bio: 'Mark Olivier is a Business Development Manager with TAL and has spent more than 25 years in the financial services industry. Throughout his career, Mark has held distribution and adviser-facing roles with OnePath, Macquarie Life and TAL, working closely with financial advisers to help them navigate insurance solutions and deliver positive client outcomes. Passionate about adviser support, Mark is focused on helping advice businesses grow with confidence through practical insights, technical expertise and a commitment to partnership.' },
+    ],
   },
   {
     id: 'trilogy', name: 'Trilogy Funds', logo: 'img/partners/2026/trilogy.png',
     blurb: 'For over 25 years, Trilogy Funds has specialised in property backed, income investments. We have successfully navigated numerous economic, property and interest rate cycles, seeking to maximise returns while preserving capital in our credit portfolios and pursuing growth in our property investments. Our experience, expertise and reputation enable us to source high quality opportunities for our retail, wholesale and institutional investors.',
+    topic: 'The Road Ahead - Opportunities in Property & Private Credit',
+    // 29 Sep sheet: John Law replaces Walter Raspopin as presenter.
     speakers: [
-      { name: 'Walter Raspopin', photo: 'img/speakers/2026/trilogy-raspopin.jpg', title: 'Distribution Manager — QLD, SA & TAS', bio: "Walter Raspopin is the Distribution Manager for Queensland, South Australia and Tasmania at Trilogy Funds. With more than 30 years of experience in the financial services industry, Walter has built an extensive career working across boutique fund managers, banks, building societies and financial planning firms. Walter joined Trilogy Funds over 11 years ago and has played a key role during a period of significant growth for the business. During his tenure, Trilogy's funds under management (FUM) have expanded from approximately $30 million to more than $1.6 billion, reflecting the strength of the firm's investment offering and its growing presence in the market. Drawing on his deep industry knowledge and broad distribution experience, Walter works closely with financial advisers and investment professionals across his regions, helping them identify solutions that support their clients' wealth creation and investment objectives." },
+      { name: 'John Law', photo: 'img/speakers/2026/trilogy-law.jpg', title: 'Distribution Manager NSW/ACT', bio: "John Law is a Distribution Manager for Trilogy Funds, responsible for managing adviser and wholesale investor relationships across New South Wales and the Australian Capital Territory. With 18 years' experience in the financial services industry, John brings extensive expertise across banking, finance, property and private credit. He spent 12 years with Bankwest in a variety of senior banking and finance roles, developing deep knowledge of lending, relationship management and client outcomes. Over the past six years, John has specialised in the distribution of property and private credit investment solutions, working closely with financial advisers to help their clients access high-quality income-focused investment opportunities. John's strong industry knowledge, relationship-driven approach and extensive experience across both banking and investment markets make him a trusted partner to advisers throughout NSW and the ACT." },
     ],
   },
   {
@@ -304,6 +343,21 @@ export const partners = [
     ],
   },
 ]
+
+// Package tier per partner, from the sheet's Package column (29 Sep).
+// Paradino's package reads "Platinum at Gold Price" — ranked as Platinum (the
+// package, not the price). A partner missing here sorts LAST rather than
+// breaking the app; the bench check flags it.
+const TIER_RANK = { main: 0, platinum: 1, goldplus: 2, gold: 3, sponsor: 4 }
+const PARTNER_TIER = {
+  pep: 'main',
+  afic: 'platinum', afm: 'platinum', gyrostat: 'platinum', hub24: 'platinum', mst: 'platinum', paradino: 'platinum',
+  centuria: 'goldplus', macquarie: 'goldplus', millbrook: 'goldplus', openmarkets: 'goldplus', trilogy: 'goldplus', wam: 'goldplus',
+  ellerston: 'gold', russell: 'gold', tal: 'gold',
+  gda: 'sponsor',
+}
+const tierRank = (p) => TIER_RANK[PARTNER_TIER[p.id]] ?? 99
+partners.sort((a, b) => tierRank(a) - tierRank(b) || a.name.localeCompare(b.name))
 
 export function partnerById(id) {
   return partners.find((p) => p.id === id)
@@ -370,6 +424,45 @@ export const speakers = partners.flatMap((p) =>
 
 export function speakerById(id) {
   return speakers.find((s) => s.id === id)
+}
+
+/* Non-speaking DELEGATES — sheet columns G/H (Delegate 2/3), 29 Sep sheet.
+   Adam, 29 Sep: listed under Speakers & Delegates so advisers can find them;
+   the BDMs want to be contactable. Same tier order as the partners.
+   NAME only (the sheet carries no delegate titles); "TBA"/"N/A" left out.
+
+   CONTACT SLOT — speakers and delegates alike may carry `linkedin` (public
+   profile URL) or `email` (WORK email). EMPTY today on purpose: each one goes
+   in only after PGW confirm that person's consent. The view shows a button
+   only when a value is present — no value, no block.
+   ⛔ NEVER a mobile, never a personal email: this repo is public and
+   attendees never sign in, so anything here is published to the world. */
+const PARTNER_DELEGATES = {
+  pep: [{ name: 'Alexander Brown' }, { name: 'Jack Auton' }],
+  afic: [{ name: 'Claire Aitchison' }],
+  centuria: [{ name: 'Paul Roach' }],
+  gyrostat: [{ name: 'Michael Baker' }],
+  macquarie: [{ name: 'Brendon Pocock' }],
+  millbrook: [{ name: 'Peter Smirnios' }],
+  mst: [{ name: 'John Meagher' }],
+  openmarkets: [{ name: 'David Jenkins' }],
+  paradino: [{ name: 'Kieren Samways' }],
+  wam: [{ name: 'Tomasina East' }],
+}
+export const delegates = partners.flatMap((p) =>
+  (PARTNER_DELEGATES[p.id] ?? []).map((d) => ({
+    id: `${p.id}-${slug(d.name.split(' ').at(-1))}`,
+    partnerId: p.id,
+    org: p.name,
+    orgShort: p.short ?? p.name,
+    role: 'delegate',
+    ...d,
+  })),
+)
+
+/** A speaker OR a delegate — the person page serves both. */
+export function personById(id) {
+  return speakerById(id) ?? delegates.find((d) => d.id === id)
 }
 
 /** Who is presenting a session: named speakers if the agenda names any,

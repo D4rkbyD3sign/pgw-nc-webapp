@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, speakersForSession, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow } from './data.js'
+import { conference, sessions, speakers, speakerById, delegates, personById, speakersForSession, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 
@@ -330,7 +330,7 @@ export function homeView() {
         </a>
         <a href="#/speakers" class="tile">
           <div class="ico">${icons.speakers}</div>
-          <div><div class="n">Speakers</div><div class="s">${speakers.length} this year</div></div>
+          <div><div class="n">Speakers &amp; Delegates</div><div class="s">${speakers.length} speakers · ${delegates.length} delegates</div></div>
         </a>
         <a href="#/tonight" class="tile tonight">
           <div class="ico">${icons.dinner}</div>
@@ -465,13 +465,23 @@ function initials(name) {
     .join('')
 }
 
+/** Contact slot — LinkedIn and/or WORK email, only when data.js carries one.
+ *  Empty for everyone today by design (consent pending via PGW), so this
+ *  renders nothing until a value lands. Never a mobile. */
+function contactBlock(p) {
+  const ways = []
+  if (p.linkedin) ways.push(`<a class="pill active" href="${p.linkedin}" target="_blank" rel="noopener">Connect on LinkedIn</a>`)
+  if (p.email) ways.push(`<a class="pill" href="mailto:${p.email}">Email ${p.name.split(' ')[0]}</a>`)
+  return ways.length ? `<div class="spcontact">${ways.join('')}</div>` : ''
+}
+
 export function speakersView() {
-  /* 2026: derived from the partners (see data.js). Title and bio are present
-     only where PGW's sheet carries them — a blank is a missing line, never
-     filler. No contact block anywhere on a speaker: the repo is public. */
-  const cards = speakers
-    .map(
-      (s) => `
+  /* 2026: derived from the partners (see data.js), in partner TIER order.
+     Title and bio are present only where PGW's sheet carries them — a blank
+     is a missing line, never filler. Delegates (29 Sep) are the partners'
+     non-speaking people, sectioned below the speakers. Contact appears only
+     through contactBlock on the person page — never a mobile. */
+  const card = (s) => `
       <a href="#/speaker/${s.id}" class="spcard">
         ${s.photo ? `<img class="spavatar" src="${s.photo}" alt="${s.name}">` : `<span class="spavatar spinit">${initials(s.name)}</span>`}
         <div class="spbody">
@@ -479,22 +489,24 @@ export function speakersView() {
           <div class="s">${s.title ? `${s.title} · ` : ''}${s.orgShort}</div>
           ${s.bio ? `<p class="spbio clamp">${s.bio}</p>` : ''}
         </div>
-      </a>`,
-    )
-    .join('')
+      </a>`
 
   return `
     <div class="pagehead">
-      <h2>Speakers</h2>
-      <p class="sub">${speakers.length} presenting across the two days</p>
+      <h2>Speakers &amp; Delegates</h2>
+      <p class="sub">${speakers.length} presenting · ${delegates.length} more from our partners</p>
     </div>
-    <div class="splist">${cards}</div>
+    <span class="lab">// Speakers</span>
+    <div class="splist">${speakers.map(card).join('')}</div>
+    ${delegates.length ? `
+    <span class="lab" style="margin-top:26px">// Delegates</span>
+    <div class="splist">${delegates.map(card).join('')}</div>` : ''}
   `
 }
 
 export function speakerView(id) {
-  const s = speakerById(id)
-  if (!s) return stubView('Speaker', 'Speaker not found.')
+  const s = personById(id)
+  if (!s) return stubView('Speaker', 'Person not found.')
   const theirSessions = sessions.filter((x) => speakersForSession(x).some((sp) => sp.id === s.id))
   return `
     <div class="sphero">
@@ -508,6 +520,7 @@ export function speakerView(id) {
     <div class="spdetail">
       <p class="spbio">${s.bio}</p>
     </div>` : ''}
+    ${contactBlock(s)}
     <a href="#/partner/${s.partnerId}" class="spcard" style="margin-top:14px">
       <img class="spavatar" src="${partnerById(s.partnerId)?.logo ?? ''}" alt="${s.org}" style="object-fit:contain;background:#fff">
       <div class="spbody">
