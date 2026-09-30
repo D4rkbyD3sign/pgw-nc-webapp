@@ -122,12 +122,17 @@ function whoLine(s) {
     const orgs = [...new Set(sps.map((sp) => sp.orgShort))]
     return `<b>${sps.map((sp) => sp.name).join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
   }
+  // A named keynote / spotlight guest who is not a partner (30 Sep).
+  if (s.guest) return `<b>${s.guest}</b>`
+  /* 30 Sep: the agenda header names the one conference room, so a card only
+     names a place when it is somewhere else. */
+  const place = s.room === conference.room ? '' : s.room
   /* While topics are unconfirmed a partner slot's TITLE is the organisation, so
      repeating it underneath prints the same name twice in one card. Drop it and
      show the room alone. This resolves itself the moment real topics land —
      title becomes the topic and the org reappears beneath it. */
-  if (s.org && s.org !== s.title) return `<b>${s.org}</b> · ${s.room}`
-  return s.room
+  if (s.org && s.org !== s.title) return `<b>${s.org}</b>${place ? ` · ${place}` : ''}`
+  return place
 }
 
 /** Small wayfinding icon for breaks and social events, by title. */
@@ -421,14 +426,14 @@ export function agendaView(dayArg) {
         return `
         <div class="agrow">
           <div class="agtime">${s.start}</div>
-          <div class="agbreak"><span class="evico">${eventIcon(s)}</span>${s.title} · ${s.room}</div>
+          <div class="agbreak"><span class="evico">${eventIcon(s)}</span>${s.title}${s.room === conference.room ? '' : ` · ${s.room}`}</div>
         </div>`
       }
       const social = s.kind === 'SOCIAL'
       return `
       <div class="agrow">
         <div class="agtime">${s.start}</div>
-        <a href="#/${social ? 'tonight' : `session/${s.id}`}" class="agcard${isNow ? ' isnow' : ''}">
+        <a href="#/${social ? `tonight/${s.day}` : `session/${s.id}`}" class="agcard${isNow ? ' isnow' : ''}">
           <div class="row">
             <span class="live">${isNow ? '<span class="dot"></span>ON NOW · ' : ''}${s.start}–${s.end}</span>
             ${social ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
@@ -443,6 +448,7 @@ export function agendaView(dayArg) {
   return `
     <div class="pagehead">
       <h2>Agenda</h2>
+      <p class="sub">All sessions in <b>${conference.room}</b> · ${conference.venue.name}</p>
       <div class="daypills">
         ${conference.days
           .map(
@@ -626,11 +632,15 @@ export function partnerView(id) {
   `
 }
 
-export function tonightView() {
+/* 30 Sep: an agenda card passes ITS day (#/tonight/2). Before, every evening card
+   opened the LIVE day's evening, so Friday's drinks and dinner showed Thursday's
+   cruise until Friday itself. No day given (home tile, FAQ) = the live day. */
+export function tonightView(dayArg) {
   const live = liveSession()
-  const socials = socialsForDay(live.session.day)
+  const day = [1, 2].includes(Number(dayArg)) ? Number(dayArg) : live.session.day
+  const socials = socialsForDay(day)
   if (!socials.length) return stubView('Tonight', 'Nothing scheduled tonight.')
-  const dayLabel = conference.days.find((d) => d.day === live.session.day)?.label ?? ''
+  const dayLabel = conference.days.find((d) => d.day === day)?.label ?? ''
   const cards = socials
     .map((social) => {
       const v = social.venue ?? {}
@@ -706,7 +716,7 @@ function askFromSession(s) {
   if (s.kind === 'BREAK' || s.kind === 'SOCIAL') return ''
   return `
     <div style="padding:20px 24px">
-      <p class="asklater">${icons.chat} Questions for this session open at <b>${s.start}</b>, while it's on.</p>
+      <p class="asklater">${icons.chat}<span>Questions for this session open at <b>${s.start}</b>, while it's on.</span></p>
     </div>`
 }
 
@@ -1416,6 +1426,7 @@ export function wireMod() {
    speaker means no line at all. */
 function screenWho(s) {
   if (s.kind === 'SOCIAL') return s.venue?.name ?? s.room
+  if (s.guest) return s.guest
   const sps = speakersForSession(s)
   if (sps.length) {
     const orgs = [...new Set(sps.map((sp) => sp.org))]

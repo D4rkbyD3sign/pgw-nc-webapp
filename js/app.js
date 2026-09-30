@@ -55,7 +55,7 @@ const routes = {
   speaker: { render: (arg) => speakerView(arg), back: 'speakers' },
   partners: { render: () => partnersView() },
   partner: { render: (arg) => partnerView(arg), back: 'partners' },
-  tonight: { render: () => tonightView(), back: '' },
+  tonight: { render: (arg) => tonightView(arg), back: '' },
   ask: { render: () => askView(), wire: wireAsk, live: true },
   // Pulse survey for one session — reached from the home prompt after it ends.
   pulse: { render: (arg) => pulseView(arg), wire: wirePulse, back: '' },

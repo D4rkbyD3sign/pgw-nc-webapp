@@ -21,6 +21,9 @@ export const conference = {
   tagline: 'Turning technology into results.',
   eyebrow: 'National Conference · 29 Oct · Hobart',
   dates: '29–30 October 2026',
+  /* The ONE room every session and break is in, both days (Adam, 30 Sep). The agenda
+     states it once at the top, so cards only name a place when it is NOT this room. */
+  room: 'Aura · Level 12',
   /* `date` is load-bearing, not decoration. Without it the app had no way to
      know WHICH DAY it was, and the "what's on now" lookup matched on clock
      time alone across both days at once. See conferenceNow() below. ISO, and
@@ -72,8 +75,12 @@ export const welcome = {
 
 // photo: URL to headshot (empty = initials avatar). linkedin: public profile URL.
 // Bios condensed from the 2025 NC booklet (see Squad/PGW/PGW-NC-2026/Webapp/booklet-2025-extract.md).
-const GB = 'Grand Ballroom'
-const AT = 'Atrium'
+// ⚖ 2026-09-30 (Tracey via Adam): EVERY conference session AND break is in the one
+// room on Level 12, Crowne Plaza Hobart, both days. The only things elsewhere are the
+// Mustique cruise, pre-dinner drinks and the Awards Dinner (Centurion 1, Level 4).
+// 'Grand Ballroom' / 'Atrium' were the 2025 Gold Coast names and are retired.
+const GB = conference.room
+const AT = conference.room
 
 /* ---------- THE REAL 2026 PROGRAM ----------
    Transcribed slot for slot from PGW's working agenda,
@@ -95,7 +102,7 @@ const AT = 'Atrium'
      - Both keynote speakers. Neither is booked; the opening candidate has not
        replied and the closing slot has no candidate.
      - Both adviser spotlights.
-     - ROOMS. GB/AT are carried over from the 2025 shape and are NOT confirmed
+     - ~~ROOMS.~~ ✅ 30 Sep: Level 12 for everything (see GB/AT). Was: GB/AT carried over from the 2025 shape and NOT confirmed
        for Hobart. Flagged with Adam.
 
    ⛔ EVENING EVENTS ARE ABSENT ON PURPOSE. PGW's partner tracker shows a
@@ -113,23 +120,34 @@ const AT = 'Atrium'
 
    ~~⚠️ `partnerId` is set ONLY for the four partners returning from 2025.~~
    ✅ 2026-09-08: all fifteen 2026 partners have records + logos; every partner
-   session is linked, and its summary carries the topic where PGW has one. */
+   session is linked, and its summary carries the topic where PGW has one.
+
+   ⚖ 2026-09-30 — V3 AGENDA TABLE IS LAW (Adam): 'ImplementAI 2026 - Conference
+   Agenda - Detailed.docx'. Its TABLES govern; the prose below them is ignored,
+   so the 'not written here' list above is superseded for the keynotes and
+   Spotlight 1 — the table names Dr Leela, Matthew Byrne and Ben Ross.
+   ⚠ THERE ARE TWO BEN ROSSES. This one is the external AI speaker, NOT PGW's
+   Ben Ross. Attendees see 'Ben Ross' only; the table's 'II' is PGW's label.
+   Panel 2: 'maybe PEP' on the table is NOT shown until confirmed.
+   Friday's Adviser Spotlight is gone; d2-panel-3 became d2-keynote-close-1.
+   `guest` = a named non-partner presenter (keynotes, spotlight). whoLine shows it on
+   the card; before it existed the name lived only in `summary`, which cards omit. */
 export const sessions = [
-  // ---- Day 1 · Thu 29 Oct · 9:00am to 5:00pm ----
-  { id: 'd1-welcome', day: 1, start: '09:00', end: '09:15', title: 'Welcome & housekeeping', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
-  { id: 'd1-keynote-open', day: 1, start: '09:15', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: [], summary: 'Guest speaker to be announced.' },
+  // ---- Day 1 · Thu 29 Oct · 8:30am to 5:00pm (v3 agenda table, 30 Sep) ----
+  { id: 'd1-welcome', day: 1, start: '08:30', end: '08:45', title: 'Welcome & housekeeping', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
+  { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Dr Leela', speakerIds: [], summary: 'With Dr Leela.' },
   { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook' },
-  { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:20', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:20', end: '11:40', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
-  { id: 'd1-openmarkets', partnerId: 'openmarkets', day: 1, start: '11:40', end: '12:00', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Tokenisation of real-world assets' },
-  { id: 'd1-spotlight', day: 1, start: '12:00', end: '12:10', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
-  { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:10', end: '12:55', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Structural weakness in retirement portfolio construction — the SMILE risks: Sequencing, Market, Inflation, Longevity, Emotional' },
-  { id: 'd1-lunch', day: 1, start: '12:55', end: '13:45', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:15', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:15', end: '11:35', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
+  { id: 'd1-openmarkets', partnerId: 'openmarkets', day: 1, start: '11:35', end: '11:55', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Tokenisation of real-world assets' },
+  { id: 'd1-spotlight', day: 1, start: '11:55', end: '12:15', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', guest: 'Matthew Byrne', speakerIds: [], summary: 'With Matthew Byrne.' },
+  { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:15', end: '13:00', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Structural weakness in retirement portfolio construction — the SMILE risks: Sequencing, Market, Inflation, Longevity, Emotional' },
+  { id: 'd1-lunch', day: 1, start: '13:00', end: '13:45', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-panel-1', day: 1, start: '13:45', end: '14:20', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: 'PGW', speakerIds: [], summary: 'Panel and topic to be announced.' },
   { id: 'd1-wam', partnerId: 'wam', day: 1, start: '14:20', end: '14:40', title: 'Wilson Asset Management', kind: 'PLENARY', room: GB, org: 'Wilson Asset Management', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd1-paradino', partnerId: 'paradino', day: 1, start: '14:40', end: '15:25', title: 'Paradino', kind: 'PLENARY', room: GB, org: 'Paradino', speakerIds: [], summary: 'The little things that make AI work in advice — a practical session with workflow examples, adviser use cases and Q&A' },
-  { id: 'd1-arvo-tea', day: 1, start: '15:25', end: '15:55', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd1-panel-2', day: 1, start: '15:55', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['ellerston-coggins'], summary: 'Topic to be announced.' },
+  { id: 'd1-arvo-tea', day: 1, start: '15:25', end: '15:50', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd1-panel-2', day: 1, start: '15:50', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['ellerston-coggins', 'russell-gamboa', 'afm-gosselin'], summary: 'Topic to be announced.' },
   { id: 'd1-centuria', partnerId: 'centuria', day: 1, start: '16:30', end: '16:50', title: 'Centuria', kind: 'PLENARY', room: GB, org: 'Centuria', speakerIds: [], summary: 'Protected Cropping: Where Agriculture Meets Technology' },
   { id: 'd1-wrap', day: 1, start: '16:50', end: '17:00', title: 'Day one wrap-up', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
@@ -145,7 +163,7 @@ export const sessions = [
     },
   },
 
-  // ---- Day 2 · Fri 30 Oct · 9:00am to 4:50pm ----
+  // ---- Day 2 · Fri 30 Oct · 9:00am to 4:50pm (v3 agenda table, 30 Sep) ----
   { id: 'd2-welcome', day: 2, start: '09:00', end: '09:10', title: 'Welcome back & recap', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   { id: 'd2-macquarie', partnerId: 'macquarie', day: 2, start: '09:10', end: '09:30', title: 'Macquarie', kind: 'PLENARY', room: GB, org: 'Macquarie', speakerIds: [], summary: 'The ‘modern heist’: Safeguarding your practice, your clients, and their wealth' },
   { id: 'd2-pep', partnerId: 'pep', day: 2, start: '09:30', end: '10:15', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
@@ -153,27 +171,26 @@ export const sessions = [
   { id: 'd2-morning-tea', day: 2, start: '10:35', end: '11:05', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd2-afic', partnerId: 'afic', day: 2, start: '11:05', end: '11:50', title: 'AFIC', kind: 'PLENARY', room: GB, org: 'AFIC', speakerIds: [], summary: 'Technology insights from the recent company profit reporting season' },
   { id: 'd2-millbrook', partnerId: 'millbrook', day: 2, start: '11:50', end: '12:10', title: 'Millbrook Group', kind: 'PLENARY', room: GB, org: 'Millbrook Group', speakerIds: [], summary: 'Building resilient portfolios: the growing role of private credit' },
-  { id: 'd2-spotlight', day: 2, start: '12:10', end: '12:20', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', speakerIds: [], summary: 'Adviser to be announced.' },
-  { id: 'd2-lunch', day: 2, start: '12:20', end: '13:10', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd2-hub24', partnerId: 'hub24', day: 2, start: '13:10', end: '13:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
-  { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '13:55', end: '14:15', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'The Road Ahead - Opportunities in Property & Private Credit' },
-  { id: 'd2-panel-3', day: 2, start: '14:15', end: '15:00', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['afm-gosselin'], summary: 'Topic to be announced.' },
+  { id: 'd2-lunch', day: 2, start: '13:00', end: '14:00', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
+  { id: 'd2-hub24', partnerId: 'hub24', day: 2, start: '12:10', end: '12:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '14:00', end: '14:20', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'The Road Ahead - Opportunities in Property & Private Credit' },
+  { id: 'd2-keynote-close-1', day: 2, start: '14:20', end: '15:00', title: 'Closing Keynote Part 1', kind: 'KEYNOTE', room: GB, org: '', guest: 'Ben Ross', speakerIds: [], summary: 'With Ben Ross — AI.' },
   { id: 'd2-arvo-tea', day: 2, start: '15:00', end: '15:30', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: [], summary: 'Guest speaker to be announced.' },
+  { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Ben Ross', speakerIds: [], summary: 'With Ben Ross.' },
   { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
-    id: 'd2-drinks', day: 2, start: '17:00', end: '18:30', title: 'Drinks', kind: 'SOCIAL',
-    room: 'Level 4', org: '', speakerIds: [],
-    summary: 'Optional — before the awards dinner.',
+    id: 'd2-drinks', day: 2, start: '17:00', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
+    room: 'Outside Centurion 1, Level 4', org: '', speakerIds: [],
+    summary: 'Optional — just outside the Centurion 1 room, before the awards dinner.',
     venue: {
-      name: 'Level 4, Crowne Plaza',
+      name: 'Outside Centurion 1 · Level 4, Crowne Plaza',
       address: '110 Liverpool Street, Hobart TAS 7000',
       mapUrl: 'https://maps.google.com/?q=Crowne+Plaza+Hobart+110+Liverpool+Street',
     },
   },
   {
     id: 'd2-awards', day: 2, start: '18:30', end: '22:00', title: 'Annual Awards Dinner', kind: 'SOCIAL',
-    room: 'Crowne Plaza', org: '', speakerIds: [],
+    room: 'Centurion 1, Level 4', org: '', speakerIds: [],
     summary: 'The adviser awards night — the conference finale.',
     /* ⚠️ END TIME IS AN ASSUMPTION, and the only invented value in this array.
        The invitation gives a 6:30pm start and no finish. 22:00 is a guess kept
@@ -181,8 +198,9 @@ export const sessions = [
        ⬜ Confirm with Adam and correct — do not let it harden by sitting here. */
     endAssumed: true,
     venue: {
-      name: 'Crowne Plaza by IHG',
-      address: 'Level 12, 110 Liverpool Street, Hobart TAS 7000',
+      // ⚖ 30 Sep (Tracey via Adam): moved from Level 12 to Centurion 1, Level 4.
+      name: 'Centurion 1 · Level 4, Crowne Plaza',
+      address: '110 Liverpool Street, Hobart TAS 7000',
       mapUrl: 'https://maps.google.com/?q=Crowne+Plaza+Hobart+110+Liverpool+Street',
     },
   },
