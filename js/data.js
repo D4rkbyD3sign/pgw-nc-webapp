@@ -179,7 +179,7 @@ export const sessions = [
   { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Ben Ross', speakerIds: [], summary: 'With Ben Ross.' },
   { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
-    id: 'd2-drinks', day: 2, start: '17:00', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
+    id: 'd2-drinks', day: 2, start: '18:00', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
     room: 'Outside Centurion 1, Level 4', org: '', speakerIds: [],
     summary: 'Optional — just outside the Centurion 1 room, before the awards dinner.',
     venue: {
@@ -317,7 +317,9 @@ export const partners = [
     blurb: "Openmarkets Group (OMG) is a leading Australian B2B fintech, providing trading, wealth management infrastructure and technology solutions to financial institutions, advisers and fintechs. We deliver a unique, end-to-end ecosystem that connects investors to markets through scalable, compliant and innovative technology. Operating within Australia's highly regulated financial system under our AFSL and as a clearing broker of ASX, we are trusted by partners to power critical trading and investment capabilities. We also provide wealth management products and services, such as Portfolio Administration, MDA, tax engine and model rebalancing technology.",
     topic: 'Tokenisation of real-world assets',
     speakers: [
-      { name: 'Dan Jowett', photo: 'img/speakers/2026/openmarkets-jowett.jpg', title: 'Chief Executive Officer', bio: 'Dan is the CEO of Openmarkets and has served as OMG’s Chief Executive Officer since March 2022. Prior to joining Openmarkets, Mr Jowett was the Chief Operating Officer and Chief Financial Officer of Shaw and Partners Limited, an Australian investment and wealth management firm, between 2012 and 2021. Dan commenced his career providing financial assurance and advisory services while at PwC Australia and KPMG UK, and has 30 years of professional experience across stockbroking, wealth management, funds management and investment banking. Mr Jowett is a Fellow of the Institute of Chartered Accountants in England and Wales, holds a Professional Diploma in Stockbroking, and is a Responsible Executive under the ASIC Market Integrity Rules (ASX).' },
+      // ⚖ 30 Sep (Adam): Dan Jowett is NOT attending; David Jenkins presents for Openmarkets
+      // and is their only attendee. Title + bio incoming - absent fields hide, no invented copy.
+      { name: 'David Jenkins', photo: 'img/speakers/2026/openmarkets-jenkins.jpg' },
     ],
   },
   {
@@ -463,7 +465,6 @@ const PARTNER_DELEGATES = {
   macquarie: [{ name: 'Brendon Pocock' }],
   millbrook: [{ name: 'Peter Smirnios' }],
   mst: [{ name: 'John Meagher' }],
-  openmarkets: [{ name: 'David Jenkins' }],
   paradino: [{ name: 'Kieren Samways' }],
   wam: [{ name: 'Tomasina East' }],
 }
