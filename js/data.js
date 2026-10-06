@@ -125,7 +125,8 @@ const AT = conference.room
    ⚖ 2026-09-30 — V3 AGENDA TABLE IS LAW (Adam): 'ImplementAI 2026 - Conference
    Agenda - Detailed.docx'. Its TABLES govern; the prose below them is ignored,
    so the 'not written here' list above is superseded for the keynotes and
-   Spotlight 1 — the table names Dr Leela, Matthew Byrne and Ben Ross.
+   Spotlight 1 — the table names Dr Lila (Landowski; the table spelled it 'Leela', and Adam
+   ruled 7 Oct that Lila is correct, matching the booklet), Matthew Byrne and Ben Ross.
    ⚠ THERE ARE TWO BEN ROSSES. This one is the external AI speaker, NOT PGW's
    Ben Ross. Attendees see 'Ben Ross' only; the table's 'II' is PGW's label.
    Panel 2: 'maybe PEP' on the table is NOT shown until confirmed.
@@ -135,7 +136,7 @@ const AT = conference.room
 export const sessions = [
   // ---- Day 1 · Thu 29 Oct · 8:30am to 5:00pm (v3 agenda table, 30 Sep) ----
   { id: 'd1-welcome', day: 1, start: '08:30', end: '08:45', title: 'Welcome & housekeeping', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
-  { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Dr Leela', speakerIds: [], summary: 'With Dr Leela.' },
+  { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Dr Lila Landowski', speakerIds: [], summary: 'With Dr Lila Landowski.' },
   { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook' },
   { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:15', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:15', end: '11:35', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
@@ -233,7 +234,7 @@ export const partners = [
     topic: 'Choosing the Winners: The Art of Manager Selection',
     speakers: [
       { name: 'Cameron Blanks', photo: 'img/speakers/2026/pep-blanks.jpg', title: 'Managing Director', bio: 'Cameron joined Pacific Equity Partners in 2002. Prior to joining PEP, Cameron spent three years with Bain & Company in Australia and North America. Previously, Cameron worked for seven years in the mining and construction industry in Australia, Asia and North America. He received an MBA from MIT Sloan, and a MEng and BEng (First Class Honours) from the University of South Australia where he was a Graduate Society Scholar.' },
-      { name: 'Paul Ryan', photo: 'img/speakers/2026/pep-ryan.jpg', bio: 'Paul joined Pacific Equity Partners in 2013. Before joining PEP, he was at Deutsche Bank and Dakota Capital. He holds a BCom (Hons) from the University of Auckland.' },
+      // ⚖ 7 Oct (Adam): Cameron is PEP's ONLY speaker. Paul Ryan removed (he was in v33).
     ],
   },
   {
@@ -250,14 +251,15 @@ export const partners = [
     // logo PROVISIONAL — Adam confirming with PGW 30 Sep. Panel only;
     // no blurb or topic supplied, so neither block renders.
     id: 'afm', name: 'Australian Fund Monitors', short: 'AFM', logo: 'img/partners/2026/afm.png',
-    speakers: [{ name: 'Chris Gosselin' }],
+    // ⚖ 7 Oct (Adam): title CEO, checked against AFM's website + LinkedIn; photo in. Bio still to come from Chris.
+    speakers: [{ name: 'Chris Gosselin', photo: 'img/speakers/2026/afm-gosselin.jpg', title: 'CEO' }],
   },
   {
     id: 'centuria', name: 'Centuria', logo: 'img/partners/2026/centuria.png',
     blurb: 'Centuria Capital Group is a leading S&P/ASX 200 Australian real estate funds management company with a 25+ year track record of helping investors build long-term wealth. The Group manages $22.2 billion of assets across a diversified range of sectors, including industrial, office, retail, agriculture, healthcare, commercial real estate debt, and investment bonds.',
     topic: 'Protected Cropping: Where Agriculture Meets Technology',
     speakers: [
-      { name: 'Chris De Livera', photo: 'img/speakers/2026/centuria-livera.jpg', bio: "Chris De Livera is Centuria's Distribution Manager for NSW and ACT, responsible for managing and developing relationships with financial advisers regarding investments across Centuria's property and credit fund offerings. He has held this role for more than four years and brings over a decade of experience in the financial services industry. Chris has worked with leading firms including Centuria, Netwealth, Colonial First State and Gallagher Bassett, providing him with broad experience across funds management and wealth platforms." },
+      { name: 'Chris De Livera', photo: 'img/speakers/2026/centuria-livera.jpg', title: 'Distribution Manager NSW/ACT', bio: "Chris De Livera is Centuria's Distribution Manager for NSW and ACT, responsible for managing and developing relationships with financial advisers regarding investments across Centuria's property and credit fund offerings. He has held this role for more than four years and brings over a decade of experience in the financial services industry. Chris has worked with leading firms including Centuria, Netwealth, Colonial First State and Gallagher Bassett, providing him with broad experience across funds management and wealth platforms." },
     ],
   },
   {
@@ -266,7 +268,7 @@ export const partners = [
     // Panel only (sheet topic: "N/A, panel only") — no topic, no plenary slot.
     // Jason Coggins is named on the sheet as the panel speaker (29 Sep sheet).
     speakers: [
-      { name: 'Jason Coggins', photo: 'img/speakers/2026/ellerston-coggins.jpg', bio: 'Jason joined Ellerston in late 2023 as Head of Product Strategy. He has over 20 years of experience in financial services, spanning banking, private wealth, and asset consultancy. Until 2023, he spent nearly a decade at Koda Capital as Head of Funds Research, playing a key role in shaping the firm’s investment strategy from its inception. His responsibilities included supporting asset allocation, portfolio construction, and strategy selection. During his tenure, the Investment Strategy Group (ISG) gained recognition for introducing and seeding innovative strategies in the Australian market. The team also played a pivotal role in securing some of the country’s largest non-profit organisations and high-net-worth family offices. Prior to Koda Capital, Jason co-led the research team at ANZ Global Wealth, overseeing ANZ’s centralised advice research function. Earlier in his career, he worked at CPG/Grove Financial Services, an institutional asset consultancy firm' },
+      { name: 'Jason Coggins', photo: 'img/speakers/2026/ellerston-coggins.jpg', title: 'Head of Product Strategy', bio: 'Jason joined Ellerston in late 2023 as Head of Product Strategy. He has over 20 years of experience in financial services, spanning banking, private wealth, and asset consultancy. Until 2023, he spent nearly a decade at Koda Capital as Head of Funds Research, playing a key role in shaping the firm’s investment strategy from its inception. His responsibilities included supporting asset allocation, portfolio construction, and strategy selection. During his tenure, the Investment Strategy Group (ISG) gained recognition for introducing and seeding innovative strategies in the Australian market. The team also played a pivotal role in securing some of the country’s largest non-profit organisations and high-net-worth family offices. Prior to Koda Capital, Jason co-led the research team at ANZ Global Wealth, overseeing ANZ’s centralised advice research function. Earlier in his career, he worked at CPG/Grove Financial Services, an institutional asset consultancy firm' },
     ],
   },
   {
@@ -285,7 +287,12 @@ export const partners = [
   {
     id: 'hub24', name: 'HUB24', logo: 'img/partners/2026/hub24.png',
     blurb: 'HUB24 is a leading provider of integrated platform and technology solutions for financial advisers, offering a flexible and innovative investment platform designed to improve efficiency and deliver better client outcomes. Backed by award-winning functionality and a strong focus on adviser experience, HUB24 helps simplify complexity and drive better financial futures.',
-    speakers: [{ name: 'Jack Rooke', photo: 'img/speakers/2026/hub24-rooke.jpg' }],
+    // ⚖ 7 Oct (Adam): Jack Rooke and Luke Peterson are JOINT presenters. Title + bio verbatim from
+    // the 2026 booklet's shared HUB24 speaker page (one text written for both of them).
+    speakers: [
+      { name: 'Jack Rooke', photo: 'img/speakers/2026/hub24-rooke.jpg', title: 'Business Development Manager', bio: 'Jack Rooke and Luke Peterson are Business Development Managers at HUB24, partnering with financial advisers across NSW, ACT and QLD to help grow and streamline their businesses through innovative platform, investment and technology solutions. Passionate about building strong adviser relationships and delivering positive client outcomes, they work closely with practices to drive efficiency, support business growth, and help advisers unlock the full potential of the HUB24 ecosystem.' },
+      { name: 'Luke Peterson', photo: 'img/speakers/2026/hub24-peterson.jpg', title: 'Business Development Manager', bio: 'Jack Rooke and Luke Peterson are Business Development Managers at HUB24, partnering with financial advisers across NSW, ACT and QLD to help grow and streamline their businesses through innovative platform, investment and technology solutions. Passionate about building strong adviser relationships and delivering positive client outcomes, they work closely with practices to drive efficiency, support business growth, and help advisers unlock the full potential of the HUB24 ecosystem.' },
+    ],
   },
   {
     id: 'macquarie', name: 'Macquarie', logo: 'img/partners/2026/macquarie.png',
@@ -318,8 +325,8 @@ export const partners = [
     topic: 'Tokenisation of real-world assets',
     speakers: [
       // ⚖ 30 Sep (Adam): Dan Jowett is NOT attending; David Jenkins presents for Openmarkets
-      // and is their only attendee. Title + bio incoming - absent fields hide, no invented copy.
-      { name: 'David Jenkins', photo: 'img/speakers/2026/openmarkets-jenkins.jpg' },
+      // and is their only attendee. ⚖ 7 Oct: title + bio verbatim from the 2026 booklet's speaker page.
+      { name: 'David Jenkins', photo: 'img/speakers/2026/openmarkets-jenkins.jpg', title: 'Chief Product and Technology Officer', bio: 'David is Chief Product and Technology Officer at OMG, bringing more than 30 years of experience across fintech, capital markets and digital assets. His expertise lies in building and growing financial technology platforms that bring traditional and decentralised finance together. Alongside his role at OMG, David is the founder of XIO Innovation, Fractional Chief Technology Officer and Product Lead at ImpactX Markets from the Digital Finance CRC, and a Non-Executive Director at Reach Alternative Investments. Previously, David was Chief Technology Officer at Pepperstone, where he led the initiation of a global crypto exchange solution. He has also held senior executive technology, product and strategy roles at Frontier, Liquidnet, Thomson Reuters, Bloomberg and Fidessa, working across New York, London and Hong Kong. With a career spanning product development, technology leadership and market strategy, David brings a practical perspective on how innovation is shaping the future of financial markets.' },
     ],
   },
   {
@@ -336,7 +343,7 @@ export const partners = [
     // Presenter column still blank, but the booklet blurb is Laurence Gamboa's —
     // Adam, 29 Sep: he replaces the main contact who stood in.
     speakers: [
-      { name: 'Laurence Gamboa', photo: 'img/speakers/2026/russell-gamboa.jpg', bio: 'Laurence Gamboa is Regional Manager – NSW/ACT at Russell Investments, bringing over 18 years of experience in financial services and adviser distribution. He holds a Bachelor of Commerce in Finance and Economics from Curtin University and has extensive experience working with Financial Advisers and Licensees across managed funds and managed portfolios. Laurence is passionate about building strong relationships and helping Advisers deliver better investment outcomes for their clients.' },
+      { name: 'Laurence Gamboa', photo: 'img/speakers/2026/russell-gamboa.jpg', title: 'Regional Manager – NSW/ACT', bio: 'Laurence Gamboa is Regional Manager – NSW/ACT at Russell Investments, bringing over 18 years of experience in financial services and adviser distribution. He holds a Bachelor of Commerce in Finance and Economics from Curtin University and has extensive experience working with Financial Advisers and Licensees across managed funds and managed portfolios. Laurence is passionate about building strong relationships and helping Advisers deliver better investment outcomes for their clients.' },
     ],
   },
   {
@@ -369,7 +376,8 @@ export const partners = [
 // package, not the price). A partner missing here sorts LAST rather than
 // breaking the app; the bench check flags it.
 const TIER_RANK = { main: 0, platinum: 1, goldplus: 2, gold: 3, sponsor: 4 }
-const PARTNER_TIER = {
+// Exported 7 Oct (v34) so the landing page (pgwconference.com.au) can read tiers instead of copying them.
+export const PARTNER_TIER = {
   pep: 'main',
   afic: 'platinum', afm: 'platinum', gyrostat: 'platinum', hub24: 'platinum', mst: 'platinum', paradino: 'platinum',
   centuria: 'goldplus', macquarie: 'goldplus', millbrook: 'goldplus', openmarkets: 'goldplus', trilogy: 'goldplus', wam: 'goldplus',
@@ -434,7 +442,8 @@ export const materials = [
 const slug = (t) => t.toLowerCase().normalize('NFD').replace(/[^a-z]/g, '')
 export const speakers = partners.flatMap((p) =>
   (p.speakers ?? []).map((sp) => ({
-    id: `${p.id}-${slug(sp.name.split(' ').at(-1))}`,
+    // No .at(-1): it needs iOS 15.4+, and at module load a throw here breaks the whole app on older iPhones.
+    id: `${p.id}-${slug(sp.name.split(' ').slice(-1)[0])}`,
     partnerId: p.id,
     org: p.name,
     orgShort: p.short ?? p.name,
@@ -470,7 +479,7 @@ const PARTNER_DELEGATES = {
 }
 export const delegates = partners.flatMap((p) =>
   (PARTNER_DELEGATES[p.id] ?? []).map((d) => ({
-    id: `${p.id}-${slug(d.name.split(' ').at(-1))}`,
+    id: `${p.id}-${slug(d.name.split(' ').slice(-1)[0])}`,
     partnerId: p.id,
     org: p.name,
     orgShort: p.short ?? p.name,
