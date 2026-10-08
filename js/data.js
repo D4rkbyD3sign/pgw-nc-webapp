@@ -125,8 +125,7 @@ const AT = conference.room
    ⚖ 2026-09-30 — V3 AGENDA TABLE IS LAW (Adam): 'ImplementAI 2026 - Conference
    Agenda - Detailed.docx'. Its TABLES govern; the prose below them is ignored,
    so the 'not written here' list above is superseded for the keynotes and
-   Spotlight 1 — the table names Dr Lila (Landowski; the table spelled it 'Leela', and Adam
-   ruled 7 Oct that Lila is correct, matching the booklet), Matthew Byrne and Ben Ross.
+   Spotlight 1 — the table names Dr Lila Landowski, Matthew Byrne and Ben Ross.
    ⚠ THERE ARE TWO BEN ROSSES. This one is the external AI speaker, NOT PGW's
    Ben Ross. Attendees see 'Ben Ross' only; the table's 'II' is PGW's label.
    Panel 2: 'maybe PEP' on the table is NOT shown until confirmed.
@@ -234,7 +233,7 @@ export const partners = [
     topic: 'Choosing the Winners: The Art of Manager Selection',
     speakers: [
       { name: 'Cameron Blanks', photo: 'img/speakers/2026/pep-blanks.jpg', title: 'Managing Director', bio: 'Cameron joined Pacific Equity Partners in 2002. Prior to joining PEP, Cameron spent three years with Bain & Company in Australia and North America. Previously, Cameron worked for seven years in the mining and construction industry in Australia, Asia and North America. He received an MBA from MIT Sloan, and a MEng and BEng (First Class Honours) from the University of South Australia where he was a Graduate Society Scholar.' },
-      // ⚖ 7 Oct (Adam): Cameron is PEP's ONLY speaker. Paul Ryan removed (he was in v33).
+      // One presenter for PEP (confirmed 7 Oct).
     ],
   },
   {
@@ -251,7 +250,7 @@ export const partners = [
     // logo PROVISIONAL — Adam confirming with PGW 30 Sep. Panel only;
     // no blurb or topic supplied, so neither block renders.
     id: 'afm', name: 'Australian Fund Monitors', short: 'AFM', logo: 'img/partners/2026/afm.png',
-    // ⚖ 7 Oct (Adam): title CEO, checked against AFM's website + LinkedIn; photo in. Bio still to come from Chris.
+    // Title confirmed 7 Oct. Bio to follow.
     speakers: [{ name: 'Chris Gosselin', photo: 'img/speakers/2026/afm-gosselin.jpg', title: 'CEO' }],
   },
   {
@@ -287,8 +286,7 @@ export const partners = [
   {
     id: 'hub24', name: 'HUB24', logo: 'img/partners/2026/hub24.png',
     blurb: 'HUB24 is a leading provider of integrated platform and technology solutions for financial advisers, offering a flexible and innovative investment platform designed to improve efficiency and deliver better client outcomes. Backed by award-winning functionality and a strong focus on adviser experience, HUB24 helps simplify complexity and drive better financial futures.',
-    // ⚖ 7 Oct (Adam): Jack Rooke and Luke Peterson are JOINT presenters. Title + bio verbatim from
-    // the 2026 booklet's shared HUB24 speaker page (one text written for both of them).
+    // Joint presentation. Both profiles carry the shared HUB24 bio from the 2026 booklet.
     speakers: [
       { name: 'Jack Rooke', photo: 'img/speakers/2026/hub24-rooke.jpg', title: 'Business Development Manager', bio: 'Jack Rooke and Luke Peterson are Business Development Managers at HUB24, partnering with financial advisers across NSW, ACT and QLD to help grow and streamline their businesses through innovative platform, investment and technology solutions. Passionate about building strong adviser relationships and delivering positive client outcomes, they work closely with practices to drive efficiency, support business growth, and help advisers unlock the full potential of the HUB24 ecosystem.' },
       { name: 'Luke Peterson', photo: 'img/speakers/2026/hub24-peterson.jpg', title: 'Business Development Manager', bio: 'Jack Rooke and Luke Peterson are Business Development Managers at HUB24, partnering with financial advisers across NSW, ACT and QLD to help grow and streamline their businesses through innovative platform, investment and technology solutions. Passionate about building strong adviser relationships and delivering positive client outcomes, they work closely with practices to drive efficiency, support business growth, and help advisers unlock the full potential of the HUB24 ecosystem.' },
@@ -324,8 +322,7 @@ export const partners = [
     blurb: "Openmarkets Group (OMG) is a leading Australian B2B fintech, providing trading, wealth management infrastructure and technology solutions to financial institutions, advisers and fintechs. We deliver a unique, end-to-end ecosystem that connects investors to markets through scalable, compliant and innovative technology. Operating within Australia's highly regulated financial system under our AFSL and as a clearing broker of ASX, we are trusted by partners to power critical trading and investment capabilities. We also provide wealth management products and services, such as Portfolio Administration, MDA, tax engine and model rebalancing technology.",
     topic: 'Tokenisation of real-world assets',
     speakers: [
-      // ⚖ 30 Sep (Adam): Dan Jowett is NOT attending; David Jenkins presents for Openmarkets
-      // and is their only attendee. ⚖ 7 Oct: title + bio verbatim from the 2026 booklet's speaker page.
+      // Openmarkets' presenter. Title and bio from the 2026 booklet.
       { name: 'David Jenkins', photo: 'img/speakers/2026/openmarkets-jenkins.jpg', title: 'Chief Product and Technology Officer', bio: 'David is Chief Product and Technology Officer at OMG, bringing more than 30 years of experience across fintech, capital markets and digital assets. His expertise lies in building and growing financial technology platforms that bring traditional and decentralised finance together. Alongside his role at OMG, David is the founder of XIO Innovation, Fractional Chief Technology Officer and Product Lead at ImpactX Markets from the Digital Finance CRC, and a Non-Executive Director at Reach Alternative Investments. Previously, David was Chief Technology Officer at Pepperstone, where he led the initiation of a global crypto exchange solution. He has also held senior executive technology, product and strategy roles at Frontier, Liquidnet, Thomson Reuters, Bloomberg and Fidessa, working across New York, London and Hong Kong. With a career spanning product development, technology leadership and market strategy, David brings a practical perspective on how innovation is shaping the future of financial markets.' },
     ],
   },
