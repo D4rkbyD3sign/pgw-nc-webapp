@@ -177,7 +177,8 @@ export async function submitQuestion(sessionId, text, name = '') {
 
   // Show it on the asker's screen immediately — a send that appears to do
   // nothing for 300ms reads as broken, and this app is the exhibit.
-  const tempId = `local-${crypto.randomUUID()}`
+  // Not crypto.randomUUID(): it needs iOS 15.4+, and Ask would throw before sending on older iPhones.
+  const tempId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`
   optimistic = [...optimistic, { id: tempId, sessionId, text: body, name: who, status: 'pending', ts: null }]
   notify()
 
