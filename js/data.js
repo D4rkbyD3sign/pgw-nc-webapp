@@ -243,13 +243,11 @@ export const partners = [
     ],
   },
   {
-    // New on the 29 Sep sheet (row "FundMontitors"). Name taken from their own
-    // logo artwork, which outranks the tracker's typo (29 Sep). Name and
-    // logo to be confirmed with PGW. Panel only;
-    // no blurb or topic supplied, so neither block renders.
-    id: 'afm', name: 'Australian Fund Monitors', short: 'AFM', logo: 'img/partners/2026/afm.png',
-    // Title confirmed 7 Oct. Bio to follow.
-    speakers: [{ name: 'Chris Gosselin', photo: 'img/speakers/2026/afm-gosselin.jpg', title: 'CEO' }],
+    // Name and logo are the partner's own current branding (13 Oct).
+    // Blurb and bio from the 13 Oct sheet. Panel only; no topic supplied.
+    id: 'afm', name: 'FundMonitors.com', logo: 'img/partners/2026/afm.png',
+    blurb: 'FundMonitors.com was established in 2006 and provides performance and operational information covering over 1,100 "actively managed" funds, (including Alternative, Absolute Return and Hedge Funds) operating in the fund management sector in Australia. Each fund is allocated to one of 17 peer groups, with information organised via a series of "tabs" to enable ease of sorting, and fair comparison. Every fund has a Full Profile to enable in depth analysis of each fund, and the site includes comparison tools including Watch Lists, Fund Selectors, Model Portfolios, Advanced analytics and Custom Statistics.',
+    speakers: [{ name: 'Chris Gosselin', photo: 'img/speakers/2026/afm-gosselin.jpg', title: 'CEO', bio: 'Chris Gosselin has been involved in financial services for 40 years, including the last 20 years as CEO of Australian Fund Monitors. His experience combines stockbroking, financial technology, funds management, and fund research, providing a broad knowledge and understanding of the managed fund sector.' }],
   },
   {
     id: 'centuria', name: 'Centuria', logo: 'img/partners/2026/centuria.png',
