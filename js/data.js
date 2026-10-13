@@ -2,14 +2,14 @@
 // fill at run time. 2027 = new data, same shapes.
 //
 // SESSIONS: the real 2026 program, transcribed from PGW's working agenda
-// 'Partner Speaking Allocation v3' (Adam, 2026-08-21). Times and partner
+// 'Partner Speaking Allocation v3' (2026-08-21). Times and partner
 // allocations confirmed; topics, panels, keynote speakers and adviser
 // spotlights are not yet supplied and are NOT invented here.
 //
 // ✅ 2026-09-09: the 2025 speaker list is GONE. `speakers` is now DERIVED from
 // each partner's `speakers` block below (one source of truth: PGW's partner
 // sheet), so the Speakers tab, a speaker page and a session page can never
-// disagree with the Partners tab. Rule from Adam, 2026-09-09: the presenter
+// disagree with the Partners tab. Rule from 2026-09-09: the presenter
 // named on the sheet; where the sheet says TBC or names nobody, the partner's
 // MAIN CONTACT stands in. Centuria names neither, so it has no speaker yet.
 // The 2025 set (fourteen people, four returning partners) lives in git at v22.
@@ -21,7 +21,7 @@ export const conference = {
   tagline: 'Turning technology into results.',
   eyebrow: 'National Conference · 29 Oct · Hobart',
   dates: '29–30 October 2026',
-  /* The ONE room every session and break is in, both days (Adam, 30 Sep). The agenda
+  /* The ONE room every session and break is in, both days (30 Sep). The agenda
      states it once at the top, so cards only name a place when it is NOT this room. */
   room: 'Aura · Level 12',
   /* `date` is load-bearing, not decoration. Without it the app had no way to
@@ -58,24 +58,22 @@ export const conference = {
 }
 
 /* ---------- Welcome note + last year's recap (to-do 12) ----------
-   Asked for unprompted by an adviser at the 2026-08-04 phone test, which is
-   better evidence than either Adam or Lumen weighing it.
+   Asked for unprompted by an adviser at the 2026-08-04 phone test.
 
    ⚠️ THE VIDEO IS UNLISTED AND THIS REPO IS PUBLIC. The id below is readable
    by anyone who opens the source, so "unlisted" here means UNADVERTISED, not
-   confidential. That is a KNOWING, RECORDED acceptance, not an oversight:
-   Lumen recommended linking out on exposure grounds and Adam overruled on the
-   content itself — a conference recap is not sensitive material (2026-08-06,
-   "i think lets embedd it - not an issue given the type of video it is
-   anyway"). Do not "fix" this back to a link-out without asking him. */
+   confidential. That is a deliberate, recorded choice, not an oversight: a
+   link-out was considered and the embed chosen on the content itself — a
+   conference recap is not sensitive material (2026-08-06). Do not "fix" this
+   back to a link-out without asking. */
 export const welcome = {
   videoId: 'ZIosyj8JZwM',
   videoTitle: 'Our National Conference 2025 — Gold Coast',
 }
 
 // photo: URL to headshot (empty = initials avatar). linkedin: public profile URL.
-// Bios condensed from the 2025 NC booklet (see Squad/PGW/PGW-NC-2026/Webapp/booklet-2025-extract.md).
-// ⚖ 2026-09-30 (Tracey via Adam): EVERY conference session AND break is in the one
+// Bios condensed from the 2025 NC booklet.
+// 2026-09-30 (PGW): EVERY conference session AND break is in the one
 // room on Level 12, Crowne Plaza Hobart, both days. The only things elsewhere are the
 // Mustique cruise, pre-dinner drinks and the Awards Dinner (Centurion 1, Level 4).
 // 'Grand Ballroom' / 'Atrium' were the 2025 Gold Coast names and are retired.
@@ -84,7 +82,7 @@ const AT = conference.room
 
 /* ---------- THE REAL 2026 PROGRAM ----------
    Transcribed slot for slot from PGW's working agenda,
-   'ImplementAI 2026 - Partner Speaking Allocation v3.docx' (Adam, 2026-08-21),
+   'ImplementAI 2026 - Partner Speaking Allocation v3.docx' (2026-08-21),
    replacing the 2025 booklet shape that stood here since July.
 
    ⚠️ WHAT IS CONFIRMED: every TIME and every partner ALLOCATION. Those are the
@@ -103,7 +101,7 @@ const AT = conference.room
        replied and the closing slot has no candidate.
      - Both adviser spotlights.
      - ~~ROOMS.~~ ✅ 30 Sep: Level 12 for everything (see GB/AT). Was: GB/AT carried over from the 2025 shape and NOT confirmed
-       for Hobart. Flagged with Adam.
+       for Hobart.
 
    ⛔ EVENING EVENTS ARE ABSENT ON PURPOSE. PGW's partner tracker shows a
    Thursday evening dinner and a Friday Annual Awards Dinner exist, but no time
@@ -122,12 +120,12 @@ const AT = conference.room
    ✅ 2026-09-08: all fifteen 2026 partners have records + logos; every partner
    session is linked, and its summary carries the topic where PGW has one.
 
-   ⚖ 2026-09-30 — V3 AGENDA TABLE IS LAW (Adam): 'ImplementAI 2026 - Conference
+   2026-09-30 — THE V3 AGENDA TABLE GOVERNS: 'ImplementAI 2026 - Conference
    Agenda - Detailed.docx'. Its TABLES govern; the prose below them is ignored,
    so the 'not written here' list above is superseded for the keynotes and
    Spotlight 1 — the table names Dr Lila Landowski, Matthew Byrne and Ben Ross.
-   ⚠ THERE ARE TWO BEN ROSSES. This one is the external AI speaker, NOT PGW's
-   Ben Ross. Attendees see 'Ben Ross' only; the table's 'II' is PGW's label.
+   The closing keynote speaker is listed on the table as 'Ben Ross II'.
+   Attendees see 'Ben Ross' only; the 'II' is the table's own label.
    Panel 2: 'maybe PEP' on the table is NOT shown until confirmed.
    Friday's Adviser Spotlight is gone; d2-panel-3 became d2-keynote-close-1.
    `guest` = a named non-partner presenter (keynotes, spotlight). whoLine shows it on
@@ -195,10 +193,10 @@ export const sessions = [
     /* ⚠️ END TIME IS AN ASSUMPTION, and the only invented value in this array.
        The invitation gives a 6:30pm start and no finish. 22:00 is a guess kept
        solely because a session needs an end for the agenda to render a range.
-       ⬜ Confirm with Adam and correct — do not let it harden by sitting here. */
+       Correct it when the finish time is confirmed. */
     endAssumed: true,
     venue: {
-      // ⚖ 30 Sep (Tracey via Adam): moved from Level 12 to Centurion 1, Level 4.
+      // 30 Sep (PGW): moved from Level 12 to Centurion 1, Level 4.
       name: 'Centurion 1 · Level 4, Crowne Plaza',
       address: '110 Liverpool Street, Hobart TAS 7000',
       mapUrl: 'https://maps.google.com/?q=Crowne+Plaza+Hobart+110+Liverpool+Street',
@@ -207,9 +205,9 @@ export const sessions = [
 ]
 
 // Educational partners — 2026 line-up, from PGW's Education Partners sheet
-// (Adam, 2026-09-08; refreshed from the 29 Sep sheet).
-// ORDER — ⚖ RULING CHANGED 29 Sep (Adam): package tier first, then A–Z within
-// a tier. Supersedes the 8 Sep ruling (artwork order, "no tiers in the app").
+// (2026-09-08; refreshed from the 29 Sep sheet).
+// ORDER — changed 29 Sep: package tier first, then A–Z within a tier.
+// Supersedes the 8 Sep order (artwork order, "no tiers in the app").
 // The tier map + sort sit just below the array; the ARRAY order is irrelevant.
 // Tier labels only, never prices — prices stay in the fenced sheet.
 //
@@ -221,8 +219,8 @@ export const sessions = [
 // PGW's, so the fix lives here, not there.
 //
 // ⛔ Speakers carry NAME + TITLE only. No mobiles, no emails: this repo is
-// public, and the sheet's contact columns stay in the fenced Squad folder.
-// Speaker photos: nine landed 2026-09-09 (Adam, via speakers-inbox), cropped
+// public, and the sheet's contact columns are never copied here.
+// Speaker photos: nine landed 2026-09-09, cropped
 // square at 480px to img/speakers/2026/<speakerId>.jpg. Absent = monogram.
 //
 // The 2025 set (eleven partners, four returning) lives in git at v20 `8e9a039`.
@@ -246,8 +244,8 @@ export const partners = [
   },
   {
     // New on the 29 Sep sheet (row "FundMontitors"). Name taken from their own
-    // logo artwork, which outranks the tracker's typo (Adam, 29 Sep). ⏳ Name +
-    // logo PROVISIONAL — Adam confirming with PGW 30 Sep. Panel only;
+    // logo artwork, which outranks the tracker's typo (29 Sep). Name and
+    // logo to be confirmed with PGW. Panel only;
     // no blurb or topic supplied, so neither block renders.
     id: 'afm', name: 'Australian Fund Monitors', short: 'AFM', logo: 'img/partners/2026/afm.png',
     // Title confirmed 7 Oct. Bio to follow.
@@ -272,7 +270,7 @@ export const partners = [
   },
   {
     // New on the 29 Sep sheet — a partner with nothing else supplied yet
-    // (Adam, 29 Sep: "just add them in as a partner"). Logo only.
+    // (29 Sep). Logo only.
     id: 'gda', name: 'GDA', logo: 'img/partners/2026/gda.png',
   },
   {
@@ -311,7 +309,7 @@ export const partners = [
   {
     id: 'mst', name: 'MST Financial', logo: 'img/partners/2026/mst.png',
     blurb: "MST Financial is a premier equity research and institutional services platform founded in 2017 and wholly owned by its staff and representatives. Built by an experienced team of highly regarded investment professionals, MST Financial serves more than 150 institutional investors with research and advisory services consistently rated among the best in the market. As an Australian owned firm, MST Financial brings an alignment of interest and depth of conviction that sets it apart. From this research foundation, MST Financial has evolved into a fully integrated platform purpose built to support advice firms and their clients. Sandstone Insights delivers equity research, market insights and adviser education, while MST Investment Solutions provides portfolio consulting and bespoke implementation across SMA, IMA and MDA structures. MST Income Solutions rounds out the offering with hybrid and credit portfolios, listed and OTC income strategies, and transition portfolios giving advisers institutional grade tools to meet a broad range of client income needs. Underpinning it all, MST Financial's execution and capital markets capabilities ensure seamless end to end implementation. From listed and OTC execution with institutional liquidity access, through to primary market participation via its Equity and Debt Capital Markets division, advisers partnering with MST Financial gain access to infrastructure and expertise that was once the exclusive domain of the largest institutional investors.",
-    // Topic verbatim as MST wrote it — "Bathla" included (Adam, 29 Sep: "put it in as they say").
+    // Topic verbatim as MST wrote it — "Bathla" included (29 Sep).
     topic: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook',
     speakers: [
       { name: 'John Lockton', photo: 'img/speakers/2026/mst-lockton.jpg', title: 'Chief Investment Officer & Portfolio Manager', bio: 'John brings over two decades of experience in equity strategy and portfolio management to his role as Chief Investment Officer at MST Financial. John joined MST Financial in 2022. As CIO, John is responsible for the multi-asset-class views and sits on investment committees of some of Australia’s leading private wealth firms. Prior to MST, John held senior positions at Wilsons Advisory. John held multiple roles at Wilsons over his 12 years at the Firm, including Head of Asset Allocation and Portfolio Manager for the Australian Equities and Global Equities portfolios.' },
@@ -338,7 +336,7 @@ export const partners = [
     id: 'russell', name: 'Russell Investments', logo: 'img/partners/2026/russell.png',
     blurb: 'Since 1936, Russell Investments has been building a legacy of continuous innovation to deliver exceptional value to clients, working every day to improve people’s financial security. Russell Investments leverages its global research capabilities to identify and assess the best ideas from across the investment management universe. We then apply these insights through a disciplined portfolio construction process, helping advisers access diversified, professionally managed investment solutions.',
     // Presenter column still blank, but the booklet blurb is Laurence Gamboa's —
-    // Adam, 29 Sep: he replaces the main contact who stood in.
+    // 29 Sep: he replaces the main contact who stood in.
     speakers: [
       { name: 'Laurence Gamboa', photo: 'img/speakers/2026/russell-gamboa.jpg', title: 'Regional Manager – NSW/ACT', bio: 'Laurence Gamboa is Regional Manager – NSW/ACT at Russell Investments, bringing over 18 years of experience in financial services and adviser distribution. He holds a Bachelor of Commerce in Finance and Economics from Curtin University and has extensive experience working with Financial Advisers and Licensees across managed funds and managed portfolios. Laurence is passionate about building strong relationships and helping Advisers deliver better investment outcomes for their clients.' },
     ],
@@ -371,7 +369,7 @@ export const partners = [
 // Package tier per partner, from the sheet's Package column (29 Sep).
 // Paradino's package reads "Platinum at Gold Price" — ranked as Platinum (the
 // package, not the price). A partner missing here sorts LAST rather than
-// breaking the app; the bench check flags it.
+// breaking the app.
 const TIER_RANK = { main: 0, platinum: 1, goldplus: 2, gold: 3, sponsor: 4 }
 // Exported 7 Oct (v34) so the landing page (pgwconference.com.au) can read tiers instead of copying them.
 export const PARTNER_TIER = {
@@ -390,30 +388,29 @@ export function partnerById(id) {
 
 /* ---------- On-the-day help (to-do 5, the emergency-contacts ask) ----------
    The people an adviser calls when something goes wrong at the venue.
-   Names and numbers supplied by Adam, 2026-08-21, verbatim.
+   Names and numbers supplied 2026-08-21, verbatim.
 
-   NO TITLES, deliberately (Adam's call). This is a list you scan while
+   NO TITLES, deliberately. This is a list you scan while
    something has already gone wrong; a job title does not help you decide who
    to ring, and four names read faster than four names and four roles.
 
    ⚠️⚠️ THE NUMBERS BELOW ARE PLACEHOLDERS. THE REAL ONES ARE NOT IN THIS REPO
    AND MUST NOT BE PUT IN IT.
 
-   This repository is PUBLIC (free-tier Pages requires it). Four of these five
-   mobiles belong to people who are not Adam; they were given for conference
-   use, which is not the same as agreeing to be findable on the open internet.
+   This repository is PUBLIC (free-tier Pages requires it). These mobiles
+   were given for conference use, which is not the same as agreeing to be
+   findable on the open internet.
    And git history is permanent — deleting a committed number removes it from
    the file, never from the history of a repo that has already been cloned.
 
-   Agreed with Adam, 2026-08-21: names + placeholders here so the screen can be
+   Agreed 2026-08-21: names + placeholders here so the screen can be
    seen and reviewed, real numbers delivered at runtime from Firestore
    (events/{EVENT_ID}/live/contacts), same pattern as the schedule overrides —
    code is the default, cloud is the override.
    ✅ BUILT 2026-09-09 (v28): brain.js listens on live/contacts, the Help page
    merges by id, and #/admin has a "Help numbers" box the crew type into.
 
-   Real numbers live at ~/.house-keys/pgw-nc-contacts.json — outside every
-   repo, never ferried. (The 0400 000 0XX placeholders that sat here from
+   Real numbers live outside every repo. (The 0400 000 0XX placeholders that sat here from
    21 Aug to 9 Sep are gone: a name with no published number now shows as a
    name, which is honest, instead of a number that dials nowhere.) */
 // ⛔ NAMES ONLY. The numbers are personal mobiles and live in Firestore at
@@ -453,7 +450,7 @@ export function speakerById(id) {
 }
 
 /* Non-speaking DELEGATES — sheet columns G/H (Delegate 2/3), 29 Sep sheet.
-   Adam, 29 Sep: listed under Speakers & Delegates so advisers can find them;
+   29 Sep: listed under Speakers & Delegates so advisers can find them;
    the BDMs want to be contactable. Same tier order as the partners.
    NAME only (the sheet carries no delegate titles); "TBA"/"N/A" left out.
 
@@ -528,11 +525,11 @@ const toMin = (t) => {
    essentially all of Friday.
 
    Found because PGW tested from Adelaide on 2026-08-21 and were half an hour
-   behind Adam, which surfaced that "on now" was device-relative. Chasing that
+   behind the organisers, which surfaced that "on now" was device-relative. Chasing that
    turned up the larger fault underneath: the app had no concept of the date.
 
-   WHOSE CLOCK. The conference timezone, not the device's. Adam's read is right
-   that everyone will be in Hobart together, so this is belt and braces rather
+   WHOSE CLOCK. The conference timezone, not the device's. Everyone will be in
+   Hobart together, so this is belt and braces rather
    than the main event — but a timezone is a DEVICE SETTING, not a fact about
    where someone is standing: a phone with its timezone set by hand, a laptop
    brought from interstate, or anyone following along remotely would otherwise
@@ -592,7 +589,7 @@ export function agendaForDay(day) {
 }
 
 /* ---------- live schedule overrides (the admin screen writes these) ----------
-   ARCHITECTURE (Adam's call, 2026-07-27): the code is the DEFAULT, the cloud is
+   ARCHITECTURE (2026-07-27): the code is the DEFAULT, the cloud is
    an OVERRIDE. The app always has a working agenda from this file; Firebase only
    carries the differences. If the cloud is empty, slow or unreachable, phones
    still show a correct schedule — nothing on stage ever renders blank.
