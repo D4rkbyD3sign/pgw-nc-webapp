@@ -132,7 +132,7 @@ const AT = conference.room
    the card; before it existed the name lived only in `summary`, which cards omit. */
 export const sessions = [
   // ---- Day 1 · Thu 29 Oct · 8:30am to 5:00pm (v3 agenda table, 30 Sep) ----
-  { id: 'd1-welcome', day: 1, start: '08:30', end: '08:45', title: 'Welcome & housekeeping', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
+  { id: 'd1-welcome', day: 1, start: '08:30', end: '08:45', title: 'Welcome & event begins', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
   { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Dr Lila Landowski', speakerIds: [], summary: 'With Dr Lila Landowski.' },
   { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook' },
   { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:15', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },

@@ -31,13 +31,35 @@ service cloud.firestore {
                 ];
     }
 
+    // 2026-10-14, pre-event windows (record 239, spec §4.7). The app's closed
+    // states are a courtesy; THESE are the control, because the apiKey is public.
+    // Scoped to the live drawer 'nc-2026' ONLY: every other event id keeps the
+    // rules below exactly as they were (the demo drawer depends on that).
+    // Each instant is written once, as epoch milliseconds (UTC):
+    function conferenceStart() {   // T2 = 2026-10-28T21:30:00Z = Thu 29 Oct 08:30, Hobart
+      return timestamp.value(1793223000000);
+    }
+    function conferenceOver() {    // T4 = 2026-10-30T13:00:00Z = Sat 31 Oct 00:00, Hobart
+      return timestamp.value(1793365200000);
+    }
+    // Questions: only while the conference is on, [T2, T4).
+    function questionWindowOpen(eventId) {
+      return eventId != 'nc-2026'
+             || (request.time >= conferenceStart() && request.time < conferenceOver());
+    }
+    // Ratings: never before the first session (T2). Late feedback stays welcome.
+    function responseWindowOpen(eventId) {
+      return eventId != 'nc-2026' || request.time >= conferenceStart();
+    }
+
     match /events/{eventId}/questions/{questionId} {
 
       // ANYONE MAY ASK — no sign-in, no identity, that's the whole point.
       // But only a well-formed, pending question, stamped by the SERVER clock:
       // a phone with a wrong clock must not be able to jump the moderator queue,
       // and nobody gets to post themselves straight onto the big screen.
-      allow create: if request.resource.data.keys().hasOnly(['sessionId', 'text', 'status', 'ts', 'name'])
+      allow create: if questionWindowOpen(eventId)
+                    && request.resource.data.keys().hasOnly(['sessionId', 'text', 'status', 'ts', 'name'])
                     && request.resource.data.status == 'pending'
                     && request.resource.data.ts == request.time
                     && request.resource.data.text is string
@@ -75,7 +97,8 @@ service cloud.firestore {
     // reads them at all. Not even by id.
     match /events/{eventId}/responses/{responseId} {
 
-      allow create: if request.resource.data.keys().hasOnly(['sessionId', 'rating', 'comment', 'ts'])
+      allow create: if responseWindowOpen(eventId)
+                    && request.resource.data.keys().hasOnly(['sessionId', 'rating', 'comment', 'ts'])
                     && request.resource.data.rating is int
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5

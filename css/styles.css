@@ -2127,3 +2127,41 @@ h1.title .ai::after {
   border-color: var(--greige-line);
   box-shadow: none;
 }
+
+/* Pre-event countdown card (record 239, spec §5.1; Vesper's render rules, 14 Oct).
+   Existing tokens only: no new colours. No dot in the row: nothing here is live. */
+.now.pre .row .live {
+  color: var(--ink-soft);
+}
+.cd {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 16px;
+}
+.cd b {
+  font-family: Poppins, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 46px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  white-space: nowrap; /* "UNDER 1" must not break inside itself (measured: it wrapped at 320, 92px tall) */
+}
+.cd small {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  color: var(--grey);
+  margin-right: 14px;
+}
+.now.pre p.where {
+  font-size: 13px;
+  color: var(--grey);
+  margin-top: 14px;
+  line-height: 1.5;
+}
+.now.pre p.where b {
+  color: var(--ink-soft);
+  font-weight: 500;
+}

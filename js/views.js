@@ -1,10 +1,103 @@
-import { conference, sessions, speakers, speakerById, delegates, personById, speakersForSession, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow } from './data.js'
+import { conference, sessions, speakers, speakerById, delegates, personById, speakersForSession, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow, CONFERENCE_TZ } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 
 const minutes = (t) => {
   const [h, m] = t.split(':').map(Number)
   return h * 60 + m
+}
+
+/* ---------- PRE-EVENT MODE (record 239, spec §2 + §4, 14 Oct) ----------
+   Before 16 Oct the app performed a live conference on every non-conference day
+   (the old 'demo' block), because Adam demos it. From 16 Oct real advisers open
+   it, so the PUBLIC app now tells the truth about time. Four phases, one clock
+   (conferenceNow's, so every surface agrees):
+     PRE   before T1  — a save-the-date: a countdown, nothing live, nothing to ask or rate
+     EVE   T1 → T2    — the night before and the morning: the countdown says tomorrow / today
+     ON    T2 → T4    — exactly the day's behaviour (live / break / gap / ended)
+     AFTER from T4    — it's over: thank-you, the program as a record, late ratings allowed
+   ⛔ There is NO demo branch here, by host or otherwise (Round 2, record 240, adds
+   the private demo host). firestore.rules carries the same T2 / T4: the server is
+   the control, this is the courtesy. */
+const T1 = '2026-10-28T18:00:00+11:00' // the ONE typed instant: Adam, "6pm the night before" (= 2026-10-28T07:00:00Z)
+
+const TZ_PARTS = new Intl.DateTimeFormat('en-AU', {
+  timeZone: CONFERENCE_TZ, year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+})
+/** A wall-clock time on a date IN CONFERENCE TIME, as epoch ms. The browser's
+ *  own zone never enters into it (a phone set to Perth or London gets Hobart). */
+function conferenceMs(date, hhmm) {
+  const [y, mo, d] = date.split('-').map(Number)
+  const [h, mi] = hhmm.split(':').map(Number)
+  const guess = Date.UTC(y, mo - 1, d, h, mi)
+  const p = Object.fromEntries(TZ_PARTS.formatToParts(guess).filter((x) => x.type !== 'literal').map((x) => [x.type, Number(x.value)]))
+  const shownAsUtc = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second)
+  return guess - (shownAsUtc - guess)
+}
+const nextDate = (date) => {
+  const [y, mo, d] = date.split('-').map(Number)
+  return new Date(Date.UTC(y, mo - 1, d + 1)).toISOString().slice(0, 10)
+}
+const DAY1 = conference.days[0]
+const LAST_DAY = conference.days[conference.days.length - 1]
+/* T2 derives from day 1's earliest PRISTINE start (baseTimes), not a live
+   override: the server's T2 is fixed, so the app must not drift from it. */
+const DAY1_FIRST = sessions
+  .filter((s) => s.day === DAY1.day)
+  .sort((a, b) => minutes(baseTimes(a.id).start) - minutes(baseTimes(b.id).start))[0]
+const T1_MS = Date.parse(T1)
+const T2_MS = conferenceMs(DAY1.date, baseTimes(DAY1_FIRST.id).start) // = 2026-10-28T21:30:00Z
+const T4_MS = conferenceMs(nextDate(LAST_DAY.date), '00:00') // = 2026-10-30T13:00:00Z
+
+/** Which phase is it? 'pre' | 'eve' | 'on' | 'after'. `now` injectable. */
+export function phaseAt(now = new Date()) {
+  const t = now.getTime()
+  if (t < T1_MS) return 'pre'
+  if (t < T2_MS) return 'eve'
+  if (t < T4_MS) return 'on'
+  return 'after'
+}
+
+/* Dates, derived (en-AU, conference time): "Thursday 29 October" and "Thu 29 Oct". */
+const longDate = (date) =>
+  new Intl.DateTimeFormat('en-AU', { timeZone: CONFERENCE_TZ, weekday: 'long', day: 'numeric', month: 'long' }).format(conferenceMs(date, '12:00'))
+const dayLabel = (dayNum) => conference.days.find((d) => d.day === dayNum)?.label ?? ''
+
+/* ⭐ THE WORDS (spec §6, APPROVED by Adam 14 Oct), as ONE block so a change is one
+   line. Every argument is derived from data; nothing in a sentence is a typed fact. */
+const VENUE_LINE_ROOM = (room) => room.replace(' · ', ', ') // "Aura · Level 12" → "Aura, Level 12" (W4b; Adam ruled 14 Oct: derive, "Crowne Plaza by IHG")
+export const WORDS = {
+  w1Start: (date) => `The conference starts on <b>${date}</b>.`,
+  w1Today: (when) => `The conference starts <b>${when}</b>.`, // when = 'tomorrow' | 'today'
+  w1Box: (start, title) => `The box opens at <b>${start}</b>, for <b>${title}</b>.`,
+  w2: (start, label) => `Questions for this session open at <b>${start}</b> on <b>${label}</b>, while it's on.`,
+  w3Head: 'Feedback opens after the session',
+  w3: (title, end, label) => `<b>${title}</b> finishes at <b>${end}</b> on <b>${label}</b>. Rate it then.`,
+  w4aPre: '// The conference starts in',
+  w4aEve: '// Day 1 starts in',
+  w4b: (room, venue) => `Day 1 opens in <b>${VENUE_LINE_ROOM(room)}</b>, <b>${venue}</b>.`,
+  w4c: 'See the full agenda →',
+  w5aHead: (name, year) => `That's ${name} ${year}.`,
+  w5b: 'Thank you for coming.',
+  w5c: 'See the program →',
+  w5AskHead: 'The conference has finished',
+  w5Ask: 'Thank you for every question.',
+  w5Session: 'Questions are closed. The conference has finished.',
+  w6a: (name, year) => `${name} ${year}`,
+  w6bWhen: (date, start) => `${date} · ${start}`,
+  w6bAfter: 'Thank you for coming',
+  w6c: 'The conference app is on your phone',
+}
+
+/** The countdown to T2: 24h+ → days + hours; under 24h → hours + minutes; under a
+ *  minute → UNDER 1 MIN. Floored (never a time that hasn't arrived). No seconds. */
+export function countdownParts(ms) {
+  if (ms < 60_000) return [['UNDER 1', 'MIN']]
+  const totalMin = Math.floor(ms / 60_000)
+  const d = Math.floor(totalMin / 1440), h = Math.floor((totalMin % 1440) / 60), m = totalMin % 60
+  const u = (n, one, many) => (n === 1 ? one : many)
+  return d >= 1 ? [[String(d), u(d, 'DAY', 'DAYS')], [String(h), u(h, 'HR', 'HRS')]] : [[String(h), u(h, 'HR', 'HRS')], [String(m), 'MIN']]
 }
 
 /** The session on right now, in CONFERENCE time, on TODAY's program only.
@@ -76,16 +169,20 @@ export function liveSession(now = new Date()) {
      break  — morning tea, lunch, drinks: something is on, nobody is presenting
      gap    — a conference day, between the ends and the starts
      ended  — the day's program is finished
-     demo   — not a conference day at all, so nothing is real and everything is
-              a preview. Kept OPEN deliberately: Adam demos this app constantly
-              and gating the demo would have removed the loop from every
-              rehearsal, including the one PGW ran this morning.
+     pre / eve / after — outside the conference (record 239). `session` is ALWAYS
+              null here, so no caller can mistake a fiction for a fact; `next` is
+              day 1's first session (PRE / EVE) or null (AFTER).
+     ⛔ 'demo' is GONE from the public app (14 Oct). It used to answer every
+              non-conference day, which made the public app perform a live event
+              to real advisers. The demo returns only on its own private host (Round 2).
 
    Both this and liveSession() read conferenceNow(), so they can disagree about
    what is worth showing but never about the time or the day. */
 export function currentBlock(now = new Date()) {
+  const phase = phaseAt(now)
+  if (phase !== 'on') return { state: phase, session: null, next: phase === 'after' ? null : DAY1_FIRST }
   const { nowMin, day } = conferenceNow(now)
-  if (day === null) return { state: 'demo', session: liveSession(now).session, next: null }
+  if (day === null) return { state: 'ended', session: null, next: null } // unreachable inside ON; never invent
 
   const today = sessions.filter((s) => s.day === day)
   const onAny = today.find((s) => nowMin >= minutes(s.start) && nowMin < minutes(s.end))
@@ -104,7 +201,7 @@ export function currentBlock(now = new Date()) {
 /** Can a question be filed right now, and against what? */
 export function askTarget(now = new Date()) {
   const b = currentBlock(now)
-  if (b.state === 'live' || b.state === 'demo') return { open: true, session: b.session, block: b }
+  if (b.state === 'live') return { open: true, session: b.session, block: b } // open ONLY when something is truly on (spec §4.5)
   return { open: false, session: null, block: b }
 }
 
@@ -151,12 +248,14 @@ function partnerMark(s) {
   return p ? `<img class="aglogo" src="${p.logo}" alt="${p.name}">` : ''
 }
 
-function upcomingCard(s) {
+/* `dated` (PRE / EVE, spec §5.2): the row names the DAY instead of "UP NEXT", and
+   carries no dot — the dot means live in this app, and nothing here is. */
+function upcomingCard(s, dated = false) {
   const isBreak = s.kind === 'BREAK'
   return `
     <div class="now upcard${isBreak ? ' brk' : ''}">
       <div class="row">
-        <span class="live"><span class="dot up"></span>UP NEXT · ${s.start}–${s.end}</span>
+        <span class="live">${dated ? `${dayLabel(s.day).toUpperCase()} · ` : '<span class="dot up"></span>UP NEXT · '}${s.start}–${s.end}</span>
         ${eventIcon(s) ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
       </div>
       <h3>${s.title}</h3>
@@ -181,13 +280,14 @@ const PULSE_WINDOW_MIN = 90
  *  Ben Ross's ask was responses within a minute or two of the presentation, so
  *  this chases sessions just gone — never the one currently running. */
 export function justEndedSession(now = new Date()) {
+  /* ⛔ Outside the conference there is nothing to rate (spec §4.6). The old
+     off-conference fallback chased the DEMO session's day, so on any October
+     morning the public app asked people to rate sessions that hadn't happened
+     (leak L7, seen in the 14 Oct render). The demo host gets it back in Round 2. */
+  if (phaseAt(now) !== 'on') return null
   const cn = conferenceNow(now)
   const nowMin = cn.nowMin
-  /* On a conference day, chase only THAT day's sessions. Off-conference, fall
-     back to the demo session's day so the prompt can still be shown in a demo
-     — losing that would quietly remove the thing Ben asked for from every
-     rehearsal before the event. */
-  const day = cn.day ?? liveSession(now).session.day
+  const day = cn.day
   return (
     sessions
       .filter(
@@ -229,16 +329,51 @@ function pulsePrompt() {
    preview is allowed to look alive. */
 
 function homeNowLabel(block) {
+  if (block.state === 'pre') return WORDS.w4aPre
+  if (block.state === 'eve') return WORDS.w4aEve
+  if (block.state === 'after') return ''
   if (block.state === 'break') return 'Happening now'
   if (block.state === 'gap') return 'Up next'
   if (block.state === 'ended') return "That's today"
   return 'Happening now'
 }
 
+/* PRE / EVE (spec §5.1): the countdown to the first session. The row names the day
+   (or TOMORROW / TODAY on the eve), the city says whose 08:30 it is, and there is no
+   dot because nothing is live. Counts to T2, floored, no seconds. */
+function countdownCard(block, now = new Date()) {
+  const cn = conferenceNow(now)
+  const start = baseTimes(DAY1_FIRST.id).start
+  const when = block.state === 'pre' ? dayLabel(DAY1.day).toUpperCase() : cn.date === DAY1.date ? 'TODAY' : 'TOMORROW'
+  const parts = countdownParts(T2_MS - now.getTime())
+  return `
+      <div class="now pre">
+        <div class="row">
+          <span class="live">${when} · ${start}</span>
+          <span class="tagm">${CONFERENCE_TZ.split('/').pop().toUpperCase()}</span>
+        </div>
+        <div class="cd">${parts.map(([n, u]) => `<b>${n}</b><small>${u}</small>`).join('')}</div>
+        <p class="where">${WORDS.w4b(conference.room, conference.venue.name)}</p>
+        <a href="#/agenda" class="ask askin">${WORDS.w4c}</a>
+      </div>`
+}
+
+/* AFTER (spec §5.3): it's over — the program stays as a record. */
+function thankYouCard() {
+  return `
+      <div class="now">
+        <h3 style="margin-top:0">${WORDS.w5aHead(conference.eventName, conference.year)}</h3>
+        <div class="who"><span class="txt">${WORDS.w5b}</span></div>
+        <a href="#/agenda" class="ask askin">${WORDS.w5c}</a>
+      </div>`
+}
+
 function homeNowCard(block, live) {
-  // Live, or a pre-conference preview — the card as it has always been.
-  if (block.state === 'live' || block.state === 'demo') {
-    const s = block.state === 'live' ? block.session : live.session
+  if (block.state === 'pre' || block.state === 'eve') return countdownCard(block)
+  if (block.state === 'after') return thankYouCard()
+  // Something is genuinely on stage — the card as it has always been.
+  if (block.state === 'live') {
+    const s = block.session
     return `
       <div class="now">
         <div class="row">
@@ -285,11 +420,11 @@ export function homeView() {
   const live = liveSession()
   const block = currentBlock()
   const cn = conferenceNow()
-  /* On a conference day the carousel runs off the REAL clock. Off-conference it
-     runs off the demo session's position, which is what keeps a preview looking
-     like a live event. */
-  const all =
-    cn.day !== null ? upcomingAfter(cn.nowMin, cn.day) : upcomingAfter(live.demoNowMin, live.session.day)
+  /* ON: the carousel runs off the REAL clock. PRE / EVE: day 1's first four
+     sessions, breaks included, as DATED cards (spec §5.2) — true, useful and not
+     pretending. AFTER: none. (It used to run off the invented demo moment.) */
+  const off = block.state === 'pre' || block.state === 'eve'
+  const all = block.state === 'after' ? [] : off ? upcomingAfter(-1, DAY1.day) : upcomingAfter(cn.nowMin, cn.day)
   /* In a gap the hero card IS the next session, so it would otherwise appear
      twice side by side. */
   const upcoming = block.state === 'gap' ? all.slice(1) : all
@@ -317,10 +452,10 @@ export function homeView() {
          nudge is patient and will still be here tomorrow. -->
     ${installPrompt()}
 
-    <span class="lab">${homeNowLabel(block)}</span>
+    ${homeNowLabel(block) ? `<span class="lab">${homeNowLabel(block)}</span>` : ''}
     <div class="nowrap">
       ${homeNowCard(block, live)}
-      ${upcoming.map(upcomingCard).join('')}
+      ${upcoming.map((s) => upcomingCard(s, off)).join('')}
     </div>
     <a href="#/agenda" class="seemore">SEE MORE →</a>
 
@@ -416,12 +551,16 @@ export function wireCrewFooter() {
 export function agendaView(dayArg) {
   const day = Number(dayArg) === 2 ? 2 : 1
   const list = agendaForDay(day)
-  const live = liveSession()
+  /* ON NOW only on the session GENUINELY on stage (spec §4.3). It used to badge
+     liveSession()'s invention whenever nothing was on — every pre-event day, and
+     every gap on the day itself. */
+  const block = currentBlock()
+  const liveId = block.state === 'live' ? block.session.id : null
 
   const rows = list
     .map((s) => {
       const isBreak = s.kind === 'BREAK'
-      const isNow = s.id === live.session.id
+      const isNow = s.id === liveId
       if (isBreak) {
         return `
         <div class="agrow">
@@ -636,8 +775,12 @@ export function partnerView(id) {
    opened the LIVE day's evening, so Friday's drinks and dinner showed Thursday's
    cruise until Friday itself. No day given (home tile, FAQ) = the live day. */
 export function tonightView(dayArg) {
-  const live = liveSession()
-  const day = [1, 2].includes(Number(dayArg)) ? Number(dayArg) : live.session.day
+  /* No day given: the conference day in ON; day 1 before the event (PRE / EVE),
+     day 2 after it (spec §4.2) — never liveSession()'s invented day. */
+  const phase = phaseAt()
+  const today = conferenceNow().day
+  const fallback = phase === 'on' && today ? today : phase === 'after' ? LAST_DAY.day : DAY1.day
+  const day = [1, 2].includes(Number(dayArg)) ? Number(dayArg) : fallback
   const socials = socialsForDay(day)
   if (!socials.length) return stubView('Tonight', 'Nothing scheduled tonight.')
   const dayLabel = conference.days.find((d) => d.day === day)?.label ?? ''
@@ -714,9 +857,18 @@ function askFromSession(s) {
     </div>`
   }
   if (s.kind === 'BREAK' || s.kind === 'SOCIAL') return ''
+  /* AFTER: closed for good (W5-session). Otherwise the "opens at" line names the
+     DAY whenever this session isn't on today's conference date (W2, spec §4.4) —
+     "opens at 08:45" was only true on the session's own day. */
+  const line =
+    phaseAt() === 'after'
+      ? WORDS.w5Session
+      : conferenceNow().date !== conference.days.find((d) => d.day === s.day)?.date
+        ? WORDS.w2(s.start, dayLabel(s.day))
+        : `Questions for this session open at <b>${s.start}</b>, while it's on.`
   return `
     <div style="padding:20px 24px">
-      <p class="asklater">${icons.chat}<span>Questions for this session open at <b>${s.start}</b>, while it's on.</span></p>
+      <p class="asklater">${icons.chat}<span>${line}</span></p>
     </div>`
 }
 
@@ -1234,8 +1386,42 @@ export function askView() {
      end that explains itself is a different thing from a dead end. */
   if (!t.open) {
     const b = t.block
+    /* Outside the conference (spec §6): W1 / W1-eve before it, W5 after it. */
+    if (b.state === 'after') {
+      return `
+      <div class="pagehead">
+        <h2>${WORDS.w5AskHead}</h2>
+      </div>
+      <div class="askshut">
+        <span class="askshut-ico">${icons.chat}</span>
+        <p>${WORDS.w5Ask}</p>
+      </div>
+      ${myQuestionsBlock()}
+    `
+    }
+    if (b.state === 'pre' || b.state === 'eve') {
+      const starts =
+        b.state === 'pre'
+          ? WORDS.w1Start(longDate(DAY1.date))
+          : WORDS.w1Today(conferenceNow().date === DAY1.date ? 'today' : 'tomorrow')
+      return `
+      <div class="pagehead">
+        <h2>Questions open during sessions</h2>
+        <p class="sub">So every question reaches the right speaker.</p>
+      </div>
+      <div class="askshut">
+        <span class="askshut-ico">${icons.chat}</span>
+        <p>${starts}</p>
+        <p>${WORDS.w1Box(b.next.start, b.next.title)}</p>
+      </div>
+      ${myQuestionsBlock()}
+    `
+    }
+    /* "again" is false before the day's first session has started (spec §4.5). */
+    const { nowMin, day } = conferenceNow()
+    const startedToday = sessions.some((s) => s.day === day && minutes(s.start) <= nowMin)
     const nextLine = b.next
-      ? `<p>The box opens again at <b>${b.next.start}</b>, for <b>${b.next.title}</b>.</p>`
+      ? `<p>The box opens ${startedToday ? 'again ' : ''}at <b>${b.next.start}</b>, for <b>${b.next.title}</b>.</p>`
       : `<p>That's the program done for today.</p>`
     const nowLine =
       b.state === 'break' && b.session
@@ -1468,8 +1654,31 @@ function qSize(t) {
 }
 
 export function screenView() {
-  const live = liveSession()
   const q = brain.promotedQuestion()
+  const qBlock = q
+    ? `<div class="bs-q ${qSize(q.text)}">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? q.name.toUpperCase() : 'ANONYMOUS'}</div>`
+    : ''
+  /* PRE / EVE / AFTER (spec §5.4): a title card, never the invented session.
+     A promoted question still shows, so the crew can rehearse the screen. */
+  const phase = phaseAt()
+  if (phase !== 'on') {
+    const sub = phase === 'after' ? WORDS.w6bAfter : WORDS.w6bWhen(longDate(DAY1.date), baseTimes(DAY1_FIRST.id).start)
+    return `
+    <div class="bigscreen${q ? ' hasq' : ''}">
+      <div class="bs-head">
+        ${icons.logoWhite}
+        <span class="bs-brand">PGW <b>ImplementAI</b> ${conference.year}</span>
+      </div>
+      <div class="bs-context">
+        <div class="bs-topic">${WORDS.w6a(conference.eventName, conference.year)}</div>
+        <div class="bs-speaker">${sub}</div>
+      </div>
+      ${q ? qBlock : `<div class="bs-idle">${WORDS.w6c}</div>`}
+    </div>
+  `
+  }
+  // ON: as before. liveSession()'s invention is right HERE (a projector never sits blank in a gap).
+  const live = liveSession()
   const who = screenWho(live.session)
   return `
     <div class="bigscreen${q ? ' hasq' : ''}">
@@ -1481,11 +1690,7 @@ export function screenView() {
         <div class="bs-topic">${live.session.title}</div>
         ${who ? `<div class="bs-speaker">${who}</div>` : ''}
       </div>
-      ${
-        q
-          ? `<div class="bs-q ${qSize(q.text)}">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? q.name.toUpperCase() : 'ANONYMOUS'}</div>`
-          : `<div class="bs-idle">Ask a question — anonymously<br><span>open the conference app on your phone</span></div>`
-      }
+      ${q ? qBlock : `<div class="bs-idle">Ask a question — anonymously<br><span>open the conference app on your phone</span></div>`}
     </div>
   `
 }
@@ -1512,9 +1717,28 @@ let pulseComment = ''
 let pulseSentFor = null // the session just answered — NOT a boolean, see below
 let pulseFor = null // which session the draft above belongs to
 
+/** Has this session ended, in conference time? (Its own date + its end.) */
+export function sessionEnded(s, now = new Date()) {
+  const date = conference.days.find((d) => d.day === s.day)?.date
+  return !!date && now.getTime() >= conferenceMs(date, s.end)
+}
+
 export function pulseView(sessionId) {
   const s = sessions.find((x) => x.id === sessionId)
   if (!s) return stubView('Feedback', 'That session could not be found.')
+
+  /* ⛔ A direct link could rate ANY session at ANY time (leak L8). Rating is
+     allowed only once the session has ended, in every phase (spec §4.6). */
+  if (!sessionEnded(s)) {
+    return `
+      <div class="pagehead">
+        <h2>${WORDS.w3Head}</h2>
+      </div>
+      <div class="askshut">
+        <span class="askshut-ico">${icons.chat}</span>
+        <p>${WORDS.w3(s.title, s.end, dayLabel(s.day))}</p>
+      </div>`
+  }
 
   /* Both the draft and the thank-you are keyed to a session id rather than
      held as flags. As flags they leak: rate session A, walk into session B's
@@ -1582,6 +1806,12 @@ export function wirePulse(rerender, sessionId) {
   document.getElementById('pulseform')?.addEventListener('submit', async (e) => {
     e.preventDefault()
     if (!pulseRating) return
+    // Re-checked at SUBMIT, as Ask is: a page left open must not rate a session that hasn't ended.
+    const s = sessions.find((x) => x.id === sessionId)
+    if (!s || !sessionEnded(s)) {
+      rerender()
+      return
+    }
     await brain.submitResponse(sessionId, pulseRating, pulseComment)
     pulseSentFor = sessionId
     pulseRating = 0

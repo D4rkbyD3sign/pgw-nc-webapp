@@ -244,3 +244,9 @@ renderUpdatebar()
 setInterval(() => {
   if (currentPath() === '') render()
 }, 30_000)
+
+// A phone woken from a pocket shows the right countdown at once (record 239, spec §4.8),
+// not up to 30 seconds late.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentPath() === '') render()
+})
