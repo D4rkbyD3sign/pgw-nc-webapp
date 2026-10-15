@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, delegates, personById, speakersForSession, partners, partnerById, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow, CONFERENCE_TZ } from './data.js'
+import { conference, sessions, speakers, speakerById, keynoteSpeakers, delegates, personById, speakersForSession, partners, partnerById, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow, CONFERENCE_TZ } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 import { esc } from './esc.js'
@@ -231,6 +231,9 @@ function whoLine(s) {
   /* 2026-09-09: presenters derive from the partner sheet, so a partner slot
      now reads "Cameron Blanks & Paul Ryan · PEP" instead of the room alone. */
   const sps = speakersForSession(s)
+  /* A keynote shows the NAME alone (spec PGW-KN-001 §4.1, record 243): with the org it wraps on a
+     390 phone and the keynote card grows taller than every other card. */
+  if (sps.length && sps.every((sp) => sp.role === 'keynote')) return `<b>${sps.map((sp) => sp.name).join(' & ')}</b>`
   if (sps.length) {
     const orgs = [...new Set(sps.map((sp) => sp.orgShort))]
     return `<b>${sps.map((sp) => sp.name).join(' & ')}</b> · ${orgs.join(' · ') || s.room}`
@@ -488,7 +491,7 @@ export function homeView() {
         </a>
         <a href="#/speakers" class="tile">
           <div class="ico">${icons.speakers}</div>
-          <div><div class="n">Speakers &amp; Delegates</div><div class="s">${speakers.length} speakers · ${delegates.length} delegates</div></div>
+          <div><div class="n">Speakers &amp; Delegates</div><div class="s">${speakers.length + keynoteSpeakers.length} speakers · ${delegates.length} delegates</div></div>
         </a>
         <a href="#/tonight/${eveDay}" class="tile tonight">
           <div class="ico">${icons.dinner}</div>
@@ -657,9 +660,13 @@ export function speakersView() {
   return `
     <div class="pagehead">
       <h2>Speakers &amp; Delegates</h2>
-      <p class="sub">${speakers.length} presenting · ${delegates.length} more from our partners</p>
+      <p class="sub">${speakers.length + keynoteSpeakers.length} presenting · ${delegates.length} more from our partners</p>
     </div>
-    <span class="lab">// Speakers</span>
+    ${keynoteSpeakers.length ? `
+    <span class="lab">// Keynote</span>
+    <div class="splist">${keynoteSpeakers.map(card).join('')}</div>
+    <span class="lab" style="margin-top:26px">// Speakers</span>` : `
+    <span class="lab">// Speakers</span>`}
     <div class="splist">${speakers.map(card).join('')}</div>
     ${delegates.length ? `
     <span class="lab" style="margin-top:26px">// Delegates</span>
@@ -684,13 +691,14 @@ export function speakerView(id) {
       <p class="spbio">${s.bio}</p>
     </div>` : ''}
     ${contactBlock(s)}
+    ${s.partnerId ? `
     <a href="#/partner/${s.partnerId}" class="spcard" style="margin-top:14px">
       <img class="spavatar" src="${partnerById(s.partnerId)?.logo ?? ''}" alt="${s.org}" style="object-fit:contain;background:#fff">
       <div class="spbody">
         <div class="n">${s.org}</div>
         <div class="s">Education partner · view profile</div>
       </div>
-    </a>
+    </a>` : ''}
     ${theirSessions.length ? `
     <span class="lab" style="margin-top:26px">// Speaking at</span>
     <div class="aglist">
@@ -1630,6 +1638,8 @@ function screenWho(s) {
   if (s.kind === 'SOCIAL') return s.venue?.name ?? s.room
   if (s.guest) return s.guest
   const sps = speakersForSession(s)
+  // A keynote: the name alone, as before record 243 (spec PGW-KN-001 §4.1).
+  if (sps.length && sps.every((sp) => sp.role === 'keynote')) return sps.map((sp) => sp.name).join(' & ')
   if (sps.length) {
     const orgs = [...new Set(sps.map((sp) => sp.org))]
     return `${sps.map((sp) => sp.name).join(' & ')}${orgs.length ? ` · ${orgs.join(' · ')}` : ''}`

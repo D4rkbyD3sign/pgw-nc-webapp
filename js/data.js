@@ -111,7 +111,7 @@ const AT = conference.room
    Tonight tile, the Tonight page and the FAQ's evening answers all read from
    this array and will light up on their own.
 
-   `speakerIds` is used ONLY on panels (29 Sep), because a panel has no single
+   `speakerIds` is used on panels and keynotes (29 Sep; keynotes 15 Oct, record 243), because a panel has no single
    presenting partner: it names the panellists the sheet confirms, by speaker
    id (`<partnerId>-<surname>`). Partner slots leave it empty and derive their
    speaker from `partnerId`.
@@ -126,14 +126,17 @@ const AT = conference.room
    Spotlight 1 — the table names Dr Lila Landowski, Matthew Byrne and Ben Ross.
    The closing keynote speaker is listed on the table as 'Ben Ross II'.
    Attendees see 'Ben Ross' only; the 'II' is the table's own label.
+   15 Oct 2026, record 243: the external Ross is retired; Julian Moore holds both Friday closing slots.
    Panel 2: 'maybe PEP' on the table is NOT shown until confirmed.
    Friday's Adviser Spotlight is gone; d2-panel-3 became d2-keynote-close-1.
    `guest` = a named non-partner presenter (keynotes, spotlight). whoLine shows it on
-   the card; before it existed the name lived only in `summary`, which cards omit. */
+   the card; before it existed the name lived only in `summary`, which cards omit.
+   15 Oct 2026, record 243: the keynotes no longer carry `guest`; they name their speaker in
+   `speakerIds` (`keynoteSpeakers`, below). Only the spotlight still uses `guest`. */
 export const sessions = [
   // ---- Day 1 · Thu 29 Oct · 8:30am to 5:00pm (v3 agenda table, 30 Sep) ----
   { id: 'd1-welcome', day: 1, start: '08:30', end: '08:45', title: 'Welcome & event begins', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: 'Opening welcome from PGW.' },
-  { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Dr Lila Landowski', speakerIds: [], summary: 'With Dr Lila Landowski.' },
+  { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-landowski'], summary: '' },
   { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook' },
   { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:15', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:15', end: '11:35', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
@@ -172,9 +175,9 @@ export const sessions = [
   { id: 'd2-lunch', day: 2, start: '13:00', end: '14:00', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd2-hub24', partnerId: 'hub24', day: 2, start: '12:10', end: '12:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
   { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '14:00', end: '14:20', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'The Road Ahead - Opportunities in Property & Private Credit' },
-  { id: 'd2-keynote-close-1', day: 2, start: '14:20', end: '15:00', title: 'Closing Keynote Part 1', kind: 'KEYNOTE', room: GB, org: '', guest: 'Ben Ross', speakerIds: [], summary: 'With Ben Ross — AI.' },
+  { id: 'd2-keynote-close-1', day: 2, start: '14:20', end: '15:00', title: 'Closing Keynote Part 1', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-moore'], summary: 'AI in the Advice Practice: Built Live, Ready for Monday' },
   { id: 'd2-arvo-tea', day: 2, start: '15:00', end: '15:30', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', guest: 'Ben Ross', speakerIds: [], summary: 'With Ben Ross.' },
+  { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-moore'], summary: 'AI in the Advice Practice: Built Live, Ready for Monday' },
   { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
     id: 'd2-drinks', day: 2, start: '18:00', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
@@ -447,6 +450,15 @@ export function speakerById(id) {
   return speakers.find((s) => s.id === id)
 }
 
+/** The keynote speakers (spec PGW-KN-001 §3, record 243). ⛔ A SEPARATE list, never in `speakers`:
+ *  the live landing imports `speakers` at runtime and shows every entry under "Educational partners",
+ *  so a keynote there would appear twice on the landing without a landing build. No `partnerId`.
+ *  Every string is copied by script from its source (the landing's keynotes[0]; the facts file). */
+export const keynoteSpeakers = [
+  {"id": "keynote-landowski", "name": "Dr Lila Landowski", "title": "Neuroscientist", "org": "University of Tasmania", "orgShort": "University of Tasmania", "photo": "img/speakers/2026/keynote-landowski.jpg", "bio": "Dr Lila Landowski is a multi-award-winning neuroscientist and senior lecturer at the University of Tasmania, Board Director of Science & Technology Australia, World Health Organisation Fides health ambassador and Executive Director of the Australian Brain Alliance. Passionate about making science useful in everyday life, Lila brings brain science to millions through radio, TV screens, podcasts and live events. Her TEDx talk on the neuroscience of learning faster is the #3 most-watched TEDx talk in the world since it came out in 2023. As a keynote speaker, she is trusted by Fortune 500 and ASX 50 companies, governments, athletes and leaders to translate neuroscience into practical strategies for optimising performance. An Australian Museum Eureka Award winner, Lila is on a mission to make brain science accessible to everyone.", "role": "keynote"},
+  {"id": "keynote-moore", "name": "Julian Moore", "title": "Chief AI Consultant", "org": "Strategic Membership Solutions", "orgShort": "Strategic Membership Solutions", "photo": "img/speakers/2026/keynote-moore.jpg", "bio": "Julian Moore is one of Australasia’s leading experts in the practical application of AI across corporates, government, and associations. Known for his engaging, story-driven keynotes featuring trademark live demonstrations - where AI tools are built in front of the audience - Julian helps organisations embed AI into their operations, customer and member engagement, and new revenue streams. Beyond the stage, Julian works directly with leadership teams as Chief AI Consultant at Strategic Membership Solutions, guiding organisations through the practical realities of adopting AI - from identifying the right opportunities to building the skills and confidence to act on them. His focus is always on what works in practice, not theory, and audiences consistently leave his sessions with tools and ideas they can apply immediately.", "role": "keynote"},
+]
+
 /* Non-speaking DELEGATES — sheet columns G/H (Delegate 2/3), 29 Sep sheet.
    29 Sep: listed under Speakers & Delegates so advisers can find them;
    the BDMs want to be contactable. Same tier order as the partners.
@@ -480,15 +492,15 @@ export const delegates = partners.flatMap((p) =>
   })),
 )
 
-/** A speaker OR a delegate — the person page serves both. */
+/** A speaker, a keynote speaker OR a delegate: the person page serves all three. */
 export function personById(id) {
-  return speakerById(id) ?? delegates.find((d) => d.id === id)
+  return speakerById(id) ?? keynoteSpeakers.find((k) => k.id === id) ?? delegates.find((d) => d.id === id)
 }
 
 /** Who is presenting a session: named speakers if the agenda names any,
  *  otherwise the presenting partner's people. */
 export function speakersForSession(s) {
-  const named = (s.speakerIds ?? []).map(speakerById).filter(Boolean)
+  const named = (s.speakerIds ?? []).map((id) => speakerById(id) ?? keynoteSpeakers.find((k) => k.id === id)).filter(Boolean)
   if (named.length) return named
   return s.partnerId ? speakers.filter((sp) => sp.partnerId === s.partnerId) : []
 }
