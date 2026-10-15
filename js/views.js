@@ -1484,7 +1484,7 @@ export function askView() {
       <h3>${session.title}</h3>
     </div>
     <form id="askform" class="askform">
-      <textarea id="asktext" rows="3" maxlength="${ASK_MAX}" placeholder="Type your question for this session…">${askDraft}</textarea>
+      <textarea id="asktext" rows="3" maxlength="${ASK_MAX}" placeholder="Type your question for this session…">${esc(askDraft)}</textarea>
       <div id="askcount" class="askcount${ASK_MAX - askDraft.length <= 40 ? ' near' : ''}">${askDraft.length} / ${ASK_MAX}</div>
 
       <label class="namecheck" for="asknamed">
@@ -1498,7 +1498,7 @@ export function askView() {
         maxlength="60"
         autocomplete="name"
         placeholder="Your name"
-        value="${askName.replace(/"/g, '&quot;')}"
+        value="${esc(askName)}"
       />
 
       <button type="submit" class="ask" style="margin:14px 0 0; width:100%">
@@ -1810,7 +1810,7 @@ export function pulseView(sessionId) {
       </div>
       <div class="rateends"><span>Not useful at all</span><span>Very useful</span></div>
       <span class="lab" style="margin:28px 0 10px">// Anything to add? (optional)</span>
-      <textarea id="pulsetext" rows="3" maxlength="400" placeholder="What worked, what didn't…">${pulseComment}</textarea>
+      <textarea id="pulsetext" rows="3" maxlength="400" placeholder="What worked, what didn't…">${esc(pulseComment)}</textarea>
       <button type="submit" class="ask" id="pulsesend" style="margin:16px 0 0;width:100%" ${pulseRating ? '' : 'disabled'}>
         Send feedback
       </button>
