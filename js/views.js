@@ -1,6 +1,7 @@
-import { conference, sessions, speakers, speakerById, delegates, personById, speakersForSession, partners, partnerById, nextSocial, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow, CONFERENCE_TZ } from './data.js'
+import { conference, sessions, speakers, speakerById, delegates, personById, speakersForSession, partners, partnerById, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow, CONFERENCE_TZ } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
+import { esc } from './esc.js'
 
 const minutes = (t) => {
   const [h, m] = t.split(':').map(Number)
@@ -88,7 +89,22 @@ export const WORDS = {
   w6bWhen: (date, start) => `${date} · ${start}`,
   w6bAfter: 'Thank you for coming',
   w6c: 'The conference app is on your phone',
+  // W7 (spec B §13.3, APPROVED by Adam 14 Oct): the evening's name outside "tonight".
+  // The date part is joined with non-breaking spaces so it never splits.
+  w7a: (label) => `${label.replace(/ /g, '&nbsp;')} evening`,
+  w7b: "The evening's plan",
 }
+
+/* ONE day, one function (spec B §13.2 rule 1): the evening the Home tile and the Tonight
+   page both mean. ON: today; PRE / EVE: day 1; AFTER: the last day. It was tonightView's
+   own fallback; it moved here so the tile and the page can never disagree again. */
+export function eveningDay(now = new Date()) {
+  const phase = phaseAt(now)
+  const today = conferenceNow().day
+  return phase === 'on' && today ? today : phase === 'after' ? LAST_DAY.day : DAY1.day
+}
+/* "Tonight" is true only in ON, and only for today's evening (§13.2 rules 4 and 5). */
+const isTonight = (day) => phaseAt() === 'on' && conferenceNow().day === day
 
 /** The countdown to T2: 24h+ → days + hours; under 24h → hours + minutes; under a
  *  minute → UNDER 1 MIN. Floored (never a time that hasn't arrived). No seconds. */
@@ -255,7 +271,7 @@ function upcomingCard(s, dated = false) {
   return `
     <div class="now upcard${isBreak ? ' brk' : ''}">
       <div class="row">
-        <span class="live">${dated ? `${dayLabel(s.day).toUpperCase()} · ` : '<span class="dot up"></span>UP NEXT · '}${s.start}–${s.end}</span>
+        <span class="live">${dated ? `${dayLabel(s.day).toUpperCase()} · ` : '<span class="dot up"></span>UP NEXT · '}${esc(s.start)}–${esc(s.end)}</span>
         ${eventIcon(s) ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
       </div>
       <h3>${s.title}</h3>
@@ -377,7 +393,7 @@ function homeNowCard(block, live) {
     return `
       <div class="now">
         <div class="row">
-          <span class="live"><span class="dot"></span>ON NOW · ${s.start}–${s.end}</span>
+          <span class="live"><span class="dot"></span>ON NOW · ${esc(s.start)}–${esc(s.end)}</span>
           <span class="tagm">${s.kind}</span>
         </div>
         <h3>${s.title}</h3>
@@ -397,12 +413,12 @@ function homeNowCard(block, live) {
     return `
       <div class="now brk">
         <div class="row">
-          <span class="live"><span class="dot up"></span>ON NOW · ${s.start}–${s.end}</span>
+          <span class="live"><span class="dot up"></span>ON NOW · ${esc(s.start)}–${esc(s.end)}</span>
           <span class="evico">${eventIcon(s)}</span>
         </div>
         <h3>${s.title}</h3>
         <div class="who"><span class="txt">${s.room}</span></div>
-        ${block.next ? `<p class="nownext">Next up — <b>${block.next.title}</b> at ${block.next.start}.</p>` : ''}
+        ${block.next ? `<p class="nownext">Next up — <b>${block.next.title}</b> at ${esc(block.next.start)}.</p>` : ''}
       </div>`
   }
 
@@ -428,7 +444,9 @@ export function homeView() {
   /* In a gap the hero card IS the next session, so it would otherwise appear
      twice side by side. */
   const upcoming = block.state === 'gap' ? all.slice(1) : all
-  const social = nextSocial()
+  // The evening's FIRST event by start (spec B §13.2 rule 2). The old first-SOCIAL helper retired.
+  const eveDay = eveningDay()
+  const social = socialsForDay(eveDay)[0]
 
   return `
     <header class="appbar">
@@ -472,9 +490,9 @@ export function homeView() {
           <div class="ico">${icons.speakers}</div>
           <div><div class="n">Speakers &amp; Delegates</div><div class="s">${speakers.length} speakers · ${delegates.length} delegates</div></div>
         </a>
-        <a href="#/tonight" class="tile tonight">
+        <a href="#/tonight/${eveDay}" class="tile tonight">
           <div class="ico">${icons.dinner}</div>
-          <div><div class="n">Tonight</div><div class="s">${social ? `${social.title} · ${social.start}` : 'Nothing scheduled'}</div></div>
+          <div><div class="n">${isTonight(eveDay) ? 'Tonight' : WORDS.w7a(dayLabel(eveDay))}</div><div class="s">${social ? `${social.title} · ${esc(social.start)}` : 'Nothing scheduled'}</div></div>
         </a>
       </div>
     </div>
@@ -504,7 +522,7 @@ export function homeView() {
          or a support conversation, "what does the bottom of your home screen
          say" settles in one second whether a phone is stale or you're chasing
          a real bug. Attendees will never notice it; you will need it. -->
-    <p class="buildstamp">BUILD ${brain.buildState().running}</p>
+    <p class="buildstamp">BUILD ${esc(brain.buildState().running)}</p>
   `
 }
 
@@ -564,17 +582,17 @@ export function agendaView(dayArg) {
       if (isBreak) {
         return `
         <div class="agrow">
-          <div class="agtime">${s.start}</div>
+          <div class="agtime">${esc(s.start)}</div>
           <div class="agbreak"><span class="evico">${eventIcon(s)}</span>${s.title}${s.room === conference.room ? '' : ` · ${s.room}`}</div>
         </div>`
       }
       const social = s.kind === 'SOCIAL'
       return `
       <div class="agrow">
-        <div class="agtime">${s.start}</div>
+        <div class="agtime">${esc(s.start)}</div>
         <a href="#/${social ? `tonight/${s.day}` : `session/${s.id}`}" class="agcard${isNow ? ' isnow' : ''}">
           <div class="row">
-            <span class="live">${isNow ? '<span class="dot"></span>ON NOW · ' : ''}${s.start}–${s.end}</span>
+            <span class="live">${isNow ? '<span class="dot"></span>ON NOW · ' : ''}${esc(s.start)}–${esc(s.end)}</span>
             ${social ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
           </div>
           <h3>${s.title}</h3>
@@ -680,9 +698,9 @@ export function speakerView(id) {
         .map(
           (x) => `
       <div class="agrow">
-        <div class="agtime">${x.start}</div>
+        <div class="agtime">${esc(x.start)}</div>
         <a href="#/session/${x.id}" class="agcard">
-          <div class="row"><span class="live">${conference.days.find((d) => d.day === x.day)?.label ?? ''} · ${x.start}–${x.end}</span><span class="tagm">${x.kind}</span></div>
+          <div class="row"><span class="live">${conference.days.find((d) => d.day === x.day)?.label ?? ''} · ${esc(x.start)}–${esc(x.end)}</span><span class="tagm">${x.kind}</span></div>
           <h3>${x.title}</h3>
         </a>
       </div>`,
@@ -742,9 +760,9 @@ export function partnerView(id) {
         .map(
           (x) => `
       <div class="agrow">
-        <div class="agtime">${x.start}</div>
+        <div class="agtime">${esc(x.start)}</div>
         <a href="#/session/${x.id}" class="agcard">
-          <div class="row"><span class="live">${dayOf(x)} · ${x.start}–${x.end}</span><span class="tagm">${x.kind}</span></div>
+          <div class="row"><span class="live">${dayOf(x)} · ${esc(x.start)}–${esc(x.end)}</span><span class="tagm">${x.kind}</span></div>
           <h3>${x.title}</h3>
         </a>
       </div>`,
@@ -776,11 +794,9 @@ export function partnerView(id) {
    cruise until Friday itself. No day given (home tile, FAQ) = the live day. */
 export function tonightView(dayArg) {
   /* No day given: the conference day in ON; day 1 before the event (PRE / EVE),
-     day 2 after it (spec §4.2) — never liveSession()'s invented day. */
-  const phase = phaseAt()
-  const today = conferenceNow().day
-  const fallback = phase === 'on' && today ? today : phase === 'after' ? LAST_DAY.day : DAY1.day
-  const day = [1, 2].includes(Number(dayArg)) ? Number(dayArg) : fallback
+     day 2 after it (spec §4.2) — never liveSession()'s invented day. The rule now
+     lives in eveningDay(), shared with the Home tile (spec B §13.2 rule 1). */
+  const day = [1, 2].includes(Number(dayArg)) ? Number(dayArg) : eveningDay()
   const socials = socialsForDay(day)
   if (!socials.length) return stubView('Tonight', 'Nothing scheduled tonight.')
   const dayLabel = conference.days.find((d) => d.day === day)?.label ?? ''
@@ -790,7 +806,7 @@ export function tonightView(dayArg) {
       return `
     <div class="now" style="margin-bottom:14px">
       <div class="row">
-        <span class="live"><span class="evico">${eventIcon(social)}</span>${social.start} · ${social.title}</span>
+        <span class="live"><span class="evico">${eventIcon(social)}</span>${esc(social.start)} · ${social.title}</span>
         <span class="tagm">${v.dress ?? ''}</span>
       </div>
       <h3>${v.name ?? social.room}</h3>
@@ -804,8 +820,8 @@ export function tonightView(dayArg) {
     .join('')
   return `
     <div class="pagehead">
-      <h2>Tonight</h2>
-      <p class="sub">${dayLabel} — the evening's plan</p>
+      <h2>${isTonight(day) ? 'Tonight' : WORDS.w7a(dayLabel)}</h2>
+      <p class="sub">${isTonight(day) ? `${dayLabel} — the evening's plan` : WORDS.w7b}</p>
     </div>
     ${cards}
   `
@@ -817,7 +833,7 @@ export function sessionView(id) {
   const sps = speakersForSession(s)
   return `
     <div class="stub">
-      <span class="eyebrow">${s.kind} · ${s.start}–${s.end} · ${s.room}</span>
+      <span class="eyebrow">${s.kind} · ${esc(s.start)}–${esc(s.end)} · ${s.room}</span>
       <h2 style="margin-top:12px">${s.title}</h2>
       <p>${s.summary || ''}</p>
     </div>
@@ -864,8 +880,8 @@ function askFromSession(s) {
     phaseAt() === 'after'
       ? WORDS.w5Session
       : conferenceNow().date !== conference.days.find((d) => d.day === s.day)?.date
-        ? WORDS.w2(s.start, dayLabel(s.day))
-        : `Questions for this session open at <b>${s.start}</b>, while it's on.`
+        ? WORDS.w2(esc(s.start), dayLabel(s.day))
+        : `Questions for this session open at <b>${esc(s.start)}</b>, while it's on.`
   return `
     <div style="padding:20px 24px">
       <p class="asklater">${icons.chat}<span>${line}</span></p>
@@ -965,9 +981,9 @@ function helpContacts() {
 
 function contactLine(c) {
   const ways = []
-  if (c.phone) ways.push(`<a href="tel:${c.phone.replace(/\s/g, '')}">${c.phone}</a>`)
-  if (c.email) ways.push(`<a href="mailto:${c.email}">${c.email}</a>`)
-  return `<li><b>${c.name}</b>${ways.length ? `<br>${ways.join(' · ')}` : ''}</li>`
+  if (c.phone) ways.push(`<a href="tel:${esc(c.phone.replace(/\s/g, ''))}">${esc(c.phone)}</a>`)
+  if (c.email) ways.push(`<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`)
+  return `<li><b>${esc(c.name)}</b>${ways.length ? `<br>${ways.join(' · ')}` : ''}</li>`
 }
 
 function faqSections() {
@@ -984,7 +1000,7 @@ function faqSections() {
     const ven = s.venue ?? {}
     const label = conference.days.find((d) => d.day === s.day)?.label ?? ''
     const place = ven.name && ven.name !== s.title ? ven.name : s.room
-    return `<li><b>${s.title}</b><br>${label} · ${s.start}${place ? ` · ${place}` : ''}${
+    return `<li><b>${s.title}</b><br>${label} · ${esc(s.start)}${place ? ` · ${place}` : ''}${
       ven.dress ? ` · ${ven.dress}` : ''
     }</li>`
   }
@@ -1031,8 +1047,8 @@ function faqSections() {
         },
         {
           q: 'When does it start and finish?',
-          a: `<p><b>${conference.days[0].label}</b> — from ${firstUp.start} (${firstUp.title.toLowerCase()})<br>
-              <b>${conference.days[1].label}</b> — through to about ${lastDown.end}</p>
+          a: `<p><b>${conference.days[0].label}</b> — from ${esc(firstUp.start)} (${firstUp.title.toLowerCase()})<br>
+              <b>${conference.days[1].label}</b> — through to about ${esc(lastDown.end)}</p>
               <p>The <a href="#/agenda">Agenda</a> is live: if a session runs over, the times here move with it.</p>`,
         },
         ...(v.parking ? [{ q: 'Is there parking?', a: `<p>${v.parking}</p>` }] : []),
@@ -1364,8 +1380,8 @@ function myQuestionsBlock() {
         .map(
           (q) => `
       <div class="myq">
-        <p>${q.text}</p>
-        <span class="chip s-${q.status}">${STATUS_LABEL[q.status] ?? q.status}</span>
+        <p>${esc(q.text)}</p>
+        <span class="chip s-${esc(q.status)}">${STATUS_LABEL[q.status] ?? esc(q.status)}</span>
       </div>`,
         )
         .join('')}
@@ -1412,7 +1428,7 @@ export function askView() {
       <div class="askshut">
         <span class="askshut-ico">${icons.chat}</span>
         <p>${starts}</p>
-        <p>${WORDS.w1Box(b.next.start, b.next.title)}</p>
+        <p>${WORDS.w1Box(esc(b.next.start), b.next.title)}</p>
       </div>
       ${myQuestionsBlock()}
     `
@@ -1421,11 +1437,11 @@ export function askView() {
     const { nowMin, day } = conferenceNow()
     const startedToday = sessions.some((s) => s.day === day && minutes(s.start) <= nowMin)
     const nextLine = b.next
-      ? `<p>The box opens ${startedToday ? 'again ' : ''}at <b>${b.next.start}</b>, for <b>${b.next.title}</b>.</p>`
+      ? `<p>The box opens ${startedToday ? 'again ' : ''}at <b>${esc(b.next.start)}</b>, for <b>${b.next.title}</b>.</p>`
       : `<p>That's the program done for today.</p>`
     const nowLine =
       b.state === 'break' && b.session
-        ? `<p><b>${b.session.title}</b> until ${b.session.end}.</p>`
+        ? `<p><b>${b.session.title}</b> until ${esc(b.session.end)}.</p>`
         : b.state === 'ended'
           ? ''
           : `<p>Nothing is on stage at the moment.</p>`
@@ -1454,7 +1470,7 @@ export function askView() {
          session-detail pages no longer carry their own Ask button. -->
     <div class="now" style="margin-bottom:16px">
       <div class="row">
-        <span class="live"><span class="dot"></span>ON NOW · ${session.start}–${session.end}</span>
+        <span class="live"><span class="dot"></span>ON NOW · ${esc(session.start)}–${esc(session.end)}</span>
         <span class="tagm">${session.kind}</span>
       </div>
       <h3>${session.title}</h3>
@@ -1562,9 +1578,9 @@ export function modView() {
   const item = (q, buttons) => `
     <div class="myq">
       <div style="flex:1">
-        <p>${q.text}</p>
+        <p>${esc(q.text)}</p>
         <span class="s" style="font-family:var(--mono);font-size:10px">
-          ${q.name ? `<b class="qname">${q.name}</b> · ` : ''}${bySession(q)}
+          ${q.name ? `<b class="qname">${esc(q.name)}</b> · ` : ''}${bySession(q)}
         </span>
       </div>
       <div class="modbtns">${buttons}</div>
@@ -1583,9 +1599,9 @@ export function modView() {
       <h2>Moderator</h2>
       <p class="sub">Curate incoming questions · promote to the room screen</p>
     </div>
-    ${group('On screen', onscreen, (q) => `<button class="mbtn" data-act="shown" data-id="${q.id}">Done</button>`)}
-    ${group('Incoming', pending, (q) => `<button class="mbtn go" data-act="approve" data-id="${q.id}">Approve</button><button class="mbtn" data-act="dismiss" data-id="${q.id}">Dismiss</button>`)}
-    ${group('Approved — ready', approved, (q) => `<button class="mbtn go" data-act="promote" data-id="${q.id}">To screen</button><button class="mbtn" data-act="dismiss" data-id="${q.id}">Dismiss</button>`)}
+    ${group('On screen', onscreen, (q) => `<button class="mbtn" data-act="shown" data-id="${esc(q.id)}">Done</button>`)}
+    ${group('Incoming', pending, (q) => `<button class="mbtn go" data-act="approve" data-id="${esc(q.id)}">Approve</button><button class="mbtn" data-act="dismiss" data-id="${esc(q.id)}">Dismiss</button>`)}
+    ${group('Approved — ready', approved, (q) => `<button class="mbtn go" data-act="promote" data-id="${esc(q.id)}">To screen</button><button class="mbtn" data-act="dismiss" data-id="${esc(q.id)}">Dismiss</button>`)}
     ${group('History', history, () => '')}
     ${qs.length ? '' : '<p class="stub" style="padding-top:8px">No questions yet — open the Ask tab in another tab of this browser to demo the loop.</p>'}
     ${crewFooter()}
@@ -1656,7 +1672,7 @@ function qSize(t) {
 export function screenView() {
   const q = brain.promotedQuestion()
   const qBlock = q
-    ? `<div class="bs-q ${qSize(q.text)}">“${q.text}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? q.name.toUpperCase() : 'ANONYMOUS'}</div>`
+    ? `<div class="bs-q ${qSize(q.text)}">“${esc(q.text)}”</div><div class="bs-tag">AUDIENCE QUESTION · ${q.name ? esc(q.name.toUpperCase()) : 'ANONYMOUS'}</div>`
     : ''
   /* PRE / EVE / AFTER (spec §5.4): a title card, never the invented session.
      A promoted question still shows, so the crew can rehearse the screen. */
@@ -1736,7 +1752,7 @@ export function pulseView(sessionId) {
       </div>
       <div class="askshut">
         <span class="askshut-ico">${icons.chat}</span>
-        <p>${WORDS.w3(s.title, s.end, dayLabel(s.day))}</p>
+        <p>${WORDS.w3(s.title, esc(s.end), dayLabel(s.day))}</p>
       </div>`
   }
 
@@ -1768,7 +1784,7 @@ export function pulseView(sessionId) {
     </div>
     <div class="now" style="margin-bottom:18px">
       <div class="row">
-        <span class="live">${s.start}–${s.end}</span>
+        <span class="live">${esc(s.start)}–${esc(s.end)}</span>
         <span class="tagm">${s.kind}</span>
       </div>
       <h3>${s.title}</h3>
@@ -1823,7 +1839,7 @@ export function wirePulse(rerender, sessionId) {
 /** Crew-only rollup — what Ben actually wants out of the day. */
 export function resultsView() {
   const rows = brain.pulseSummary()
-  const title = (id) => sessions.find((s) => s.id === id)?.title ?? id
+  const title = (id) => sessions.find((s) => s.id === id)?.title ?? esc(id)
   if (!rows.length) {
     return `
       <div class="pagehead"><h2>Pulse results</h2><p class="sub">Per-session feedback, live</p></div>
@@ -1841,16 +1857,16 @@ export function resultsView() {
           (r) => `
         <div class="pulserow">
           <div class="pr-head">
-            <span class="pr-avg">${r.avg.toFixed(1)}</span>
+            <span class="pr-avg">${esc(r.avg.toFixed(1))}</span>
             <div>
               <p class="pr-title">${title(r.sessionId)}</p>
-              <span class="pr-n">${RATING_WORDS[Math.round(r.avg)]} · ${r.count} response${r.count === 1 ? '' : 's'}</span>
+              <span class="pr-n">${RATING_WORDS[Math.round(r.avg)]} · ${esc(r.count)} response${r.count === 1 ? '' : 's'}</span>
             </div>
           </div>
           <div class="pr-bar"><i style="width:${(r.avg / 5) * 100}%"></i></div>
           ${
             r.comments.length
-              ? `<div class="pr-comments">${r.comments.map((c) => `<p>“${c}”</p>`).join('')}</div>`
+              ? `<div class="pr-comments">${r.comments.map((c) => `<p>“${esc(c)}”</p>`).join('')}</div>`
               : ''
           }
         </div>`,
@@ -1892,19 +1908,19 @@ function versionBox() {
   return `
     <span class="lab" style="margin-top:30px">// App version</span>
     <div class="delaybox">
-      <div class="delaynow">Build ${running}${behind ? ` · beacon says ${live}` : ''}</div>
+      <div class="delaynow">Build ${esc(running)}${behind ? ` · beacon says ${esc(live)}` : ''}</div>
       <p class="delayhelp">
         ${
           behind
-            ? `Phones are being told to run build ${live}, but this device can only get ${running}. If build ${live} was never really deployed, roll the beacon back — it stops everyone nagging.`
+            ? `Phones are being told to run build ${esc(live)}, but this device can only get ${esc(running)}. If build ${esc(live)} was never really deployed, roll the beacon back — it stops everyone nagging.`
             : announced
               ? 'Every phone has been told to run this build. Nothing to do.'
-              : `Phones are still being told to run build ${live}. Publish to send everyone to build ${running}.`
+              : `Phones are still being told to run build ${esc(live)}. Publish to send everyone to build ${esc(running)}.`
         }
       </p>
       <div class="delaybtns">
         <button class="dbtn" data-publish="1">
-          ${behind ? `Roll the beacon back to ${running}` : 'Publish to all phones'}
+          ${behind ? `Roll the beacon back to ${esc(running)}` : 'Publish to all phones'}
         </button>
       </div>
     </div>`
@@ -1924,9 +1940,9 @@ export function adminView(dayArg) {
     return `
       <div class="adrow${edited ? ' edited' : ''}">
         <div class="adtimes">
-          <input class="adtime" data-id="${s.id}" data-f="start" value="${s.start}" maxlength="5" inputmode="numeric" />
+          <input class="adtime" data-id="${s.id}" data-f="start" value="${esc(s.start)}" maxlength="5" inputmode="numeric" />
           <span class="addash">–</span>
-          <input class="adtime" data-id="${s.id}" data-f="end" value="${s.end}" maxlength="5" inputmode="numeric" />
+          <input class="adtime" data-id="${s.id}" data-f="end" value="${esc(s.end)}" maxlength="5" inputmode="numeric" />
         </div>
         <div class="admeta">
           <p class="adtitle">${s.title}</p>
@@ -1982,7 +1998,7 @@ function contactsBox() {
     <span class="lab" style="margin-top:30px">// Help numbers</span>
     <div class="delaybox">
       <p class="delayhelp">Shown on the Help page for attendees to call. One per line: name, mobile. ${live ? 'Published.' : 'Not published yet — the Help page shows names only.'}</p>
-      <textarea id="adcontacts" class="adcontacts" rows="5" spellcheck="false">${text}</textarea>
+      <textarea id="adcontacts" class="adcontacts" rows="5" spellcheck="false">${esc(text)}</textarea>
       <div class="delaybtns">
         <button class="dbtn" data-save-contacts="1">Save numbers</button>
       </div>

@@ -493,11 +493,6 @@ export function speakersForSession(s) {
   return s.partnerId ? speakers.filter((sp) => sp.partnerId === s.partnerId) : []
 }
 
-/** Next social event (dinner etc) for the "Tonight" tile. */
-export function nextSocial() {
-  return sessions.find((s) => s.kind === 'SOCIAL')
-}
-
 /** All social events for a day, in time order (drinks → dinner). */
 export function socialsForDay(day) {
   return sessions
