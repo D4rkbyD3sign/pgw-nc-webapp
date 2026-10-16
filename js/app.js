@@ -25,6 +25,8 @@ import {
   adminView,
   wireAdmin,
   wireCrewFooter,
+  wifiView,
+  venueView,
 } from './views.js'
 import { icons } from './icons.js'
 import { onChange, onAuthChange, user, authReadyYet, updateAvailable, buildState } from './brain.js'
@@ -68,8 +70,9 @@ const routes = {
   results: { render: () => resultsView(), wire: wireCrewFooter, live: true, auth: true },
   admin: { render: (arg) => adminView(arg), wire: wireAdmin, live: true, auth: true },
   materials: { render: () => stubView('Materials', 'Speaker decks and handouts will appear here as partners share them, before and after each session.') },
-  wifi: { render: () => stubView('Wi-Fi', 'Network details + tap-to-copy password.'), back: '' },
-  venue: { render: () => stubView('Venue', 'Map, address and parking.'), back: '' },
+  // record 246: the two builder stubs replaced (spec PGW-WV-001 §3, §4)
+  wifi: { render: () => wifiView(), back: '' },
+  venue: { render: () => venueView(), back: '' },
 }
 
 /* ---------- going back without leaving the app ----------

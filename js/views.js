@@ -95,6 +95,33 @@ export const WORDS = {
   w7b: "The evening's plan",
 }
 
+/* ⭐ THE WI-FI + VENUE WORDS (record 246, spec PGW-WV-001 §6): APPROVED by Adam 16 Oct, exactly as the spec. One block,
+   so any later change is one line. Every fact inside a sentence is derived (the room, the venue), never typed. */
+export const WV = {
+  wv1: 'The Wi-Fi details arrive the night before the conference.',
+  wv2: "They'll appear here on their own, with a button to copy the password.",
+  wv3: 'Details the night before',
+  wv4: 'Network &amp; password',
+  wv5: 'Copy password',
+  wv6: 'Copied',
+  wv7: "Couldn't copy. Press and hold the password instead.",
+  wv8: 'No password needed.',
+  wv9: 'Map &amp; address',
+  wv10: 'Where the conference is',
+  wv11: (room) => `The conference is in <b>${VENUE_LINE_ROOM(room)}</b>.`,
+  wv12: 'Parking details to come.',
+  wv13: "Shown on every phone's Wi-Fi page, with a button to copy the password.",
+  wv14: 'Published.',
+  wv15: 'Not published yet. Phones say the details arrive the night before.',
+  wv16: 'Publish Wi-Fi',
+  wv17: 'Take it down',
+  wv18: 'Add the network name.',
+  wv19: 'The network name is too long: 32 characters at most.',
+  wv20: 'The password is too long: 63 characters at most.',
+  wv21: 'The password starts or ends with a space. Remove it.',
+  wv22: 'The password is on the <a href="#/wifi">Wi-Fi page</a>, with a button to copy it.',
+}
+
 /* ONE day, one function (spec B §13.2 rule 1): the evening the Home tile and the Tonight
    page both mean. ON: today; PRE / EVE: day 1; AFTER: the last day. It was tonightView's
    own fallback; it moved here so the tile and the page can never disagree again. */
@@ -457,7 +484,6 @@ export function homeView() {
         ${icons.logo}
         <span class="wm">PGW <b>ImplementAI</b></span>
       </div>
-      <div class="avatar">AG</div>
     </header>
 
     <section class="hero">
@@ -505,11 +531,11 @@ export function homeView() {
       <div class="logigrid">
         <a href="#/wifi" class="logicard">
           ${icons.wifi}
-          <div><div class="n">Wi-Fi</div><div class="s">Tap to connect</div></div>
+          <div><div class="n">Wi-Fi</div><div class="s">${WV.wv3}</div></div>
         </a>
         <a href="#/venue" class="logicard">
           ${icons.pin}
-          <div><div class="n">Venue</div><div class="s">Map &amp; parking</div></div>
+          <div><div class="n">Venue</div><div class="s">${conference.venue.parking ? 'Map &amp; parking' : WV.wv9}</div></div>
         </a>
         <!-- Spans both columns. The FAQ answers questions from all three
              tiers — evenings, conference, app — so it does not belong beside
@@ -900,6 +926,47 @@ export function stubView(title, note) {
   return `<div class="stub"><h2>${title}</h2><p>${note}</p></div>`
 }
 
+/* ---------- Wi-Fi (record 246, spec PGW-WV-001 §3) ----------
+   Holding: one .now card, WV-1 then WV-2: no button, no empty boxes, no "check back" (the page updates
+   itself once the crew publishes). The venue sub is derived, never typed. */
+export function wifiView() {
+  return `
+    <div class="pagehead">
+      <h2>Wi-Fi</h2>
+      <p class="sub">${conference.venue.name}</p>
+    </div>
+    <div class="now">
+      <h3 style="margin-top:0">${WV.wv1}</h3>
+      <p class="spbio" style="margin-top:10px">${WV.wv2}</p>
+    </div>
+  `
+}
+
+/* ---------- Venue (record 246, spec PGW-WV-001 §4) ----------
+   Card 1 is the Tonight page's card, no new parts. The room line is derived through VENUE_LINE_ROOM.
+   Parking keys off venue.parking, which arrives in a build when Tracey answers (never from the web). */
+export function venueView() {
+  const v = conference.venue
+  return `
+    <div class="pagehead">
+      <h2>Venue</h2>
+      <p class="sub">${WV.wv10}</p>
+    </div>
+    <div class="now" style="margin-bottom:14px">
+      <h3 style="margin-top:0">${v.name}</h3>
+      <div class="who">
+        <span class="txt">${v.address}</span>
+      </div>
+      <p class="spbio" style="margin-top:10px">${WV.wv11(conference.room)}</p>
+      ${v.mapUrl ? `<a href="${v.mapUrl}" target="_blank" rel="noopener" class="ask askin">${icons.pin} Open map &amp; directions</a>` : ''}
+    </div>
+    <span class="lab" style="margin-top:30px">// Parking</span>
+    <div class="now" style="margin-top:10px">
+      <p class="spbio" style="margin-top:0">${v.parking ? v.parking : WV.wv12}</p>
+    </div>
+  `
+}
+
 /* ---------- Welcome + last year's recap (live phone test item 5) ----------
    Adam's shape, 2026-08-21: the note sits ABOVE the video, and the video is
    titled for what it is — last year, on the Gold Coast — so nobody taps it
@@ -1078,10 +1145,9 @@ function faqSections() {
               },
             ]
           : []),
-        {
-          q: "What's the Wi-Fi?",
-          a: `<p>Network <b>${conference.wifi.ssid}</b><br>Password <b>${conference.wifi.password}</b></p>`,
-        },
+        /* The Wi-Fi item (record 246): it printed a 2025 placeholder network and password, unconditionally,
+           as if real. Removed with the data in the same change. It returns only when the crew publishes
+           live/wifi (patch set 2); while holding it is absent, and the Home card says when it arrives. */
         ...(crewContacts.length
           ? [
               {

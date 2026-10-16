@@ -52,8 +52,6 @@ export const conference = {
     note: 'PGW have secured a discounted rate at the Crowne Plaza.',
     contact: 'tracey@pgwfinancial.com.au',
   },
-  // ⚠️ Still 2025 placeholder — not on the invitation, not confirmed for Hobart.
-  wifi: { ssid: 'PGW-Conference', password: 'implement2026' },
   feedbackUrl: 'https://forms.office.com/placeholder',
 }
 
