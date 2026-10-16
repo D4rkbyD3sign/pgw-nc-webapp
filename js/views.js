@@ -531,7 +531,7 @@ export function homeView() {
       <div class="logigrid">
         <a href="#/wifi" class="logicard">
           ${icons.wifi}
-          <div><div class="n">Wi-Fi</div><div class="s">${WV.wv3}</div></div>
+          <div><div class="n">Wi-Fi</div><div class="s">${brain.liveWifi() ? WV.wv4 : WV.wv3}</div></div>
         </a>
         <a href="#/venue" class="logicard">
           ${icons.pin}
@@ -928,18 +928,65 @@ export function stubView(title, note) {
 
 /* ---------- Wi-Fi (record 246, spec PGW-WV-001 §3) ----------
    Holding: one .now card, WV-1 then WV-2: no button, no empty boxes, no "check back" (the page updates
-   itself once the crew publishes). The venue sub is derived, never typed. */
+   itself once the crew publishes). The venue sub is derived, never typed.
+   Published (set 2): network, then password, both through esc() (Wren's 241 rules: crew-typed values). The
+   password is in the app's mono face, JetBrains Mono, whose 0 is dotted and whose 1 / l / I are told apart,
+   and it selects as one block. ONE button, and it copies only the password, read from the DATA, never the page. */
 export function wifiView() {
+  const w = brain.liveWifi()
+  const card = w
+    ? `
+    <div class="now">
+      <span class="live">// Network</span>
+      <p class="wvval">${esc(w.network)}</p>
+      <span class="live" style="margin-top:16px">// Password</span>
+      ${
+        w.password
+          ? `<p class="wvval wvpass">${esc(w.password)}</p>
+      <button type="button" class="ask askin wvcopy" data-copy-wifi="1">${WV.wv5}</button>`
+          : `<p class="spbio" style="margin-top:6px">${WV.wv8}</p>`
+      }
+      <p class="wvsr" aria-live="polite"></p>
+    </div>`
+    : `
+    <div class="now">
+      <h3 style="margin-top:0">${WV.wv1}</h3>
+      <p class="spbio" style="margin-top:10px">${WV.wv2}</p>
+    </div>`
   return `
     <div class="pagehead">
       <h2>Wi-Fi</h2>
       <p class="sub">${conference.venue.name}</p>
     </div>
-    <div class="now">
-      <h3 style="margin-top:0">${WV.wv1}</h3>
-      <p class="spbio" style="margin-top:10px">${WV.wv2}</p>
-    </div>
+    ${card}
   `
+}
+
+/* Copy: the exact stored string from brain.liveWifi(), never the page's HTML, so an & < or " copies as itself.
+   Copied: WV-6 with a tick for 2 seconds, then back to WV-5. Refused or missing clipboard: WV-7, and it stays
+   (the password is still selectable). Both go to the aria-live region, so a screen reader hears them. */
+export function wireWifi() {
+  const btn = document.querySelector('[data-copy-wifi]')
+  if (!btn) return
+  const say = document.querySelector('.wvsr')
+  let timer = null
+  btn.addEventListener('click', async () => {
+    const w = brain.liveWifi()
+    clearTimeout(timer)
+    try {
+      if (!w?.password || !navigator.clipboard?.writeText) throw new Error('no clipboard')
+      await navigator.clipboard.writeText(w.password)
+      btn.textContent = `✓ ${WV.wv6}`
+      if (say) say.textContent = WV.wv6
+      timer = setTimeout(() => {
+        btn.textContent = WV.wv5
+        if (say) say.textContent = ''
+      }, 2000)
+    } catch {
+      btn.textContent = WV.wv7
+      if (say) say.textContent = WV.wv7
+    }
+  })
 }
 
 /* ---------- Venue (record 246, spec PGW-WV-001 §4) ----------
@@ -1147,7 +1194,17 @@ function faqSections() {
           : []),
         /* The Wi-Fi item (record 246): it printed a 2025 placeholder network and password, unconditionally,
            as if real. Removed with the data in the same change. It returns only when the crew publishes
-           live/wifi (patch set 2); while holding it is absent, and the Home card says when it arrives. */
+           live/wifi (patch set 2); while holding it is absent, and the Home card says when it arrives.
+           ⛔ It never prints the password: one place to copy it from (the Wi-Fi page), one place to get it wrong. */
+        ...(brain.liveWifi()
+          ? [
+              {
+                q: "What's the Wi-Fi?",
+                a: `<p>Network <b>${esc(brain.liveWifi().network)}</b></p>
+                    <p>${WV.wv22}</p>`,
+              },
+            ]
+          : []),
         ...(crewContacts.length
           ? [
               {
@@ -2052,6 +2109,8 @@ export function adminView(dayArg) {
 
     ${contactsBox()}
 
+    ${wifiBox()}
+
     <span class="lab" style="margin-top:30px">// ${conference.days.find((d) => d.day === day)?.label ?? `Day ${day}`}</span>
     <div class="daytabs">
       <a href="#/admin/1" class="dtab${day === 1 ? ' on' : ''}">Day 1</a>
@@ -2081,6 +2140,40 @@ function contactsBox() {
     </div>`
 }
 
+/* Wi-Fi (record 246, spec PGW-WV-001 §5): straight after the Help numbers, in the same .delaybox. Values through
+   esc() in the inputs' value attributes (Wren's 241 rules). The phone keyboard must not capitalise a password. */
+function wifiBox() {
+  const w = brain.liveWifi()
+  const field = (id, label, value) => `
+      <label class="wvlab" for="${id}">${label}</label>
+      <input id="${id}" class="adcontacts wvinput" type="text" value="${esc(value)}" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" />`
+  return `
+    <span class="lab" style="margin-top:30px">// Wi-Fi</span>
+    <div class="delaybox">
+      <p class="delayhelp">${WV.wv13} ${w ? WV.wv14 : WV.wv15}</p>
+      ${field('adwifinet', 'Network', w?.network ?? '')}
+      ${field('adwifipass', 'Password', w?.password ?? '')}
+      <p class="wverr" role="alert"></p>
+      <div class="delaybtns">
+        <button class="dbtn" data-wifi-publish="1">${WV.wv16}</button>
+        ${w ? `<button class="dbtn reset" data-wifi-down="1">${WV.wv17}</button>` : ''}
+      </div>
+    </div>`
+}
+
+/* Validation refuses; it never fixes (spec §5, §10.1 note 3). Network trimmed, 1 to 32 characters; password
+   0 to 63 characters, stored EXACTLY as typed, and never starting or ending with a space (a pasted password
+   often carries one, and it would copy wrongly to 50 phones). Nothing is written while a rule fails. */
+export function wifiErrors(networkRaw, password) {
+  const network = networkRaw.trim()
+  const errs = []
+  if (!network) errs.push(WV.wv18)
+  else if ([...network].length > 32) errs.push(WV.wv19)
+  if ([...password].length > 63) errs.push(WV.wv20)
+  if (/^\s|\s$/.test(password)) errs.push(WV.wv21)
+  return { network, errs }
+}
+
 export function wireAdmin(rerender, dayArg) {
   const day = Number(dayArg) === 2 ? 2 : 1
   /* Conference time, not the laptop's. The crew laptop driving this screen is
@@ -2105,6 +2198,32 @@ export function wireAdmin(rerender, dayArg) {
     await brain.setDelay(0, 0, day)
     rerender()
   })
+
+  /* Wi-Fi: Saving… and Save failed — tap to retry are the Help box's own words, reused (spec §5). */
+  const wifiWrite = async (btn, act) => {
+    btn.disabled = true
+    btn.textContent = 'Saving…'
+    try {
+      await act()
+      rerender()
+    } catch (err) {
+      console.error('[admin] wifi', err)
+      btn.disabled = false
+      btn.textContent = 'Save failed — tap to retry'
+    }
+  }
+  document.querySelector('.dbtn[data-wifi-publish]')?.addEventListener('click', (e) => {
+    const { network, errs } = wifiErrors(document.getElementById('adwifinet').value, document.getElementById('adwifipass').value)
+    const box = document.querySelector('.wverr')
+    if (errs.length) {
+      box.textContent = errs.join(' ')
+      return
+    }
+    box.textContent = ''
+    const password = document.getElementById('adwifipass').value
+    wifiWrite(e.currentTarget, () => brain.setWifi(network, password))
+  })
+  document.querySelector('.dbtn[data-wifi-down]')?.addEventListener('click', (e) => wifiWrite(e.currentTarget, () => brain.clearWifi()))
 
   document.querySelector('.dbtn[data-save-contacts]')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget

@@ -2152,3 +2152,46 @@ h1.title .ai::after {
   color: var(--ink-soft);
   font-weight: 500;
 }
+
+/* ---------- Wi-Fi (record 246, spec PGW-WV-001 §3.2, §5): existing tokens only ---------- */
+.wvval {
+  font-size: 18px; /* the .now h3 size */
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-top: 6px;
+  overflow-wrap: anywhere; /* a 32-character network and a 63-character password wrap; never sideways */
+}
+.wvpass {
+  font-family: var(--mono); /* JetBrains Mono: dotted 0, distinct 1 / l / I */
+  letter-spacing: 0;
+  -webkit-user-select: all;
+  user-select: all; /* press-and-hold takes it whole */
+}
+.wvsr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.wvlab {
+  display: block;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--grey);
+}
+.wvinput {
+  margin-top: 6px;
+}
+.wverr {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.wverr:empty {
+  display: none;
+}

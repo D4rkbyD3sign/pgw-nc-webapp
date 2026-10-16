@@ -123,9 +123,18 @@ Each row has editable start and end times. Type over them and it saves as you le
 
 **A hand-edited session ignores the running-late shift entirely.** If you typed 16:15, it stays 16:15 — pressing +10 will not quietly make it 16:25. If you want it to move with everything else, press Reset first.
 
+### Wi-Fi (BUILD 39)
+
+The **Wi-Fi** box sits under the Help numbers. Until it is published, every phone's Wi-Fi page says the details arrive the night before, and the FAQ has no Wi-Fi question.
+
+- **The night before (28 Oct):** type the **Network** and the **Password** exactly as PGW give them, and press **Publish Wi-Fi**. Every phone's Wi-Fi page shows them within a second or two, with a **Copy password** button, and the FAQ gains *What's the Wi-Fi?* (network only; it points to the Wi-Fi page for the password). No build, no push.
+- **It refuses rather than guesses.** It won't save an empty network, a network over 32 characters, a password over 63, or a password that starts or ends with a space (a pasted password often carries one). Fix it and press again. The password is stored exactly as typed, capitals and all.
+- **Phones keep a copy.** A phone that has seen the Wi-Fi once still shows it with no signal (level 12 is exactly where that happens).
+- ⏰ **After the event: press Take it down.** Every phone returns to the waiting message and clears its kept copy the next time it connects. Anyone with the app can read a published Wi-Fi, the same as a card on the registration desk, so don't leave it up.
+
 ### What can't be changed here
 
-Titles, speakers, rooms, Wi-Fi and venue are in the code, not the admin. Changing those still needs Lumen and a push. This was a deliberate choice: a small tool you trust beats a big one you hesitate over while fifty people wait.
+Titles, speakers, rooms and venue are in the code, not the admin (the Wi-Fi is the exception, above). Changing those still needs Lumen and a push. This was a deliberate choice: a small tool you trust beats a big one you hesitate over while fifty people wait.
 
 ### If the cloud is unreachable
 

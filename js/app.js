@@ -26,6 +26,7 @@ import {
   wireAdmin,
   wireCrewFooter,
   wifiView,
+  wireWifi,
   venueView,
 } from './views.js'
 import { icons } from './icons.js'
@@ -71,7 +72,7 @@ const routes = {
   admin: { render: (arg) => adminView(arg), wire: wireAdmin, live: true, auth: true },
   materials: { render: () => stubView('Materials', 'Speaker decks and handouts will appear here as partners share them, before and after each session.') },
   // record 246: the two builder stubs replaced (spec PGW-WV-001 §3, §4)
-  wifi: { render: () => wifiView(), back: '' },
+  wifi: { render: () => wifiView(), wire: wireWifi, back: '', live: true },
   venue: { render: () => venueView(), back: '' },
 }
 

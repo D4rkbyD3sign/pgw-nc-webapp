@@ -23,6 +23,7 @@ import {
   serverTimestamp,
   writeBatch,
   setDoc,
+  deleteDoc,
 } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js'
 import {
   getAuth,
@@ -398,6 +399,77 @@ export function liveContacts() {
 /** Replace the published contact list. Crew-only (enforced by the rules). */
 export async function setContacts(list) {
   await setDoc(contactsRef, { contacts: list })
+}
+
+/* ---------- Wi-Fi (record 246, spec PGW-WV-001 §2, §3.3) ----------
+   live/wifi, the same public-read, crew-write path as the contacts: firestore.rules already covers it
+   (match /events/{eventId}/live/{docId}), so no rules change. Shape { network, password }. A missing doc, or
+   one without a non-empty network, means NOT PUBLISHED. Never in data.js: the public repo keeps history forever.
+
+   KEPT FOR NO SIGNAL: each phone keeps the last published Wi-Fi it saw (localStorage, every touch wrapped).
+   With no connection the page shows the kept copy; with one the live doc always wins. Only a SERVER answer can
+   clear it: an offline listener reports "no doc" from its empty cache (fromCache), and that must never wipe the
+   one thing a phone without signal on level 12 needs. Storage blocked = the page simply waits for the network. */
+const wifiRef = doc(db, 'events', EVENT_ID, 'live', 'wifi')
+const WIFI_KEPT = 'pgw-nc-wifi-kept'
+
+function wifiShape(d) {
+  if (!d || typeof d.network !== 'string' || !d.network.trim()) return null
+  return { network: d.network, password: typeof d.password === 'string' ? d.password : '' }
+}
+function readKept() {
+  try {
+    return wifiShape(JSON.parse(localStorage.getItem(WIFI_KEPT) ?? 'null'))
+  } catch {
+    return null
+  }
+}
+function writeKept(w) {
+  try {
+    if (w) localStorage.setItem(WIFI_KEPT, JSON.stringify(w))
+    else localStorage.removeItem(WIFI_KEPT)
+  } catch {
+    /* storage blocked: nothing kept, nothing lost */
+  }
+}
+
+let wifi = readKept()
+
+onSnapshot(
+  wifiRef,
+  { includeMetadataChanges: true },
+  (snap) => {
+    const before = JSON.stringify(wifi)
+    const w = wifiShape(snap.data())
+    if (w) {
+      wifi = w
+      writeKept(w)
+    } else if (!snap.metadata.fromCache) {
+      wifi = null
+      writeKept(null)
+    }
+    // Notify only on a real change: metadata-only snapshots (pending -> synced, cache -> server) would
+    // otherwise re-render #/admin and wipe what the crew is typing.
+    if (JSON.stringify(wifi) !== before) notify()
+  },
+  (err) => {
+    console.error('[brain] wifi listener', err)
+  },
+)
+
+/** The published Wi-Fi ({network, password}), the kept copy when offline, or null when not published. */
+export function liveWifi() {
+  return wifi
+}
+
+/** Publish the Wi-Fi. Crew-only (enforced by the rules). Values are stored exactly as given. */
+export async function setWifi(network, password) {
+  await setDoc(wifiRef, { network, password })
+}
+
+/** Take it down: every phone returns to holding. Crew-only (enforced by the rules). */
+export async function clearWifi() {
+  await deleteDoc(wifiRef)
 }
 
 /** True when this phone is running older code than the cloud says it should. */
