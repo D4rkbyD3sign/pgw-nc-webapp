@@ -178,7 +178,7 @@ export const sessions = [
   { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-moore'], summary: 'AI in the Advice Practice: Built Live, Ready for Monday' },
   { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
-    id: 'd2-drinks', day: 2, start: '18:00', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
+    id: 'd2-drinks', day: 2, start: '17:30', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
     room: 'Outside Centurion 1, Level 4', org: '', speakerIds: [],
     summary: 'Optional — just outside the Centurion 1 room, before the awards dinner.',
     venue: {
@@ -469,7 +469,7 @@ export const keynoteSpeakers = [
    ⛔ NEVER a mobile, never a personal email: this repo is public and
    attendees never sign in, so anything here is published to the world. */
 const PARTNER_DELEGATES = {
-  pep: [{ name: 'Alexander Brown' }, { name: 'Jack Auton' }],
+  pep: [{ name: 'Alexander Brown' }, { name: 'Thomas Harle' }],
   afic: [{ name: 'Claire Aitchison' }],
   centuria: [{ name: 'Paul Roach' }],
   gyrostat: [{ name: 'Michael Baker' }],
