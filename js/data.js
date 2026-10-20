@@ -151,6 +151,7 @@ export const sessions = [
   { id: 'd1-wrap', day: 1, start: '16:50', end: '17:00', title: 'Day one wrap-up', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
     id: 'd1-cruise', day: 1, start: '18:30', end: '21:30', title: 'Mustique — Luxury Cruising', kind: 'SOCIAL',
+    audience: 'Advisers only',
     room: 'Elizabeth Street Pier', org: '', speakerIds: [],
     summary: 'Thursday evening on the water.',
     venue: {

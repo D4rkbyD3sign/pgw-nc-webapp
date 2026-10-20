@@ -294,6 +294,14 @@ function partnerMark(s) {
   return p ? `<img class="aglogo" src="${p.logo}" alt="${p.name}">` : ''
 }
 
+/* Record 256 (spec §5.5b, Adam 20 Oct): a session's audience note - the Mustique
+   cruise's, today. The words are that session's own `audience` field in data.js,
+   typed ONCE there; absent, empty or not a string = nothing. A NOTE, not a control:
+   a plain span, no link, no tabindex, no role. Our own data.js is trusted and is not
+   passed through esc() (esc.js, spec A §2), exactly as `title` beside it is not. */
+const audTag = (s) =>
+  typeof s?.audience === 'string' && s.audience.trim() ? `<span class="aud">${s.audience.trim()}</span>` : ''
+
 /* `dated` (PRE / EVE, spec §5.2): the row names the DAY instead of "UP NEXT", and
    carries no dot — the dot means live in this app, and nothing here is. */
 function upcomingCard(s, dated = false) {
@@ -305,6 +313,7 @@ function upcomingCard(s, dated = false) {
         ${eventIcon(s) ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
       </div>
       <h3>${s.title}</h3>
+      ${audTag(s)}
       ${isBreak ? `<div class="who"><span class="txt">${s.room}</span></div>` : `
       <div class="who">
         ${s.speakerIds.length ? '<span class="pic"></span>' : ''}
@@ -427,6 +436,7 @@ function homeNowCard(block, live) {
           <span class="tagm">${s.kind}</span>
         </div>
         <h3>${s.title}</h3>
+        ${audTag(s)}
         <div class="who">
           ${s.speakerIds.length ? '<span class="pic"></span>' : ''}
           <span class="txt">${whoLine(s)}</span>
@@ -447,6 +457,7 @@ function homeNowCard(block, live) {
           <span class="evico">${eventIcon(s)}</span>
         </div>
         <h3>${s.title}</h3>
+        ${audTag(s)}
         <div class="who"><span class="txt">${s.room}</span></div>
         ${block.next ? `<p class="nownext">Next up — <b>${block.next.title}</b> at ${esc(block.next.start)}.</p>` : ''}
       </div>`
@@ -625,6 +636,7 @@ export function agendaView(dayArg) {
             ${social ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
           </div>
           <h3>${s.title}</h3>
+          ${audTag(s)}
           <div class="who"><span class="txt">${whoLine(s)}</span>${partnerMark(s)}</div>
         </a>
       </div>`
@@ -843,6 +855,7 @@ export function tonightView(dayArg) {
         <span class="live"><span class="evico">${eventIcon(social)}</span>${esc(social.start)} · ${social.title}</span>
         <span class="tagm">${v.dress ?? ''}</span>
       </div>
+      ${audTag(social)}
       <h3>${v.name ?? social.room}</h3>
       <div class="who">
         <span class="txt">${v.address ?? ''}</span>
@@ -869,6 +882,7 @@ export function sessionView(id) {
     <div class="stub">
       <span class="eyebrow">${s.kind} · ${esc(s.start)}–${esc(s.end)} · ${s.room}</span>
       <h2 style="margin-top:12px">${s.title}</h2>
+      ${audTag(s)}
       <p>${s.summary || ''}</p>
     </div>
     ${sps

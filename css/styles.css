@@ -234,6 +234,24 @@ h1.title .ai::after {
   color: var(--grey-light);
   letter-spacing: 0.05em;
 }
+/* Record 256 (spec §5.5b): the audience note. Lime FILL, ink TEXT (never lime text on
+   a light ground), NO shadow. The landing's shape, from the app's own tokens (the app's
+   --lime and --ink equal the landing's). A note, not a control. On its own line under
+   the title it belongs to. */
+.aud {
+  display: inline-block;
+  background: var(--lime);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  white-space: nowrap;
+  margin-top: 8px;
+}
 .now h3 {
   font-size: 18px;
   font-weight: 500;
