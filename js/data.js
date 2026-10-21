@@ -137,13 +137,13 @@ export const sessions = [
   { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-landowski'], summary: '' },
   { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook' },
   { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:15', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:15', end: '11:35', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
+  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:15', end: '11:35', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: ['pep-brown'], summary: 'Topic to be announced.' },
   { id: 'd1-openmarkets', partnerId: 'openmarkets', day: 1, start: '11:35', end: '11:55', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Tokenisation of real-world assets' },
   { id: 'd1-spotlight', day: 1, start: '11:55', end: '12:15', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', guest: 'Matthew Byrne', speakerIds: [], summary: 'With Matthew Byrne.' },
   { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:15', end: '13:00', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Structural weakness in retirement portfolio construction — the SMILE risks: Sequencing, Market, Inflation, Longevity, Emotional' },
   { id: 'd1-lunch', day: 1, start: '13:00', end: '13:45', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-panel-1', day: 1, start: '13:45', end: '14:20', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: 'PGW', speakerIds: [], summary: 'Panel and topic to be announced.' },
-  { id: 'd1-wam', partnerId: 'wam', day: 1, start: '14:20', end: '14:40', title: 'Wilson Asset Management', kind: 'PLENARY', room: GB, org: 'Wilson Asset Management', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd1-wam', partnerId: 'wam', day: 1, start: '14:20', end: '14:40', title: 'Wilson Asset Management', kind: 'PLENARY', room: GB, org: 'Wilson Asset Management', speakerIds: [], summary: 'Two Sides to Investing in AI' },
   { id: 'd1-paradino', partnerId: 'paradino', day: 1, start: '14:40', end: '15:25', title: 'Paradino', kind: 'PLENARY', room: GB, org: 'Paradino', speakerIds: [], summary: 'The little things that make AI work in advice — a practical session with workflow examples, adviser use cases and Q&A' },
   { id: 'd1-arvo-tea', day: 1, start: '15:25', end: '15:50', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd1-panel-2', day: 1, start: '15:50', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['ellerston-coggins', 'russell-gamboa', 'afm-gosselin'], summary: 'Topic to be announced.' },
@@ -166,17 +166,17 @@ export const sessions = [
   // ---- Day 2 · Fri 30 Oct · 9:00am to 4:50pm (v3 agenda table, 30 Sep) ----
   { id: 'd2-welcome', day: 2, start: '09:00', end: '09:10', title: 'Welcome back & recap', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   { id: 'd2-macquarie', partnerId: 'macquarie', day: 2, start: '09:10', end: '09:30', title: 'Macquarie', kind: 'PLENARY', room: GB, org: 'Macquarie', speakerIds: [], summary: 'The ‘modern heist’: Safeguarding your practice, your clients, and their wealth' },
-  { id: 'd2-pep', partnerId: 'pep', day: 2, start: '09:30', end: '10:15', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: [], summary: 'Choosing the Winners: The Art of Manager Selection' },
+  { id: 'd2-pep', partnerId: 'pep', day: 2, start: '09:30', end: '10:15', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: ['pep-blanks'], summary: 'Choosing the Winners: The Art of Manager Selection' },
   { id: 'd2-tal', partnerId: 'tal', day: 2, start: '10:15', end: '10:35', title: 'TAL', kind: 'PLENARY', room: GB, org: 'TAL', speakerIds: [], summary: 'Life insurance market update' },
   { id: 'd2-morning-tea', day: 2, start: '10:35', end: '11:05', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
   { id: 'd2-afic', partnerId: 'afic', day: 2, start: '11:05', end: '11:50', title: 'AFIC', kind: 'PLENARY', room: GB, org: 'AFIC', speakerIds: [], summary: 'Technology insights from the recent company profit reporting season' },
   { id: 'd2-millbrook', partnerId: 'millbrook', day: 2, start: '11:50', end: '12:10', title: 'Millbrook Group', kind: 'PLENARY', room: GB, org: 'Millbrook Group', speakerIds: [], summary: 'Building resilient portfolios: the growing role of private credit' },
   { id: 'd2-lunch', day: 2, start: '13:00', end: '14:00', title: 'Lunch', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd2-hub24', partnerId: 'hub24', day: 2, start: '12:10', end: '12:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Topic to be announced.' },
+  { id: 'd2-hub24', partnerId: 'hub24', day: 2, start: '12:10', end: '12:55', title: 'HUB24', kind: 'PLENARY', room: GB, org: 'HUB24', speakerIds: [], summary: 'Why Advice Productivity Needs a New Approach' },
   { id: 'd2-trilogy', partnerId: 'trilogy', day: 2, start: '14:00', end: '14:20', title: 'Trilogy Funds', kind: 'PLENARY', room: GB, org: 'Trilogy Funds', speakerIds: [], summary: 'The Road Ahead - Opportunities in Property & Private Credit' },
-  { id: 'd2-keynote-close-1', day: 2, start: '14:20', end: '15:00', title: 'Closing Keynote Part 1', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-moore'], summary: 'AI in the Advice Practice: Built Live, Ready for Monday' },
+  { id: 'd2-keynote-close-1', day: 2, start: '14:20', end: '15:00', title: 'AI in the Advice Practice: Built Live Part 1', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-moore'], summary: 'AI in the Advice Practice: Built Live, Ready for Monday' },
   { id: 'd2-arvo-tea', day: 2, start: '15:00', end: '15:30', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'Closing Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-moore'], summary: 'AI in the Advice Practice: Built Live, Ready for Monday' },
+  { id: 'd2-keynote-close', day: 2, start: '15:30', end: '16:30', title: 'AI in the Advice Practice: Built Live Part 2', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-moore'], summary: 'AI in the Advice Practice: Built Live, Ready for Monday' },
   { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
     id: 'd2-drinks', day: 2, start: '17:30', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
@@ -233,7 +233,8 @@ export const partners = [
     topic: 'Choosing the Winners: The Art of Manager Selection',
     speakers: [
       { name: 'Cameron Blanks', photo: 'img/speakers/2026/pep-blanks.jpg', title: 'Managing Director', bio: 'Cameron joined Pacific Equity Partners in 2002. Prior to joining PEP, Cameron spent three years with Bain & Company in Australia and North America. Previously, Cameron worked for seven years in the mining and construction industry in Australia, Asia and North America. He received an MBA from MIT Sloan, and a MEng and BEng (First Class Honours) from the University of South Australia where he was a Graduate Society Scholar.' },
-      // One presenter for PEP (confirmed 7 Oct).
+      { name: 'Alexander Brown', photo: 'img/speakers/2026/pep-brown.jpg', title: 'Director', bio: "Alexander has over 10 years' sales experience in the finance industry, gaining experience in various roles across markets, investment management and private wealth in both large global organisations as well as domestic boutique ones. His responsibilities have covered areas of account management, new business sales and team leadership across his different employers. Alexander holds a Master of Applied Finance from Macquarie University and a Bachelor of Economics from the University of Newcastle." },
+      // Two presenters for PEP (booklet, 21 Oct): Alexander Brown on Thursday, Cameron Blanks on Friday.
     ],
   },
   {
@@ -284,6 +285,7 @@ export const partners = [
   {
     id: 'hub24', name: 'HUB24', logo: 'img/partners/2026/hub24.png',
     blurb: 'HUB24 is a leading provider of integrated platform and technology solutions for financial advisers, offering a flexible and innovative investment platform designed to improve efficiency and deliver better client outcomes. Backed by award-winning functionality and a strong focus on adviser experience, HUB24 helps simplify complexity and drive better financial futures.',
+    topic: 'Why Advice Productivity Needs a New Approach',
     // Joint presentation. Both profiles carry the shared HUB24 bio from the 2026 booklet.
     speakers: [
       { name: 'Jack Rooke', photo: 'img/speakers/2026/hub24-rooke.jpg', title: 'Business Development Manager', bio: 'Jack Rooke and Luke Peterson are Business Development Managers at HUB24, partnering with financial advisers across NSW, ACT and QLD to help grow and streamline their businesses through innovative platform, investment and technology solutions. Passionate about building strong adviser relationships and delivering positive client outcomes, they work closely with practices to drive efficiency, support business growth, and help advisers unlock the full potential of the HUB24 ecosystem.' },
@@ -360,6 +362,7 @@ export const partners = [
   {
     id: 'wam', name: 'Wilson Asset Management', logo: 'img/partners/2026/wam.png',
     blurb: 'Established in 1997 by Geoff Wilson AO, Wilson Asset Management is an independently owned investment manager based in Sydney, Australia. As the investment manager for nine leading listed investment companies (LICs) listed on the ASX and three unlisted funds, Wilson Asset Management invests $6 billion on behalf of more than 130,000 retail investors. Wilson Asset Management created and is the lead supporter of the first LICs to deliver both investment and social returns: Future Generation Australia (ASX: FGX) and Future Generation Global (ASX: FGG), as well as Future Generation Women.',
+    topic: 'Two Sides to Investing in AI',
     speakers: [
       { name: 'Chris Boyd', photo: 'img/speakers/2026/wam-boyd.jpg', title: 'Investment Specialist', bio: "Chris Boyd is an Investment Specialist at Wilson Asset Management (WAM), where he works closely with financial advisers, research houses, consultants and professional investors across Australia. With more than 25 years of experience in investment management and wealth distribution, Chris has held senior distribution roles at Pengana Capital Group, HMC Capital and Schroders. He specialises in helping advisers access differentiated investment solutions and is actively involved in the growth of WAM's alternative investment capabilities, including the WAM Founders Fund and WAM Real Assets Fund." },
     ],
@@ -470,7 +473,7 @@ export const keynoteSpeakers = [
    ⛔ NEVER a mobile, never a personal email: this repo is public and
    attendees never sign in, so anything here is published to the world. */
 const PARTNER_DELEGATES = {
-  pep: [{ name: 'Alexander Brown' }, { name: 'Thomas Harle' }],
+  pep: [{ name: 'Thomas Harle' }],
   afic: [{ name: 'Claire Aitchison' }],
   centuria: [{ name: 'Paul Roach' }],
   gyrostat: [{ name: 'Michael Baker' }],
