@@ -465,7 +465,7 @@ export const keynoteSpeakers = [
    29 Sep: listed under Speakers & Delegates so advisers can find them;
    the BDMs want to be contactable. Same tier order as the partners.
    NAME only (the sheet carries no delegate titles); "TBA"/"N/A" left out.
-   26 Oct: Paul Turner (GDA) carries a photo, on Adam's ruling (GDA's only representative, a sponsor); other delegates get one only if Adam supplies it.
+   26 Oct: every delegate carries a photo (480×480), name and photo only.
 
    CONTACT SLOT — speakers and delegates alike may carry `linkedin` (public
    profile URL) or `email` (WORK email). EMPTY today on purpose: each one goes
@@ -474,15 +474,15 @@ export const keynoteSpeakers = [
    ⛔ NEVER a mobile, never a personal email: this repo is public and
    attendees never sign in, so anything here is published to the world. */
 const PARTNER_DELEGATES = {
-  pep: [{ name: 'Thomas Harle' }],
-  afic: [{ name: 'Claire Aitchison' }],
-  centuria: [{ name: 'Paul Roach' }],
-  gyrostat: [{ name: 'Michael Baker' }],
-  macquarie: [{ name: 'Brendon Pocock' }],
-  millbrook: [{ name: 'Peter Smirnios' }],
-  mst: [{ name: 'John Meagher' }],
-  paradino: [{ name: 'Kieren Samways' }],
-  wam: [{ name: 'Tomasina East' }],
+  pep: [{ name: 'Thomas Harle', photo: 'img/speakers/2026/pep-harle.jpg' }],
+  afic: [{ name: 'Claire Aitchison', photo: 'img/speakers/2026/afic-aitchison.jpg' }],
+  centuria: [{ name: 'Paul Roach', photo: 'img/speakers/2026/centuria-roach.jpg' }],
+  gyrostat: [{ name: 'Michael Baker', photo: 'img/speakers/2026/gyrostat-baker.jpg' }],
+  macquarie: [{ name: 'Brendon Pocock', photo: 'img/speakers/2026/macquarie-pocock.jpg' }],
+  millbrook: [{ name: 'Peter Smirnios', photo: 'img/speakers/2026/millbrook-smirnios.jpg' }],
+  mst: [{ name: 'John Meagher', photo: 'img/speakers/2026/mst-meagher.jpg' }],
+  paradino: [{ name: 'Kieren Samways', photo: 'img/speakers/2026/paradino-samways.jpg' }],
+  wam: [{ name: 'Tomasina East', photo: 'img/speakers/2026/wam-east.jpg' }],
   gda: [{ name: 'Paul Turner', photo: 'img/speakers/2026/gda-turner.jpg' }],
 }
 export const delegates = partners.flatMap((p) =>
