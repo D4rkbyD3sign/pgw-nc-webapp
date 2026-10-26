@@ -465,6 +465,7 @@ export const keynoteSpeakers = [
    29 Sep: listed under Speakers & Delegates so advisers can find them;
    the BDMs want to be contactable. Same tier order as the partners.
    NAME only (the sheet carries no delegate titles); "TBA"/"N/A" left out.
+   26 Oct: Paul Turner (GDA) carries a photo, on Adam's ruling (GDA's only representative, a sponsor); other delegates get one only if Adam supplies it.
 
    CONTACT SLOT — speakers and delegates alike may carry `linkedin` (public
    profile URL) or `email` (WORK email). EMPTY today on purpose: each one goes
@@ -482,6 +483,7 @@ const PARTNER_DELEGATES = {
   mst: [{ name: 'John Meagher' }],
   paradino: [{ name: 'Kieren Samways' }],
   wam: [{ name: 'Tomasina East' }],
+  gda: [{ name: 'Paul Turner', photo: 'img/speakers/2026/gda-turner.jpg' }],
 }
 export const delegates = partners.flatMap((p) =>
   (PARTNER_DELEGATES[p.id] ?? []).map((d) => ({
