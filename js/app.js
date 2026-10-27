@@ -28,8 +28,11 @@ import {
   wifiView,
   wireWifi,
   venueView,
+  materialsView,
 } from './views.js'
 import { icons } from './icons.js'
+import { conference, sessions, conferenceNow } from './data.js'
+import { esc } from './esc.js'
 import { onChange, onAuthChange, user, authReadyYet, updateAvailable, buildState } from './brain.js'
 
 const view = document.getElementById('view')
@@ -70,7 +73,7 @@ const routes = {
   // wire added 2026-07-28 purely to carry the sign-out; results had no wiring before.
   results: { render: () => resultsView(), wire: wireCrewFooter, live: true, auth: true },
   admin: { render: (arg) => adminView(arg), wire: wireAdmin, live: true, auth: true },
-  materials: { render: () => stubView('Materials', 'Speaker decks and handouts will appear here as partners share them, before and after each session.') },
+  materials: { render: () => materialsView() },
   // record 246: the two builder stubs replaced (spec PGW-WV-001 §3, §4)
   wifi: { render: () => wifiView(), wire: wireWifi, back: '', live: true },
   venue: { render: () => venueView(), back: '' },
@@ -174,6 +177,7 @@ function render() {
   // Route change can flip screenmode on or off, which decides whether the
   // update bar is allowed to show at all.
   renderUpdatebar()
+  checkNotice()
 }
 
 /* ---------- the update bar (version beacon, SCOPE.md discipline point 2) ----------
@@ -226,6 +230,82 @@ function renderUpdatebar() {
     updatebar.dataset.wired = '1'
   }
 }
+
+/* ---------- the cruise notice (27 Oct) ----------
+   Thursday 17:30 to 18:30 conference time, the hour before the cruise departs:
+   one calm sheet, once per phone, dismissed with one tap (Got it, the backdrop
+   or Escape). Attendees never sign in, so everyone open in that hour sees it;
+   the heading says who it is for. Never over the room screen, never on a crew
+   route. Its body is the cruise's own `summary` in data.js, so the words live
+   in one place. Checked on every render, when a pocketed phone wakes, and once
+   a minute (Home's 30-second tick runs on Home only). Storage can throw in a
+   private window: then `noticeDone` holds the dismissal for this page load. */
+const CRUISE = sessions.find((s) => s.id === 'd1-cruise')
+const NOTICE_DATE = conference.days.find((d) => d.day === 1)?.date
+const NOTICE_FROM = 17 * 60 + 30 // 1050
+const NOTICE_UNTIL = 18 * 60 + 30 // 1110, departure
+const NOTICE_KEY = 'pgw-nc-cruise-notice-2026'
+let noticeDone = false
+let noticeEl = null
+
+function noticeStored() {
+  try {
+    return localStorage.getItem(NOTICE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function noticeKey(e) {
+  if (e.key === 'Escape') closeNotice(true)
+}
+
+/* `remember` = the reader dismissed it. Leaving for the room screen or a crew
+   route only takes it down, so it can show again back on a public page. */
+function closeNotice(remember) {
+  if (noticeEl) {
+    noticeEl.remove()
+    noticeEl = null
+    document.removeEventListener('keydown', noticeKey)
+  }
+  if (!remember) return
+  noticeDone = true
+  try {
+    localStorage.setItem(NOTICE_KEY, '1')
+  } catch {
+    // private window: noticeDone holds it for this page load
+  }
+}
+
+function checkNotice() {
+  const route = routes[currentPath().split('/')[0]] ?? routes['']
+  if (route.auth || app.classList.contains('screenmode')) return closeNotice(false)
+  if (noticeEl || noticeDone || noticeStored() || !CRUISE) return
+  const { date, nowMin } = conferenceNow()
+  if (date !== NOTICE_DATE || nowMin < NOTICE_FROM || nowMin >= NOTICE_UNTIL) return
+  noticeEl = document.createElement('div')
+  noticeEl.innerHTML = `
+    <div class="cnback" data-cn-back></div>
+    <div class="now cnsheet" role="dialog" aria-modal="true" aria-labelledby="cn-title">
+      <h3 id="cn-title">Advisers’ cruise tonight</h3>
+      <p class="spbio">${esc(CRUISE.summary)}</p>
+      <div class="cnacts">
+        <button type="button" class="ubbtn" data-cn-ok>Got it</button>
+        ${CRUISE.venue?.mapUrl ? `<a class="pill" href="${esc(CRUISE.venue.mapUrl)}" target="_blank" rel="noopener">Open map</a>` : ''}
+      </div>
+    </div>`
+  document.body.appendChild(noticeEl)
+  const ok = noticeEl.querySelector('[data-cn-ok]')
+  ok.addEventListener('click', () => closeNotice(true))
+  noticeEl.querySelector('[data-cn-back]').addEventListener('click', () => closeNotice(true))
+  document.addEventListener('keydown', noticeKey)
+  ok.focus()
+}
+
+setInterval(checkNotice, 60_000)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) checkNotice()
+})
 
 // A permanent subscription, unlike the per-route one below: the beacon has to
 // be able to speak on Home and Agenda too, not only on the live crew screens.

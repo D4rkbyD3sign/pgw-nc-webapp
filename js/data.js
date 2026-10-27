@@ -137,7 +137,7 @@ export const sessions = [
   { id: 'd1-keynote-open', day: 1, start: '08:45', end: '10:05', title: 'Opening Keynote', kind: 'KEYNOTE', room: GB, org: '', speakerIds: ['keynote-landowski'], summary: '' },
   { id: 'd1-mst', partnerId: 'mst', day: 1, start: '10:05', end: '10:50', title: 'MST Financial', kind: 'KEYNOTE', room: GB, org: 'MST Financial', speakerIds: [], summary: 'Bonds, Bathla & AI Bonanza — Mega forces shaping Australia’s growth outlook' },
   { id: 'd1-morning-tea', day: 1, start: '10:50', end: '11:15', title: 'Morning tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:15', end: '11:35', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: ['pep-brown'], summary: 'Topic to be announced.' },
+  { id: 'd1-pep', partnerId: 'pep', day: 1, start: '11:15', end: '11:35', title: 'Pacific Equity Partners', kind: 'PLENARY', room: GB, org: 'Pacific Equity Partners', speakerIds: ['pep-brown'], summary: 'AI Use Cases at PEP' },
   { id: 'd1-openmarkets', partnerId: 'openmarkets', day: 1, start: '11:35', end: '11:55', title: 'Open Markets', kind: 'PLENARY', room: GB, org: 'Open Markets', speakerIds: [], summary: 'Tokenisation of real-world assets' },
   { id: 'd1-spotlight', day: 1, start: '11:55', end: '12:15', title: 'Adviser Spotlight', kind: 'SPOTLIGHT', room: GB, org: '', guest: 'Matthew Byrne', speakerIds: [], summary: 'With Matthew Byrne.' },
   { id: 'd1-gyrostat', partnerId: 'gyrostat', day: 1, start: '12:15', end: '13:00', title: 'Gyrostat', kind: 'PLENARY', room: GB, org: 'Gyrostat', speakerIds: [], summary: 'Structural weakness in retirement portfolio construction — the SMILE risks: Sequencing, Market, Inflation, Longevity, Emotional' },
@@ -146,20 +146,21 @@ export const sessions = [
   { id: 'd1-wam', partnerId: 'wam', day: 1, start: '14:20', end: '14:40', title: 'Wilson Asset Management', kind: 'PLENARY', room: GB, org: 'Wilson Asset Management', speakerIds: [], summary: 'Two Sides to Investing in AI' },
   { id: 'd1-paradino', partnerId: 'paradino', day: 1, start: '14:40', end: '15:25', title: 'Paradino', kind: 'PLENARY', room: GB, org: 'Paradino', speakerIds: [], summary: 'The little things that make AI work in advice — a practical session with workflow examples, adviser use cases and Q&A' },
   { id: 'd1-arvo-tea', day: 1, start: '15:25', end: '15:50', title: 'Afternoon tea', kind: 'BREAK', room: AT, org: '', speakerIds: [], summary: '' },
-  { id: 'd1-panel-2', day: 1, start: '15:50', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['ellerston-coggins', 'russell-gamboa', 'afm-gosselin'], summary: 'Topic to be announced.' },
+  { id: 'd1-panel-2', day: 1, start: '15:50', end: '16:30', title: 'Panel Discussion', kind: 'PANEL', room: GB, org: '', speakerIds: ['ellerston-coggins', 'russell-gamboa', 'afm-gosselin'], summary: 'Follow the AI Dollar' },
   { id: 'd1-centuria', partnerId: 'centuria', day: 1, start: '16:30', end: '16:50', title: 'Centuria', kind: 'PLENARY', room: GB, org: 'Centuria', speakerIds: [], summary: 'Protected Cropping: Where Agriculture Meets Technology' },
   { id: 'd1-wrap', day: 1, start: '16:50', end: '17:00', title: 'Day one wrap-up', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
     id: 'd1-cruise', day: 1, start: '18:30', end: '21:30', title: 'Mustique — Luxury Cruising', kind: 'SOCIAL',
     audience: 'Advisers only',
     room: 'Elizabeth Street Pier', org: '', speakerIds: [],
-    summary: 'Thursday evening on the water.',
+    summary: 'Board from 6.15pm for a 6.30pm departure. The vessel is at the far end of Elizabeth Street Pier, on the north-facing side: the Fish Frenzy side, not the Salamanca Place side.',
     venue: {
       // The PLACE, not the operator — the title already carries "Mustique",
       // and the thing an adviser needs at 6pm is where to walk to.
       name: 'Elizabeth Street Pier',
       address: 'Elizabeth Street Pier, Hobart TAS 7000',
       mapUrl: 'https://maps.google.com/?q=Elizabeth+Street+Pier+Hobart',
+      dress: 'Business casual',
     },
   },
 
@@ -180,6 +181,7 @@ export const sessions = [
   { id: 'd2-close', day: 2, start: '16:30', end: '16:50', title: 'Conference close & key takeaways', kind: 'PLENARY', room: GB, org: 'PGW', speakerIds: [], summary: '' },
   {
     id: 'd2-drinks', day: 2, start: '17:30', end: '18:30', title: 'Pre-dinner drinks', kind: 'SOCIAL',
+    sponsorId: 'gda',
     room: 'Outside Centurion 1, Level 4', org: '', speakerIds: [],
     summary: 'Optional — just outside the Centurion 1 room, before the awards dinner.',
     venue: {
@@ -270,9 +272,9 @@ export const partners = [
     ],
   },
   {
-    // New on the 29 Sep sheet — a partner with nothing else supplied yet
-    // (29 Sep). Logo only.
+    // Blurb from PGW's partner sheet (27 Oct). No speakers; one delegate.
     id: 'gda', name: 'GDA', logo: 'img/partners/2026/gda.png',
+    blurb: 'GDA Securities is an experienced fund manager that has been specialising in funds management and direct property investments in Australia since 2003. GDA Securities has a long track record of developing and managing high-quality property investment solutions for both retail and wholesale investors. GDA Securities is a subsidiary of GDA Group.  GDA Group is a multifaceted financial services organisation that has been in operation since 1993.',
   },
   {
     id: 'gyrostat', name: 'Gyrostat', logo: 'img/partners/2026/gyrostat.png',
@@ -428,9 +430,12 @@ export const crewContacts = [
   { id: 'graham', name: 'Adam Graham' },
 ]
 
-export const materials = [
-  { id: 'm1', sessionId: 'd1-stropro', label: 'Deck — Maximising Opportunities with Structured Products', type: 'deck', url: '#' },
-  { id: 'm2', sessionId: 'd2-gyrostat', label: 'Handout — Portfolio Construction for Lower Risk Investors', type: 'handout', url: '#' },
+/* Sessions whose slides PGW holds. 27 Oct: the Materials tab lists these with
+   "available after the conference", not a link. Paradino (live demo), the
+   panels and the keynotes have no deck, so they are not listed. */
+export const slidesAfterConference = [
+  'd1-mst', 'd1-pep', 'd1-openmarkets', 'd1-gyrostat', 'd1-wam', 'd1-centuria',
+  'd2-macquarie', 'd2-pep', 'd2-tal', 'd2-afic', 'd2-millbrook', 'd2-hub24', 'd2-trilogy',
 ]
 
 /** Every presenter, derived from the partners above. Ids are stable
@@ -459,6 +464,11 @@ export function speakerById(id) {
 export const keynoteSpeakers = [
   {"id": "keynote-landowski", "name": "Dr Lila Landowski", "title": "Neuroscientist", "org": "University of Tasmania", "orgShort": "University of Tasmania", "photo": "img/speakers/2026/keynote-landowski.jpg", "bio": "Dr Lila Landowski is a multi-award-winning neuroscientist and senior lecturer at the University of Tasmania, Board Director of Science & Technology Australia, World Health Organisation Fides health ambassador and Executive Director of the Australian Brain Alliance. Passionate about making science useful in everyday life, Lila brings brain science to millions through radio, TV screens, podcasts and live events. Her TEDx talk on the neuroscience of learning faster is the #3 most-watched TEDx talk in the world since it came out in 2023. As a keynote speaker, she is trusted by Fortune 500 and ASX 50 companies, governments, athletes and leaders to translate neuroscience into practical strategies for optimising performance. An Australian Museum Eureka Award winner, Lila is on a mission to make brain science accessible to everyone.", "role": "keynote"},
   {"id": "keynote-moore", "name": "Julian Moore", "title": "Chief AI Consultant", "org": "Strategic Membership Solutions", "orgShort": "Strategic Membership Solutions", "photo": "img/speakers/2026/keynote-moore.jpg", "bio": "Julian Moore is one of Australasia’s leading experts in the practical application of AI across corporates, government, and associations. Known for his engaging, story-driven keynotes featuring trademark live demonstrations - where AI tools are built in front of the audience - Julian helps organisations embed AI into their operations, customer and member engagement, and new revenue streams. Beyond the stage, Julian works directly with leadership teams as Chief AI Consultant at Strategic Membership Solutions, guiding organisations through the practical realities of adopting AI - from identifying the right opportunities to building the skills and confidence to act on them. His focus is always on what works in practice, not theory, and audiences consistently leave his sessions with tools and ideas they can apply immediately.", "role": "keynote"},
+]
+
+/* Adviser Spotlight guest (27 Oct): initials, firm and firm logo only. */
+export const guestSpeakers = [
+  { id: 'guest-byrne', name: 'Matthew Byrne', org: 'Pure Advice', orgShort: 'Pure Advice', orgLogo: 'img/advisers/pure-advice.png', role: 'guest' },
 ]
 
 /* Non-speaking DELEGATES — sheet columns G/H (Delegate 2/3), 29 Sep sheet.
@@ -497,9 +507,9 @@ export const delegates = partners.flatMap((p) =>
   })),
 )
 
-/** A speaker, a keynote speaker OR a delegate: the person page serves all three. */
+/** A speaker, a keynote speaker, a guest OR a delegate: the person page serves all four. */
 export function personById(id) {
-  return speakerById(id) ?? keynoteSpeakers.find((k) => k.id === id) ?? delegates.find((d) => d.id === id)
+  return speakerById(id) ?? keynoteSpeakers.find((k) => k.id === id) ?? guestSpeakers.find((g) => g.id === id) ?? delegates.find((d) => d.id === id)
 }
 
 /** Who is presenting a session: named speakers if the agenda names any,

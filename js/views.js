@@ -1,4 +1,4 @@
-import { conference, sessions, speakers, speakerById, keynoteSpeakers, delegates, personById, speakersForSession, partners, partnerById, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow, CONFERENCE_TZ } from './data.js'
+import { conference, sessions, speakers, speakerById, keynoteSpeakers, guestSpeakers, delegates, slidesAfterConference, personById, speakersForSession, partners, partnerById, socialsForDay, upcomingAfter, agendaForDay, baseTimes, crewContacts, welcome, conferenceNow, CONFERENCE_TZ } from './data.js'
 import { icons } from './icons.js'
 import * as brain from './brain.js'
 import { esc } from './esc.js'
@@ -198,8 +198,8 @@ export function liveSession(now = new Date()) {
 }
 
 /* ---------- what is ACTUALLY happening right now ----------
-   (Adam's ruling, 2026-08-21: "only allow questions asked about the current
-   session.")
+   (decided 2026-08-21: only questions about the current
+   session are allowed.)
 
    liveSession() above answers "what should the room screen show", and it
    deliberately invents a session when nothing is on so a projector never sits
@@ -302,6 +302,17 @@ function partnerMark(s) {
 const audTag = (s) =>
   typeof s?.audience === 'string' && s.audience.trim() ? `<span class="aud">${s.audience.trim()}</span>` : ''
 
+/* A session's sponsor line (27 Oct; Friday's drinks today): the partner named by its
+   `sponsorId`, linked to that partner's page, in the audience note's styling. On a
+   surface that is itself a link (the Agenda card) it is a plain span: a link may not
+   sit inside a link. No sponsor, or one that does not resolve = nothing. */
+const sponsorTag = (s, link = true) => {
+  const p = s?.sponsorId ? partnerById(s.sponsorId) : null
+  if (!p) return ''
+  const words = `Sponsored by ${esc(p.short ?? p.name)}`
+  return link ? `<a class="aud" href="#/partner/${esc(p.id)}">${words}</a>` : `<span class="aud">${words}</span>`
+}
+
 /* `dated` (PRE / EVE, spec §5.2): the row names the DAY instead of "UP NEXT", and
    carries no dot — the dot means live in this app, and nothing here is. */
 function upcomingCard(s, dated = false) {
@@ -313,7 +324,7 @@ function upcomingCard(s, dated = false) {
         ${eventIcon(s) ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
       </div>
       <h3>${s.title}</h3>
-      ${audTag(s)}
+      ${audTag(s)}${sponsorTag(s)}
       ${isBreak ? `<div class="who"><span class="txt">${s.room}</span></div>` : `
       <div class="who">
         ${s.speakerIds.length ? '<span class="pic"></span>' : ''}
@@ -436,7 +447,7 @@ function homeNowCard(block, live) {
           <span class="tagm">${s.kind}</span>
         </div>
         <h3>${s.title}</h3>
-        ${audTag(s)}
+        ${audTag(s)}${sponsorTag(s)}
         <div class="who">
           ${s.speakerIds.length ? '<span class="pic"></span>' : ''}
           <span class="txt">${whoLine(s)}</span>
@@ -457,7 +468,7 @@ function homeNowCard(block, live) {
           <span class="evico">${eventIcon(s)}</span>
         </div>
         <h3>${s.title}</h3>
-        ${audTag(s)}
+        ${audTag(s)}${sponsorTag(s)}
         <div class="who"><span class="txt">${s.room}</span></div>
         ${block.next ? `<p class="nownext">Next up — <b>${block.next.title}</b> at ${esc(block.next.start)}.</p>` : ''}
       </div>`
@@ -528,7 +539,7 @@ export function homeView() {
         </a>
         <a href="#/speakers" class="tile">
           <div class="ico">${icons.speakers}</div>
-          <div><div class="n">Speakers &amp; Delegates</div><div class="s">${speakers.length + keynoteSpeakers.length} speakers · ${delegates.length} delegates</div></div>
+          <div><div class="n">Speakers &amp; Delegates</div><div class="s">${speakers.length + keynoteSpeakers.length + guestSpeakers.length} speakers · ${delegates.length} delegates</div></div>
         </a>
         <a href="#/tonight/${eveDay}" class="tile tonight">
           <div class="ico">${icons.dinner}</div>
@@ -636,7 +647,7 @@ export function agendaView(dayArg) {
             ${social ? `<span class="evico">${eventIcon(s)}</span>` : `<span class="tagm">${s.kind}</span>`}
           </div>
           <h3>${s.title}</h3>
-          ${audTag(s)}
+          ${audTag(s)}${sponsorTag(s, false)}
           <div class="who"><span class="txt">${whoLine(s)}</span>${partnerMark(s)}</div>
         </a>
       </div>`
@@ -688,13 +699,10 @@ document.addEventListener('click', (e) => {
   if (Array.isArray(m) && m.length === 2) location.href = 'mailto:' + m[0] + '@' + m[1]
 })
 
-export function speakersView() {
-  /* 2026: derived from the partners (see data.js), in partner TIER order.
-     Title and bio are present only where PGW's sheet carries them — a blank
-     is a missing line, never filler. Delegates (29 Sep) are the partners'
-     non-speaking people, sectioned below the speakers. Contact appears only
-     through contactBlock on the person page — never a mobile. */
-  const card = (s) => `
+/* One person's card (photo or initials, name, title · org, bio clamped), linking to
+   their page. Shared by Speakers & Delegates and a partner's own page (27 Oct). */
+function personCard(s) {
+  return `
       <a href="#/speaker/${s.id}" class="spcard">
         ${s.photo ? `<img class="spavatar" src="${s.photo}" alt="${s.name}">` : `<span class="spavatar spinit">${initials(s.name)}</span>`}
         <div class="spbody">
@@ -703,15 +711,26 @@ export function speakersView() {
           ${s.bio ? `<p class="spbio clamp">${s.bio}</p>` : ''}
         </div>
       </a>`
+}
+
+export function speakersView() {
+  /* 2026: derived from the partners (see data.js), in partner TIER order.
+     Title and bio are present only where PGW's sheet carries them — a blank
+     is a missing line, never filler. Delegates (29 Sep) are the partners'
+     non-speaking people, sectioned below the speakers. Contact appears only
+     through contactBlock on the person page — never a mobile. */
+  const card = personCard
 
   return `
     <div class="pagehead">
       <h2>Speakers &amp; Delegates</h2>
-      <p class="sub">${speakers.length + keynoteSpeakers.length} presenting · ${delegates.length} more from our partners</p>
+      <p class="sub">${speakers.length + keynoteSpeakers.length + guestSpeakers.length} presenting · ${delegates.length} more from our partners</p>
     </div>
     ${keynoteSpeakers.length ? `
     <span class="lab">// Keynote</span>
-    <div class="splist">${keynoteSpeakers.map(card).join('')}</div>
+    <div class="splist">${keynoteSpeakers.map(card).join('')}</div>${guestSpeakers.length ? `
+    <span class="lab" style="margin-top:26px">// Adviser Spotlight</span>
+    <div class="splist">${guestSpeakers.map(card).join('')}</div>` : ''}
     <span class="lab" style="margin-top:26px">// Speakers</span>` : `
     <span class="lab">// Speakers</span>`}
     <div class="splist">${speakers.map(card).join('')}</div>
@@ -737,7 +756,11 @@ export function speakerView(id) {
     <div class="spdetail">
       <p class="spbio">${s.bio}</p>
     </div>` : ''}
-    ${contactBlock(s)}
+    ${contactBlock(s)}${s.orgLogo ? `
+    <div class="spbanner">
+      <img src="${s.orgLogo}" alt="${s.org}">
+      <div class="s">Adviser Spotlight</div>
+    </div>` : ''}
     ${s.partnerId ? `
     <a href="#/partner/${s.partnerId}" class="spcard" style="margin-top:14px">
       <img class="spavatar" src="${partnerById(s.partnerId)?.logo ?? ''}" alt="${s.org}" style="object-fit:contain;background:#fff">
@@ -794,6 +817,7 @@ export function partnerView(id) {
      the "At ImplementAI" block re-derives itself when the program moves. */
   const theirSessions = sessions.filter((x) => x.partnerId === p.id)
   const speakers = p.speakers ?? []
+  const theirDelegates = delegates.filter((d) => d.partnerId === p.id)
   const dayOf = (x) => conference.days.find((d) => d.day === x.day)?.label ?? ''
   return `
     <div class="ptheroband"><img class="ptlogo big" src="${p.logo}" alt="${p.name}"></div>
@@ -840,7 +864,9 @@ export function partnerView(id) {
       ${sp.bio ? `<p class="spbio" style="margin-top:10px">${sp.bio}</p>` : ''}
     </div>`,
       )
-      .join('')}` : ''}
+      .join('')}` : ''}${theirDelegates.length ? `
+    <span class="lab" style="margin-top:26px">// Delegates</span>
+    <div class="splist">${theirDelegates.map(personCard).join('')}</div>` : ''}
   `
 }
 
@@ -864,7 +890,7 @@ export function tonightView(dayArg) {
         <span class="live"><span class="evico">${eventIcon(social)}</span>${esc(social.start)} · ${social.title}</span>
         <span class="tagm">${v.dress ?? ''}</span>
       </div>
-      ${audTag(social)}
+      ${audTag(social)}${sponsorTag(social)}
       <h3>${v.name ?? social.room}</h3>
       <div class="who">
         <span class="txt">${v.address ?? ''}</span>
@@ -891,7 +917,7 @@ export function sessionView(id) {
     <div class="stub">
       <span class="eyebrow">${s.kind} · ${esc(s.start)}–${esc(s.end)} · ${s.room}</span>
       <h2 style="margin-top:12px">${s.title}</h2>
-      ${audTag(s)}
+      ${audTag(s)}${sponsorTag(s)}
       <p>${s.summary || ''}</p>
     </div>
     ${sps
@@ -947,6 +973,37 @@ function askFromSession(s) {
 
 export function stubView(title, note) {
   return `<div class="stub"><h2>${title}</h2><p>${note}</p></div>`
+}
+
+/* ---------- Materials (27 Oct) ----------
+   The sessions whose slides PGW holds, each marked "available after the
+   conference". A record of what is coming, not a control: no link, no button,
+   nothing on the card or the pill can be tapped. Day, then BASE start time
+   (agendaForDay's order without a running-late shift: the card names the
+   session, not when it runs on the day). */
+export function materialsView() {
+  const list = slidesAfterConference
+    .map((id) => sessions.find((s) => s.id === id))
+    .filter(Boolean)
+    .sort((a, b) => a.day - b.day || minutes(baseTimes(a.id).start) - minutes(baseTimes(b.id).start))
+  const cards = list
+    .map((s) => {
+      const names = speakersForSession(s).map((sp) => sp.name).join(' & ')
+      return `
+    <div class="now" style="margin-bottom:14px">
+      <h3 style="margin-top:0">${esc(dayLabel(s.day))} · ${esc(baseTimes(s.id).start)} · ${esc(s.title)}</h3>
+      ${names ? `<div class="who"><span class="txt">${esc(names)}</span></div>` : ''}
+      <div style="margin-top:14px"><span class="pill pill-later" aria-disabled="true">Slides after the conference</span></div>
+    </div>`
+    })
+    .join('')
+  return `
+    <div class="pagehead">
+      <h2>Materials</h2>
+      <p class="sub">Slides from each session will be shared after the conference.</p>
+    </div>
+    ${cards}
+  `
 }
 
 /* ---------- Wi-Fi (record 246, spec PGW-WV-001 §3) ----------
@@ -1167,8 +1224,8 @@ function faqSections() {
           ? [
               {
                 q: 'What should I wear?',
-                a: `<p>${dressCodes.length === 1 ? `<b>${dressCodes[0]}</b> for the evening events.` : socials.filter((s) => s.venue?.dress).map((s) => `<b>${s.title}</b> — ${s.venue.dress}`).join('<br>')}</p>
-                    <p>Business attire during the sessions.</p>`,
+                a: `<p>${socials.filter((s) => s.venue?.dress).map((s) => `<b>${s.title}</b> — ${s.venue.dress}`).join('<br>')}</p>
+                    <p>Business casual during the sessions.</p>`,
               },
             ]
           : []),
@@ -1545,7 +1602,7 @@ function myQuestionsBlock() {
 export function askView() {
   const t = askTarget()
 
-  /* ⛔ CLOSED BETWEEN SESSIONS — Adam's ruling, 2026-08-21.
+  /* ⛔ CLOSED BETWEEN SESSIONS (decided 2026-08-21).
      Before this, the box was always open and every question was stamped with
      whatever liveSession() returned. During a break that was a session which
      had already finished; before the doors opened it was a session from the
