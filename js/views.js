@@ -670,14 +670,23 @@ function initials(name) {
 }
 
 /** Contact slot — LinkedIn and/or WORK email, only when data.js carries one.
- *  Empty for everyone today by design (consent pending via PGW), so this
- *  renders nothing until a value lands. Never a mobile. */
+ *  Email is assembled on tap from [local, domain]; no address is rendered.
+ *  Never a mobile. */
 function contactBlock(p) {
   const ways = []
-  if (p.linkedin) ways.push(`<a class="pill active" href="${p.linkedin}" target="_blank" rel="noopener">Connect on LinkedIn</a>`)
-  if (p.email) ways.push(`<a class="pill" href="mailto:${p.email}">Email ${p.name.split(' ')[0]}</a>`)
+  if (p.linkedin) ways.push(`<a class="pill active" href="${esc(p.linkedin)}" target="_blank" rel="noopener">Connect on LinkedIn</a>`)
+  if (p.email) ways.push(`<button type="button" class="pill" data-mail="${p.id}">Email ${p.name.split(' ')[0]}</button>`)
   return ways.length ? `<div class="spcontact">${ways.join('')}</div>` : ''
 }
+
+/* Email taps: the one place an address is joined, from data.js's [local, domain]. Nothing
+   in the page holds it; the button carries only the person's id. */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest?.('[data-mail]')
+  if (!b) return
+  const m = personById(b.dataset.mail)?.email
+  if (Array.isArray(m) && m.length === 2) location.href = 'mailto:' + m[0] + '@' + m[1]
+})
 
 export function speakersView() {
   /* 2026: derived from the partners (see data.js), in partner TIER order.

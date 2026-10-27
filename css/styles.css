@@ -632,7 +632,7 @@ h1.title .ai::after {
 .pill:active {
   background-color: var(--greige);
 }
-/* Person-page contact slot (LinkedIn / work email) — empty until consent. */
+/* Person-page contact slot (LinkedIn / work email). */
 .spcontact {
   display: flex;
   flex-wrap: wrap;
