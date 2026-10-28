@@ -219,7 +219,8 @@ export const sessions = [
 // partner's own company blurb, `speaker.bio` is their own booklet blurb, `topic`
 // is what they told PGW. Where the sheet is blank the field is absent and the
 // view hides that block — no invented copy. Three typos corrected in transit
-// (Afics → AFIC's, Deustche → Deutsche, McNeiill → McNeill); the sheet is
+// (Afics → AFIC's, Deustche → Deutsche, McNeiill → McNeill), and TAL's
+// footnote markers made superscript (sheet: ¹, 2, 3); the sheet is
 // PGW's, so the fix lives here, not there.
 //
 // ⛔ Never a mobile. Speakers carry name, title, bio, photo, and (26 Oct) a
@@ -347,6 +348,12 @@ export const partners = [
   },
   {
     id: 'tal', name: 'TAL', logo: 'img/partners/2026/tal.png',
+    blurb: 'For over 150 years, TAL has been protecting what matters most: people and their families. Together with our partners, we insure five million customers¹, helping Australians through life\'s toughest times and supporting community confidence and resilience. In FY25, we paid $4.7 billion in claims to more than 57,000 customers², with 75% of those claims providing living benefits to support recovery from illness or injury³. TAL is 100% owned by the Daiichi Life Group, one of the world\'s leading life insurers, bringing global strength and local focus. From the tools we build to the education we provide, we aim to show up in ways that genuinely help advisers deliver better outcomes for their clients.',
+    blurbNotes: [
+      'Based on insured customer policies and insured members of superannuation funds across Group, Retail and Direct as at 31 March 2026, and may include duplicate lives insured.',
+      'Claims statistics based on total claims paid under TAL Life Limited insurance products (including funeral insurance) between 1 April 2025 and 31 March 2026. Figures are approximate and have been rounded for presentation purposes.',
+      'Refers to the volume of claims TAL paid under Income Protection, Involuntary Unemployment, Terminal Illness, Total and Permanent Disability and Trauma types of cover.',
+    ],
     topic: 'Life insurance market update',
     speakers: [
       { name: 'Mark Olivier', photo: 'img/speakers/2026/tal-olivier.jpg', title: 'Business Development Manager NSW', linkedin: 'https://www.linkedin.com/in/mark-olivier-99a2b963/', email: ['mark.olivier', 'tal.com.au'], bio: 'Mark Olivier is a Business Development Manager with TAL and has spent more than 25 years in the financial services industry. Throughout his career, Mark has held distribution and adviser-facing roles with OnePath, Macquarie Life and TAL, working closely with financial advisers to help them navigate insurance solutions and deliver positive client outcomes. Passionate about adviser support, Mark is focused on helping advice businesses grow with confidence through practical insights, technical expertise and a commitment to partnership.' },

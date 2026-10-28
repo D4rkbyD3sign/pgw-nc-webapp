@@ -58,7 +58,8 @@ service cloud.firestore {
       // But only a well-formed, pending question, stamped by the SERVER clock:
       // a phone with a wrong clock must not be able to jump the moderator queue,
       // and nobody gets to post themselves straight onto the big screen.
-      allow create: if questionWindowOpen(eventId)
+      // Crew (signed in) may create at any time: the desk's "Send test question" rehearsal (27 Oct).
+      allow create: if (questionWindowOpen(eventId) || isCrew())
                     && request.resource.data.keys().hasOnly(['sessionId', 'text', 'status', 'ts', 'name'])
                     && request.resource.data.status == 'pending'
                     && request.resource.data.ts == request.time

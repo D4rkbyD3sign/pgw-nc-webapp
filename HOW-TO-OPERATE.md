@@ -37,12 +37,15 @@ They are not three apps. They are three doors into one. That's why the whole thi
 - [ ] **Sign in on the actual moderator device.** Same reason.
 - [ ] **Check the agenda is right** — session titles and times drive what questions get tagged to.
 
+### The night before
+- [ ] **Rehearse the question chain.** On the moderator desk (signed in), press **Send test question**. Watch it arrive in the queue, Approve it, send it to the screen laptop, then Done. Then clear the board (both collections). That's the whole chain, desk to screen, tested the night before.
+
 ### The morning of
+- [ ] **Clear the board, before 08:15.** Delete every practice question, including last night's rehearsal test, from both collections (see *Clearing the board* below). This is the last clear of the day: nothing gets cleared after 08:15.
 - [ ] **Screen laptop on ethernet if at all possible**, or the strongest wifi in the room. It holds one long connection all day; it is the thing to protect.
 - [ ] Open `#/screen`, press **F11** for full screen, and leave it.
 - [ ] Open `#/mod` on your device. Confirm you can see the queue.
-- [ ] **Send yourself one test question from a phone.** Watch it appear on the desk. Approve it, send it to screen, then Done. That's your smoke test — ninety seconds, and you'll know the whole chain is alive.
-- [ ] **Clear the board again** so the room starts clean.
+- [ ] **Optional live check at 08:30.** Attendee questions open at 08:30 sharp, not before. If you want to see the phone path too, send one question from a phone at 08:30 and watch it arrive in **Incoming**, then press **Dismiss**. Don't Approve it and don't send it to the screen: the room is watching the welcome. It moves to History, out of sight. Before 08:30 a phone will be refused; that's the rules working, not a fault. Don't clear the board after this, because real questions are arriving.
 
 ---
 

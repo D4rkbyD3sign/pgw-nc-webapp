@@ -205,6 +205,19 @@ export async function submitQuestion(sessionId, text, name = '') {
   }
 }
 
+/** The desk's "Send test question": one crew-only rehearsal question, any time.
+ *  Not an attendee's question, so no name, no rememberId, no optimistic copy.
+ *  Returns the new id, or throws. */
+export async function sendCrewTest() {
+  const ref = await addDoc(questionsRef, {
+    sessionId: 'crew-test',
+    text: 'Crew test, safe to clear.',
+    status: 'pending',
+    ts: serverTimestamp(),
+  })
+  return ref.id
+}
+
 export async function setStatus(id, status) {
   await updateDoc(doc(questionsRef, id), { status })
 }

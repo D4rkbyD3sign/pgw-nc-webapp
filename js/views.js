@@ -827,7 +827,8 @@ export function partnerView(id) {
     </div>
     ${p.blurb ? `
     <div class="spdetail">
-      <p class="spbio">${p.blurb}</p>
+      <p class="spbio">${p.blurb}</p>${p.blurbNotes?.length ? `
+      <ol class="spnotes">${p.blurbNotes.map((n) => `<li>${esc(n)}</li>`).join('')}</ol>` : ''}
     </div>` : `
     <div class="spdetail">
       <p class="spbio" style="opacity:.6">Partner details to come.</p>
@@ -1783,6 +1784,9 @@ export function wireAsk(rerender) {
   })
 }
 
+// The desk's "Send test question" failure line; kept here so the desk's re-renders don't wipe it.
+let crewTestError = ''
+
 export function modView() {
   const qs = brain.questions()
   const bySession = (q) => sessions.find((s) => s.id === q.sessionId)?.title ?? 'General'
@@ -1810,6 +1814,11 @@ export function modView() {
       <h2>Moderator</h2>
       <p class="sub">Curate incoming questions · promote to the room screen</p>
     </div>
+    <div style="padding:0 24px">
+      <button type="button" class="pill" data-crewtest>Send test question</button>
+      <p class="delayhelp">Crew only. Sends one test question to the queue below; clear the board after.</p>
+      <p class="wverr crewtesterr" role="alert">${esc(crewTestError)}</p>
+    </div>
     ${group('On screen', onscreen, (q) => `<button class="mbtn" data-act="shown" data-id="${esc(q.id)}">Done</button>`)}
     ${group('Incoming', pending, (q) => `<button class="mbtn go" data-act="approve" data-id="${esc(q.id)}">Approve</button><button class="mbtn" data-act="dismiss" data-id="${esc(q.id)}">Dismiss</button>`)}
     ${group('Approved — ready', approved, (q) => `<button class="mbtn go" data-act="promote" data-id="${esc(q.id)}">To screen</button><button class="mbtn" data-act="dismiss" data-id="${esc(q.id)}">Dismiss</button>`)}
@@ -1829,6 +1838,24 @@ export function wireMod() {
       else if (act === 'shown') brain.setStatus(id, 'shown')
     }),
   )
+  // On success the question arrives through the queue listener; only a failure is shown. The desk re-renders on every
+  // queue change (the pending write itself is one), so the error is kept in crewTestError, which modView renders, and
+  // the box is looked up again after the await: the one present at the click is gone by then.
+  document.querySelector('[data-crewtest]')?.addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true
+    crewTestError = ''
+    try {
+      await brain.sendCrewTest()
+    } catch (err) {
+      console.error('[mod] crew test', err)
+      crewTestError = `Test question not sent: ${err?.code ?? err?.message ?? err}`
+      const box = document.querySelector('.crewtesterr')
+      if (box) box.textContent = crewTestError
+    } finally {
+      const btn = document.querySelector('[data-crewtest]')
+      if (btn) btn.disabled = false
+    }
+  })
   wireCrewFooter()
 }
 
