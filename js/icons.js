@@ -10,7 +10,7 @@ const wrap = (inner, sw = 1.5) =>
    The colourway is load-bearing and was previously WRONG in this file: in the
    real mark the three ASCENDING BARS are lime and the RING is charcoal. The
    hand-traced stand-in had it inverted, which is why the mark broke up on the
-   charcoal room screen — the bars vanished into the background. Adam caught it
+   charcoal room screen — the bars vanished into the background. It was caught
    on the big screen, 2026-07-27. Don't re-invert it. */
 const markPaths = (bars, ring) => `
     <path d="M249.452,228.844l3.921-18.272,6.182-1.958-5.019,23.848A22.361,22.361,0,0,1,249.452,228.844Zm13.267,6.038,8.588-38.008-6.182,1.958-7.867,34.82A22.368,22.368,0,0,0,262.719,234.882Zm8.959-.971,11.343-48.945-6.1,1.932L265.7,234.966a22.411,22.411,0,0,0,5.908-1.033Z" transform="translate(-243.25 -184.966)" fill="${bars}"/>

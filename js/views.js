@@ -10,7 +10,7 @@ const minutes = (t) => {
 
 /* ---------- PRE-EVENT MODE (record 239, spec §2 + §4, 14 Oct) ----------
    Before 16 Oct the app performed a live conference on every non-conference day
-   (the old 'demo' block), because Adam demos it. From 16 Oct real advisers open
+   (the old 'demo' block), because the app is demoed off-conference. From 16 Oct real advisers open
    it, so the PUBLIC app now tells the truth about time. Four phases, one clock
    (conferenceNow's, so every surface agrees):
      PRE   before T1  — a save-the-date: a countdown, nothing live, nothing to ask or rate
@@ -20,7 +20,7 @@ const minutes = (t) => {
    ⛔ There is NO demo branch here, by host or otherwise (Round 2, record 240, adds
    the private demo host). firestore.rules carries the same T2 / T4: the server is
    the control, this is the courtesy. */
-const T1 = '2026-10-28T18:00:00+11:00' // the ONE typed instant: Adam, "6pm the night before" (= 2026-10-28T07:00:00Z)
+const T1 = '2026-10-28T18:00:00+11:00' // the ONE typed instant: "6pm the night before" (= 2026-10-28T07:00:00Z)
 
 const TZ_PARTS = new Intl.DateTimeFormat('en-AU', {
   timeZone: CONFERENCE_TZ, year: 'numeric', month: '2-digit', day: '2-digit',
@@ -65,9 +65,9 @@ const longDate = (date) =>
   new Intl.DateTimeFormat('en-AU', { timeZone: CONFERENCE_TZ, weekday: 'long', day: 'numeric', month: 'long' }).format(conferenceMs(date, '12:00'))
 const dayLabel = (dayNum) => conference.days.find((d) => d.day === dayNum)?.label ?? ''
 
-/* ⭐ THE WORDS (spec §6, APPROVED by Adam 14 Oct), as ONE block so a change is one
+/* ⭐ THE WORDS (spec §6, approved 14 Oct), as ONE block so a change is one
    line. Every argument is derived from data; nothing in a sentence is a typed fact. */
-const VENUE_LINE_ROOM = (room) => room.replace(' · ', ', ') // "Aura · Level 12" → "Aura, Level 12" (W4b; Adam ruled 14 Oct: derive, "Crowne Plaza by IHG")
+const VENUE_LINE_ROOM = (room) => room.replace(' · ', ', ') // "Aura · Level 12" → "Aura, Level 12" (W4b; decided 14 Oct: derive, "Crowne Plaza by IHG")
 export const WORDS = {
   w1Start: (date) => `The conference starts on <b>${date}</b>.`,
   w1Today: (when) => `The conference starts <b>${when}</b>.`, // when = 'tomorrow' | 'today'
@@ -89,13 +89,13 @@ export const WORDS = {
   w6bWhen: (date, start) => `${date} · ${start}`,
   w6bAfter: 'Thank you for coming',
   w6c: 'The conference app is on your phone',
-  // W7 (spec B §13.3, APPROVED by Adam 14 Oct): the evening's name outside "tonight".
+  // W7 (spec B §13.3, approved 14 Oct): the evening's name outside "tonight".
   // The date part is joined with non-breaking spaces so it never splits.
   w7a: (label) => `${label.replace(/ /g, '&nbsp;')} evening`,
   w7b: "The evening's plan",
 }
 
-/* ⭐ THE WI-FI + VENUE WORDS (record 246, spec PGW-WV-001 §6): APPROVED by Adam 16 Oct, exactly as the spec. One block,
+/* ⭐ THE WI-FI + VENUE WORDS (record 246, spec PGW-WV-001 §6): approved 16 Oct, exactly as the spec. One block,
    so any later change is one line. Every fact inside a sentence is derived (the room, the venue), never typed. */
 export const WV = {
   wv1: 'The Wi-Fi details arrive the night before the conference.',
@@ -177,7 +177,7 @@ export function liveSession(now = new Date()) {
      2026 program has NO confirmed speaker on any slot — so that test matched
      nothing, `session` came back undefined, and the app threw on every screen
      that asks what is on. Off-conference that is every demo, including the
-     one Adam runs in front of PGW. Keep this keyed on kind, never on people. */
+     one run in front of PGW. Keep this keyed on kind, never on people. */
   const demoDay = day ?? 1
   const presents = (s) => s.kind !== 'BREAK' && s.kind !== 'SOCIAL'
   const session =
@@ -294,7 +294,7 @@ function partnerMark(s) {
   return p ? `<img class="aglogo" src="${p.logo}" alt="${p.name}">` : ''
 }
 
-/* Record 256 (spec §5.5b, Adam 20 Oct): a session's audience note - the Mustique
+/* Record 256 (spec §5.5b, 20 Oct): a session's audience note - the Mustique
    cruise's, today. The words are that session's own `audience` field in data.js,
    typed ONCE there; absent, empty or not a string = nothing. A NOTE, not a control:
    a plain span, no link, no tabindex, no role. Our own data.js is trusted and is not
@@ -388,7 +388,7 @@ function pulsePrompt() {
    across every break of the conference the biggest card on the home screen
    would have announced a talk that had already finished — to fifty people
    holding phones. It also carried the Ask button, which is how the misfiled
-   questions Adam saw at the 21 Aug test got in.
+   questions seen at the 21 Aug test got in.
 
    Now the card says what is true, and the Ask button only exists where a
    question has somewhere honest to go. Off-conference nothing changes: a
@@ -811,8 +811,8 @@ export function partnerView(id) {
   if (!p) return stubView('Partner', 'Partner not found.')
   /* 2026: every block is DERIVED from what PGW's partner sheet holds for this
      partner — a blank in the sheet is a missing block here, never filler copy.
-     The 2025 view carried editorial tagline/positioning/themeFit fields Lumen
-     wrote from the booklet; PGW supplies none of those for 2026, so they are
+     The 2025 view carried editorial tagline/positioning/themeFit fields
+     written from the booklet; PGW supplies none of those for 2026, so they are
      gone rather than faked. Sessions come from the agenda by `partnerId`, so
      the "At ImplementAI" block re-derives itself when the program moves. */
   const theirSessions = sessions.filter((x) => x.partnerId === p.id)
@@ -1010,7 +1010,7 @@ export function materialsView() {
 /* ---------- Wi-Fi (record 246, spec PGW-WV-001 §3) ----------
    Holding: one .now card, WV-1 then WV-2: no button, no empty boxes, no "check back" (the page updates
    itself once the crew publishes). The venue sub is derived, never typed.
-   Published (set 2): network, then password, both through esc() (Wren's 241 rules: crew-typed values). The
+   Published (set 2): network, then password, both through esc() (the 241 escaping rules: crew-typed values). The
    password is in the app's mono face, JetBrains Mono, whose 0 is dotted and whose 1 / l / I are told apart,
    and it selects as one block. ONE button, and it copies only the password, read from the DATA, never the page. */
 export function wifiView() {
@@ -1096,7 +1096,7 @@ export function venueView() {
 }
 
 /* ---------- Welcome + last year's recap (live phone test item 5) ----------
-   Adam's shape, 2026-08-21: the note sits ABOVE the video, and the video is
+   The shape, 2026-08-21: the note sits ABOVE the video, and the video is
    titled for what it is — last year, on the Gold Coast — so nobody taps it
    expecting Hobart.
 
@@ -1157,14 +1157,14 @@ export function welcomeView() {
    that cannot be derived from data are not written here at all — see the list
    of open questions below.
 
-   ✅ ANSWERED BY ADAM, 2026-08-21 — three of the four open questions closed:
+   ✅ ANSWERED 2026-08-21 — three of the four open questions closed:
      - Booking: not needed, PGW organise it.
      - Guests: yes, and a form already covers it.
-     - On-the-day help: Tracey, Ben, Johnny, Adam, Alex → data.js crewContacts.
+     - On-the-day help: the crew contacts → data.js crewContacts.
 
    ⬜ STILL OPEN — deliberately NOT answered, because inventing conference
    logistics is exactly the kind of confident guess this house has rules about:
-     - Speaker decks. Adam's words were "very likely but we need approval."
+     - Speaker decks. The answer was "very likely but we need approval."
        LIKELY IS NOT A PROMISE, and this FAQ is read by fifty advisers who will
        treat anything in it as settled. PGW getting the decks and PGW being
        cleared to hand them out are two different events; only the first is
@@ -1172,7 +1172,7 @@ export function welcomeView() {
      - The guest form: named but not linked — see the guest answer below. */
 
 /* One helper contact — name, then a number you can tap to dial.
-   No titles (Adam, 2026-08-21). Renders whatever exists and nothing more, so
+   No titles (2026-08-21). Renders whatever exists and nothing more, so
    someone without a number still appears as a plain name rather than breaking
    the list or, worse, rendering an empty tel: link that dials nothing. */
 /** Names from data.js, numbers from the cloud, merged by id. A name with no
@@ -1234,7 +1234,7 @@ function faqSections() {
           q: 'Do I need to book the evening events?',
           a: '<p>No. PGW organise the bookings — just come along.</p>',
         },
-        /* No guest question here, deliberately (Adam, 2026-08-21). Guests were
+        /* No guest question here, deliberately (2026-08-21). Guests were
            settled at booking — everyone who is coming already answered it on
            the form. Re-asking a question the reader has personally already
            answered makes the FAQ look like it doesn't know what's going on. */
@@ -1786,6 +1786,7 @@ export function wireAsk(rerender) {
 
 // The desk's "Send test question" failure line; kept here so the desk's re-renders don't wipe it.
 let crewTestError = ''
+let crewTestSending = false
 
 export function modView() {
   const qs = brain.questions()
@@ -1815,7 +1816,7 @@ export function modView() {
       <p class="sub">Curate incoming questions · promote to the room screen</p>
     </div>
     <div style="padding:0 24px">
-      <button type="button" class="pill" data-crewtest>Send test question</button>
+      <button type="button" class="pill" data-crewtest${crewTestSending ? ' disabled' : ''}>Send test question</button>
       <p class="delayhelp">Crew only. Sends one test question to the queue below; clear the board after.</p>
       <p class="wverr crewtesterr" role="alert">${esc(crewTestError)}</p>
     </div>
@@ -1841,7 +1842,10 @@ export function wireMod() {
   // On success the question arrives through the queue listener; only a failure is shown. The desk re-renders on every
   // queue change (the pending write itself is one), so the error is kept in crewTestError, which modView renders, and
   // the box is looked up again after the await: the one present at the click is gone by then.
+  // The in-flight flag is kept in module state (crewTestSending) for the same reason, so a second press mid-send is ignored.
   document.querySelector('[data-crewtest]')?.addEventListener('click', async (e) => {
+    if (crewTestSending) return
+    crewTestSending = true
     e.currentTarget.disabled = true
     crewTestError = ''
     try {
@@ -1852,6 +1856,7 @@ export function wireMod() {
       const box = document.querySelector('.crewtesterr')
       if (box) box.textContent = crewTestError
     } finally {
+      crewTestSending = false
       const btn = document.querySelector('[data-crewtest]')
       if (btn) btn.disabled = false
     }
@@ -1956,10 +1961,10 @@ export function screenView() {
    tapping a number is the whole interaction, and the comment is there for the
    people who want to say something. Anything longer gets abandoned mid-corridor. */
 
-/* Scale anchored by Adam, 2026-07-27: 1 = not useful at all, 5 = very useful.
+/* Scale anchored 2026-07-27: 1 = not useful at all, 5 = very useful.
    The words answer the QUESTION ASKED ("how useful was this session?") rather
    than grading the speaker — an adviser can honestly say a good session wasn't
-   useful to their practice, and that is the signal Ben actually wants. */
+   useful to their practice, and that is the signal the organisers actually want. */
 const RATING_WORDS = {
   1: 'Not useful at all',
   2: 'Slightly useful',
@@ -2117,7 +2122,7 @@ export function resultsView() {
 }
 
 /* ---------- Admin: running late + hand-edited times (crew only) ----------
-   Scope deliberately narrow (Adam, 2026-07-27): times only. Titles, speakers
+   Scope deliberately narrow (2026-07-27): times only. Titles, speakers
    and the rest stay in code. What actually goes wrong on a conference day is
    the clock, and a small tool you trust beats a big one you hesitate over
    while fifty people wait. */
@@ -2131,7 +2136,7 @@ const DELAY_STEPS = [-5, 5, 10, 15]
    ⚠️ THE BUTTON IS NEVER DISABLED, and that is the whole lesson of 2026-07-28.
    It first shipped disabled whenever your device was behind the beacon — the
    reasoning being "you cannot announce a version you are not running," which
-   sounds right and is a deadlock. Adam's two-device test walked straight into
+   sounds right and is a deadlock. A two-device test walked straight into
    it: the beacon was pushed to a build that existed on one laptop and nowhere
    else, so EVERY device was behind, so EVERY device had the button disabled,
    and nothing in the app could pull it back down. Fifty phones nagging forever
@@ -2248,7 +2253,7 @@ function contactsBox() {
 }
 
 /* Wi-Fi (record 246, spec PGW-WV-001 §5): straight after the Help numbers, in the same .delaybox. Values through
-   esc() in the inputs' value attributes (Wren's 241 rules). The phone keyboard must not capitalise a password. */
+   esc() in the inputs' value attributes (the 241 escaping rules). The phone keyboard must not capitalise a password. */
 function wifiBox() {
   const w = brain.liveWifi()
   const field = (id, label, value) => `
@@ -2363,7 +2368,7 @@ export function wireAdmin(rerender, dayArg) {
       /* Repaint explicitly, exactly like every sibling handler on this screen.
          This originally leaned on the beacon listener to bounce back from
          Firestore and re-render for us. It was the only handler here that did,
-         and on Adam's phone (2026-07-28) the write landed cleanly while the
+         and on a crew phone (2026-07-28) the write landed cleanly while the
          screen never repainted — the button just sat on "Publishing…" until he
          reloaded the page by hand. The write is confirmed; do not make the
          person who pressed the button wait on a round trip to find that out. */

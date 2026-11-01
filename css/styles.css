@@ -1434,7 +1434,7 @@ h1.title .ai::after {
 }
 
 /* Scale anchors — permanent, so the direction is obvious BEFORE anyone taps.
-   Adam, 2026-07-27: without these the meaning of "1" is a guess until you've
+   2026-07-27: without these the meaning of "1" is a guess until you've
    already committed to it. */
 .rateends {
   display: flex;
@@ -1816,14 +1816,14 @@ h1.title .ai::after {
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
 }
-/* A bare numeral, no disc behind it (Adam, 2026-08-21). The icon beside it
+/* A bare numeral, no disc behind it (2026-08-21). The icon beside it
    already carries a filled box; a second filled shape 12px away made the row
    read as two badges and a sentence instead of one step.
 
    The height is deliberately the SAME 30px as .stepico rather than sized to
    the digit. The row top-aligns, so matching heights is what puts the two
    centres on one line — the earlier 22px disc sat 4px high against the icon,
-   which is exactly the offset Adam picked out by eye. Change one height here
+   which is exactly the offset that was picked out by eye. Change one height here
    and you must change the other. */
 .stepn {
   flex: none;
@@ -2204,7 +2204,7 @@ h1.title .ai::after {
   box-shadow: none;
 }
 
-/* Pre-event countdown card (record 239, spec §5.1; Vesper's render rules, 14 Oct).
+/* Pre-event countdown card (record 239, spec §5.1; the spec's render rules, 14 Oct).
    Existing tokens only: no new colours. No dot in the row: nothing here is live. */
 .now.pre .row .live {
   color: var(--ink-soft);
